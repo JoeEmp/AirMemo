@@ -2,7 +2,6 @@
 为qt控件加入所需的方法
 '''
 
-from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 class AirLineEdit(QLineEdit):

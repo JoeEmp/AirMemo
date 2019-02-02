@@ -8,14 +8,9 @@
 
 # 有注释部分基本为生成后的作者插入代码的注释
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QAction, QMenu
-
+from PyQt5 import QtCore, QtWidgets
 from module import get_records, getSize
 import config
-from customWidget import AirLineEdit
-
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def setUi(self, MainWindow):
@@ -119,11 +114,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 根据表结构写死了两个索引值，后面再改 wrb
             self.noteLineEditList[i].setText(self.records[i][1])
             self.detailTextEditList[i].setText(self.records[i][2])
-
-        # for i in range(3):
-        #     self.sendBtn.setText(_translate("MainWindow",str(i)))
         self.hideBtn.setText(_translate("MainWindow", "hide"))
-        # self.hide_detailBtn.setText(_translate("MainWindow", "hide_detail"))
         self.addBtn.setText(_translate("MainWindow", "add"))
 
     # 初始化数据
@@ -138,13 +129,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.Text_isShow = False
         MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.WindowTitleHint)
-        # MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        # MainWindow.setWindowFlags(QtCore.Qt.WindowTitleHint)
-
-        pass
 
     def TrayIcon(self, MainWindow):
-
         pass
 
     def ishide(self, MainWindow):
@@ -183,5 +169,4 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def swithEdit_state(self):
         index = self.noteLineEditList.index(self.sender())
-        # if(self.noteLineEditList[index].isEnabled()):
         self.noteLineEditList[index].setEnable(True)
