@@ -9,10 +9,7 @@
 # 有注释部分基本为生成后的作者插入代码的注释
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QApplication
-from PyQt5 import QtGui
 
 from module import get_records, getSize
 import config
@@ -89,7 +86,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 加入相应列表，禁用LineEdit
             self.noteLineEditList.append(self.noteLineEdit)
             self.noteLineEdit.setEnabled(False)
-            # self.noteLineEdit.clicked.connect(self.swithEdit_state)
 
             # 详情编辑框
             self.detailTextEdit = QtWidgets.QTextEdit(self.horizontalLayoutWidget)
@@ -112,22 +108,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rootLayout.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
 
-        # self.hideWidget(MainWindow)
-
     # 初始化相应文本
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "AirMemo"))
-        # MainWindow.setWindowIcon(QIcon('./ui/IconV2.png'))
         for i in range(len(self.records)):
             # 根据表结构写死了两个索引值，后面再改 wrb
             self.noteLineEditList[i].setText(self.records[i][1])
             self.detailTextEditList[i].setText(self.records[i][2])
         self.hideBtn.setText(_translate("MainWindow", "hide"))
         self.addBtn.setText(_translate("MainWindow", "add"))
-        # palette1 = QtGui.QPalette(self)
-        # palette1.setColor(self.backgroundRole(), QColor(192,253,123))   # 设置背景颜色
-        # palette1.setBrush(self.backgroundRole(), QtGui.QBrush(QtGui.QPixmap('../../../Document/images/17_big.jpg')))   # 设置背景图片
+
     # 初始化数据
     def setData(self, MainWindow):
         self.records = get_records(config.LDB_FILENAME)
@@ -139,7 +130,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.layoutHeight = (len(self.records) + 1) * config.BTN_HEIGHT
 
         self.Text_isShow = False
-        # MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.WindowTitleHint)
         self.widgetFlag=config.WIDGET_FLAG
 
     def TrayIcon(self, MainWindow):

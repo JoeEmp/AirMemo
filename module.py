@@ -57,11 +57,3 @@ def clear_records(filename, Severdate):
     db.commit()
     print('done')
 
-
-if __name__ == '__main__':
-    pass
-    dbName = r'AirMemo.db'
-    # add_records(dbName)
-    print(get_records(dbName))
-    # clear_records(filename=dbName,Severdate='2019-01-05')
-    print(get_records(dbName))
