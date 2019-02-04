@@ -9,6 +9,11 @@
 # 有注释部分基本为生成后的作者插入代码的注释
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtGui
+
 from module import get_records, getSize
 import config
 
@@ -36,12 +41,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rootLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.rootLayout.setContentsMargins(0, 0, 0, 0)
         self.rootLayout.setObjectName("rootLayout")
-        self.rootLayout.setGeometry(QtCore.QRect(0, 0, self.width(), self.height()))
+        self.rootLayout.setGeometry(QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
         # 收起按钮
         self.hideBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.hideBtn.setObjectName("hideBtn")
-        # 尺寸限制
-        self.hideBtn.setMaximumSize(config.hideButtonWidth, 20)
+            # 尺寸限制
+        self.hideBtn.setMaximumSize(config.HIDE_BTN_WIDTH, 20)
+            #绑定槽
+        self.hideBtn.clicked.connect(lambda: self.hideWidget(MainWindow))
         self.rootLayout.addWidget(self.hideBtn)
 
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -59,7 +66,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 收起/展开按钮
             self.hide_detailBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
             self.hide_detailBtn.setObjectName("hide_detailBtn" + str(i))
-            self.hide_detailBtn.setMaximumSize(config.buttonWidth, config.buttonHeight)
+            self.hide_detailBtn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
             self.noteLayout.addWidget(self.hide_detailBtn, 0, 2, 1, 1)
             # 加入相应列表
             self.hide_detailBtnList.append(self.hide_detailBtn)
@@ -70,8 +77,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.sendBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
             self.sendBtn.setObjectName("sendBtn" + str(i))
             self.sendBtn.setText(str(i + 1))
-            # 限制最大尺寸
-            self.sendBtn.setMaximumSize(config.buttonWidth, config.buttonHeight)
+                # 限制最大尺寸
+            self.sendBtn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
             self.noteLayout.addWidget(self.sendBtn, 0, 0, 1, 1)
 
             # 短消息编辑框
@@ -105,6 +112,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.rootLayout.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
 
+        # self.hideWidget(MainWindow)
+
     # 初始化相应文本
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -116,19 +125,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.detailTextEditList[i].setText(self.records[i][2])
         self.hideBtn.setText(_translate("MainWindow", "hide"))
         self.addBtn.setText(_translate("MainWindow", "add"))
-
+        # palette1 = QtGui.QPalette(self)
+        # palette1.setColor(self.backgroundRole(), QColor(192,253,123))   # 设置背景颜色
+        # palette1.setBrush(self.backgroundRole(), QtGui.QBrush(QtGui.QPixmap('../../../Document/images/17_big.jpg')))   # 设置背景图片
     # 初始化数据
     def setData(self, MainWindow):
-        self.records = get_records(config.filename)
+        self.records = get_records(config.LDB_FILENAME)
         if config.SIZEMODE == 'divide':
-            divide = getSize(config.divide)
+            divide = getSize(config.DIVIDE)
             self.layoutWidth = divide['width']
         else:
-            self.layoutWidth = config.baseWidth
-        self.layoutHeight = (len(self.records) + 1) * config.buttonHeight
+            self.layoutWidth = config.BASEWIDTH
+        self.layoutHeight = (len(self.records) + 1) * config.BTN_HEIGHT
 
         self.Text_isShow = False
-        MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.WindowTitleHint)
+        # MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.WindowTitleHint)
+        self.widgetFlag=config.WIDGET_FLAG
 
     def TrayIcon(self, MainWindow):
         pass
@@ -138,17 +150,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 隐藏  点击a后，再点击b，隐藏a
         if 1 in self.detailTextEdit_state_List and self.detailTextEdit_state_List.index(1) != index:
             self.detailTextEditList[self.detailTextEdit_state_List.index(1)].hide()
-            self.layoutHeight = self.layoutHeight - config.textHeight
+            self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
             self.detailTextEdit_state_List[self.detailTextEdit_state_List.index(1)] = 0
 
         # 展开或隐藏
         if self.detailTextEditList[index].isHidden():
             self.detailTextEditList[index].show()
-            self.layoutHeight = self.layoutHeight + config.textHeight
+            self.layoutHeight = self.layoutHeight + config.TEXT_HEIGHT
             self.detailTextEdit_state_List[index] = 1
         else:
             self.detailTextEditList[index].hide()
-            self.layoutHeight = self.layoutHeight - config.textHeight
+            self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
             self.detailTextEdit_state_List[index] = 0
 
         # 调整大小
@@ -170,3 +182,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def swithEdit_state(self):
         index = self.noteLineEditList.index(self.sender())
         self.noteLineEditList[index].setEnable(True)
+
+    def hideWidget(self,MainWindow):
+        rect = MainWindow.geometry()
+        #-30为手动微调，减去标题高度 bwrb
+        if not self.widgetFlag:
+            MainWindow.move(QApplication.desktop().screenGeometry().width() - config.HIDE_BTN_WIDTH, rect.top()-30)
+            self.widgetFlag=not self.widgetFlag
+        else:
+            #-8为手动微调，减去边框宽度 bwrb
+            MainWindow.move(rect.left()-8-self.layoutWidth, rect.top() - 30)
+            print(rect.left()-8-self.layoutWidth)
+            self.widgetFlag=not self.widgetFlag
+
+    def mouseReleaseEvent(self, *args, **kwargs):
+        pass
