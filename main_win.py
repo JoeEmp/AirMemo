@@ -9,6 +9,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     setApp(app)
     mainWindow = QMainWindow()
+    # mainWindow.setWindowFlag(QtCore.Qt.FramelessWindowHint)
     ui = Ui_MainWindow()
     ui.setUi(mainWindow)
     mainWindow.show()

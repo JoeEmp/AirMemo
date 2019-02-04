@@ -46,7 +46,7 @@ def add_records(filename):
     for i in range(2, 4):
         cur = c.execute("insert into Msg(id, Message) VALUES(%d,'123')" % i)
     db.commit()
-    print('done')
+    logging.info('done')
 
 
 # 根据系统返回天数删除软删除记录
@@ -55,7 +55,7 @@ def clear_records(filename, Severdate):
     c = db.cursor()
     cur = c.execute("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % Severdate)
     db.commit()
-    print('done')
+    logging.info('clear done')
 
 
 if __name__ == '__main__':
