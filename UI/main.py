@@ -27,6 +27,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 窗口
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(self.layoutWidth, self.layoutHeight)
+        MainWindow.setFixedSize(self.layoutWidth, self.layoutHeight)
 
         # 窗口总布局
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -118,6 +119,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.detailTextEditList[i].setText(self.records[i][2])
         self.hideBtn.setText(_translate("MainWindow", "hide"))
         self.addBtn.setText(_translate("MainWindow", "add"))
+        MainWindow.setStyleSheet('QMainWindow{background-image:url(./UI/bg.png);}')
 
     # 初始化数据
     def setData(self, MainWindow):
@@ -145,16 +147,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if 1 in self.detailTextEdit_state_List and self.detailTextEdit_state_List.index(1) != index:
             self.detailTextEditList[self.detailTextEdit_state_List.index(1)].hide()
             self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
+            MainWindow.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detailTextEdit_state_List[self.detailTextEdit_state_List.index(1)] = 0
 
         # 展开或隐藏
         if self.detailTextEditList[index].isHidden():
             self.detailTextEditList[index].show()
             self.layoutHeight = self.layoutHeight + config.TEXT_HEIGHT
+            MainWindow.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detailTextEdit_state_List[index] = 1
         else:
             self.detailTextEditList[index].hide()
             self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
+            MainWindow.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detailTextEdit_state_List[index] = 0
 
         # 调整大小
