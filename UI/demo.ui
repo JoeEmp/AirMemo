@@ -2,67 +2,125 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
-    <height>372</height>
+    <width>583</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>test</string>
+   <string>demo</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>app_icon.png</normaloff>app_icon.png</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>382</width>
-      <height>256</height>
+      <x>10</x>
+      <y>10</y>
+      <width>291</width>
+      <height>186</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="rootLayout">
+    <layout class="QVBoxLayout" name="rootLayout">
      <item>
-      <widget class="QPushButton" name="hideBtn">
-       <property name="text">
-        <string>hide</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="titleLayout">
        <item>
-        <layout class="QGridLayout" name="noteLayout">
-         <item row="0" column="2">
-          <widget class="QPushButton" name="hide_detailBtn">
-           <property name="text">
-            <string>hide_detail</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="sendBtn">
-           <property name="text">
-            <string>send</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="noteLE"/>
-         </item>
-         <item row="1" column="0" colspan="3">
-          <widget class="QTextEdit" name="detailTE"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addBtn">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>add</string>
+          <string>icon</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>demo</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="winLayout">
+       <item>
+        <widget class="QPushButton" name="hideBtn">
+         <property name="text">
+          <string>hide</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QGridLayout" name="noteLayout">
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="note_le"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="send_btn">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="hide_detail_btn">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="QTextEdit" name="detail_tx"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="add_btn">
+           <property name="text">
+            <string>add</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
