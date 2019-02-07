@@ -4,23 +4,44 @@
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow,QPushButton,QLineEdit,QTextEdit
 import logging
+from module import update_records
+import config
 
 class AirLineEdit(QLineEdit):
-    # clicked=pyqtSignal()
-    #定义clicked信号
-    # def mouseReleaseEvent(self, QMouseEvent):
-    #     if QMouseEvent.button()==Qt.LeftButton:
-    #         self.clicked.emit()
-    def focusOutEvent(self, QFocusEvent):
-        self.setDisabled(True)
 
-    def focusInEvent(self, QFocusEvent):
-        self.setDisabled(False)
-    #发送clicked信号
-    # def mouseDoubleClickEvent(self, QMouseEvent):
-    #     self.setDisabled(True)
+
+    def enterEvent(self, *args, **kwargs):
+        self.setEnabled(True)
+
+    def leaveEvent(self, *args, **kwargs):
+        self.setEnabled(False)
+        data={'id':-1,'text':'','col':'message'}
+        try:
+            #使用 objName 获取id bwrb
+            data['id']=int(self.objectName().replace('note_le',''))
+        except Exception as e:
+            print(e)
+        data['text']=self.text()
+        update_records(config.LDB_FILENAME,data)
+
+class AirTextEdit(QTextEdit):
+
+
+    def enterEvent(self, *args, **kwargs):
+        self.setEnabled(True)
+
+    def leaveEvent(self, *args, **kwargs):
+        self.setEnabled(False)
+        data={'id':-1,'text':'','col':'detail'}
+        try:
+            #使用 objName 获取id bwrb
+            data['id']=int(self.objectName().replace('detail_tx',''))
+        except Exception as e:
+            print(e)
+        data['text']=self.toPlainText()
+        update_records(config.LDB_FILENAME,data)
 
 class hideButton(QPushButton):
     #flag 为Ture时为展开
@@ -32,32 +53,3 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
-
-class FramelessWidget(QWidget):
-    _startPos = None
-    _endPos = None
-    _isTracking = False
-
-    def __init__(self):
-        super().__init__()
-        self._initUI()
-
-    def _initUI(self):
-        self.setFixedSize(QSize(400, 400))
-        self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
-        self.show()
-
-    def mouseMoveEvent(self, e: QMouseEvent):  # 重写移动事件
-        self._endPos = e.pos() - self._startPos
-        self.move(self.pos() + self._endPos)
-
-    def mousePressEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:
-            self._isTracking = True
-            self._startPos = QPoint(e.x(), e.y())
-
-    def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton:
-            self._isTracking = False
-            self._startPos = None
-            self._endPos = None

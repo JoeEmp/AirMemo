@@ -36,7 +36,7 @@
       <x>10</x>
       <y>10</y>
       <width>291</width>
-      <height>186</height>
+      <height>216</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="rootLayout">
@@ -44,6 +44,9 @@
       <layout class="QHBoxLayout" name="titleLayout">
        <item>
         <widget class="QLabel" name="label">
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>icon</string>
          </property>
@@ -126,6 +129,8 @@
      </item>
     </layout>
    </widget>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder>label</zorder>
   </widget>
  </widget>
  <resources/>

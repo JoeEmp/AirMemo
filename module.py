@@ -25,7 +25,6 @@ def setApp(app):
     app.setWindowIcon(icon)
     app.setWindowIcon(QIcon('./ui/app_icon.png'))
 
-
 def get_records(filename, filter=None):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -38,6 +37,18 @@ def get_records(filename, filter=None):
     logging.info('read record!!!')
     return cur.fetchall()
 
+def update_records(filename, data):
+    db = sqlite3.connect(filename)
+    c = db.cursor()
+    logging.info('link db successfully')
+    if data['id'] != -1:
+        c.execute("update  Msg set %s='%s' WHERE id=%d;"%(data['col'],data['text'],data['id']))
+    else:
+        # sql="select %s,%s from Msg where is_del=0;"%(for s in filter)
+        pass
+    logging.info('update record successfully!!!')
+    db.commit()
+    return True
 
 def add_records(filename):
     db = sqlite3.connect(filename)
@@ -47,7 +58,6 @@ def add_records(filename):
         cur = c.execute("insert into Msg(id, Message) VALUES(%d,'123')" % i)
     db.commit()
     logging.info('done')
-
 
 # 根据系统返回天数删除软删除记录
 def clear_records(filename, Severdate):
