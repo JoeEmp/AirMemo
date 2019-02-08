@@ -56,15 +56,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.titleLayout = QtWidgets.QHBoxLayout()
         self.titleLayout.setObjectName("titleLayout")
         #icon 标签
-        self.label = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.label.setObjectName("label")
-        self.titleLayout.addWidget(self.label)
-        self.label.setStyleSheet('border-image:url(./UI/app_icon.png);')
+        self.icon_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.icon_lab.setObjectName("label")
+        self.titleLayout.addWidget(self.icon_lab)
+        self.icon_lab.setStyleSheet('border-image:url(./UI/app_icon.png);')
         #标题标签
-        self.label_2 = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.label_2.setObjectName("label_2")
-        self.titleLayout.addWidget(self.label_2)
-        self.label_2.setText('AirMemo')
+        self.title_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.title_lab.setObjectName("label_2")
+        self.titleLayout.addWidget(self.title_lab)
+        self.title_lab.setText('AirMemo')
         #空白
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.titleLayout.addItem(spacerItem)
@@ -74,7 +74,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close_btn.setObjectName("closeButton")
         self.titleLayout.addWidget(self.close_btn)
         self.close_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
-        self.close_btn.clicked.connect(self.close)
+        self.close_btn.clicked.connect(self.hide)
 
         self.rootLayout.addLayout(self.titleLayout)
 
@@ -82,11 +82,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.winLayout = QtWidgets.QHBoxLayout()
         self.winLayout.setObjectName("winLayout")
         #隐藏按钮
-        self.hideBtn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.hideBtn.setObjectName("hideBtn")
-        self.winLayout.addWidget(self.hideBtn)
+        self.welt_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.welt_btn.setObjectName("welt_btn")
+        self.winLayout.addWidget(self.welt_btn)
         #使用 self.layoutHeight 直接占满
-        self.hideBtn.setMaximumSize(config.HIDE_BTN_WIDTH,self.layoutHeight)
+        self.welt_btn.setMaximumSize(config.WELT_BTN_WIDTH, self.layoutHeight)
+        self.welt_btn.clicked.connect(self.welt)
 
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -156,7 +157,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 根据表结构写死了两个索引值，后面再改 wrb
             self.note_le_list[i].setText(self.records[i][1])
             self.detail_tx_list[i].setText(self.records[i][2])
-        self.hideBtn.setText(_translate("MainWindow", "hide"))
+        self.welt_btn.setText(_translate("MainWindow", "welt"))
         self.add_btn.setText(_translate("MainWindow", "add"))
         self.setStyleSheet('QMainWindow{background-color:rgba(169,169,169,0.74);}')
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
@@ -174,7 +175,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Text_isShow = False
 
     #系统托盘
-    def TrayIcon(self, MainWindow):
+    def TrayIcon(self):
+
         pass
 
     def ishide(self):
@@ -219,22 +221,35 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # if(self.note_le_list[index].isEnabled()):
         self.note_le_list[index].setEnable(True)
 
+    def welt(self):
+        width=QApplication.desktop().screenGeometry().width()
+        if self.x() <= width - config.BASEWIDTH:
+            for i in range(width - self.x() -config.WELT_BTN_WIDTH):
+                self.move(self.x()+1,self.y())
+                sleep(0.001)
+            # self.sender().setSytleSheet('')
+        else:
+            for i in range(config.BASEWIDTH - config.WELT_BTN_WIDTH):
+                self.move(self.x()-1,self.y())
+                sleep(0.001)
+            # self.sender().setSytleSheet('')
+
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
-        if not self.geometry().contains(self.pos()):
-            self._endPos = e.pos() - self._startPos
-            self.move(self.pos() + self._endPos)
+        # if not self.geometry().contains(self.pos()):
+        self._endPos = e.pos() - self._startPos
+        self.move(self.pos() + self._endPos)
 
     def mousePressEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton and not self.geometry().contains(self.pos()):
+        if e.button() == Qt.LeftButton:# and not self.geometry().contains(self.pos()):
             self._isTracking = True
             self._startPos = QPoint(e.x(), e.y())
 
     def mouseReleaseEvent(self, e: QMouseEvent):
-        if e.button() == Qt.LeftButton and not self.geometry().contains(self.pos()):
+        if e.button() == Qt.LeftButton:# and not self.geometry().contains(self.pos()):
             width=QApplication.desktop().screenGeometry().width()
             if self.x() > width - config.BASEWIDTH:
-                for i in range(width-self.x()-config.HIDE_BTN_WIDTH):
+                for i in range(width-self.x()-config.WELT_BTN_WIDTH):
                     self.move(self.x()+1,self.y())
                     sleep(0.001)    # 0.001为微调结果
             self._isTracking = False

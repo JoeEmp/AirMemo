@@ -19,7 +19,6 @@ def getSize(divide):
 # 设置app
 def setApp(app):
     app.setStyle(QStyleFactory.create('Fusion'))
-
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap("./ui/app_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     app.setWindowIcon(icon)
@@ -28,27 +27,28 @@ def setApp(app):
 def get_records(filename, filter=None):
     db = sqlite3.connect(filename)
     c = db.cursor()
-    logging.info('link db successfully')
-    if filter == None:
-        cur = c.execute('SELECT * FROM Msg WHERE is_del=0;')
-    else:
-        # sql="select %s,%s from Msg where is_del=0;"%(for s in filter)
-        pass
-    logging.info('read record!!!')
+    try:
+        if filter == None:
+            cur = c.execute('SELECT * FROM Msg WHERE is_del=0;')
+        else:
+            # sql="select %s,%s from Msg where is_del=0;"%(for s in filter)
+            pass
+    except Exception as e:
+        logging.error(e)
     return cur.fetchall()
 
 def update_records(filename, data):
     db = sqlite3.connect(filename)
     c = db.cursor()
-    logging.info('link db successfully')
-    if data['id'] != -1:
-        c.execute("update  Msg set %s='%s' WHERE id=%d;"%(data['col'],data['text'],data['id']))
-    else:
-        # sql="select %s,%s from Msg where is_del=0;"%(for s in filter)
-        pass
-    logging.info('update record successfully!!!')
-    db.commit()
-    return True
+    try:
+        if data['id'] != -1:
+            c.execute("update  Msg set %s='%s' WHERE id=%d;"%(data['col'],data['text'],data['id']))
+            logging.info('update record successfully!!!')
+            db.commit()
+            return True
+    except Exception as e:
+        print(e)
+        return False
 
 def add_records(filename):
     db = sqlite3.connect(filename)
