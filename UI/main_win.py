@@ -30,7 +30,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setData()
         self.setupLayout()
         self.retranslateUi()
-        # self.TrayIcon(MainWindow)
+        self.TrayIcon()
 
     # 初始化 窗口布局及控件
     def setupLayout(self):
@@ -74,7 +74,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close_btn.setObjectName("closeButton")
         self.titleLayout.addWidget(self.close_btn)
         self.close_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
-        self.close_btn.clicked.connect(self.hide)
+        self.close_btn.clicked.connect(self.close)
 
         self.rootLayout.addLayout(self.titleLayout)
 
@@ -100,6 +100,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(len(self.records)):
             self.noteLayout = QtWidgets.QGridLayout()
             self.noteLayout.setObjectName("noteLayout" + str(i))
+            self.noteLayout
 
             #短消息编辑框
             self.note_le = customWidget.AirLineEdit(self.verticalLayoutWidget)
@@ -176,8 +177,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     #系统托盘
     def TrayIcon(self):
-
-        pass
+        tray=customWidget.AirTray(self)
 
     def ishide(self):
         index = self.hide_detail_btn_list.index(self.sender())
@@ -204,6 +204,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.resize(self.layoutWidth, self.layoutHeight)
         self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
         self.verticalLayoutWidget.resize(self.layoutWidth, self.layoutHeight)
+        self.welt_btn.setMaximumSize(config.WELT_BTN_WIDTH, self.layoutHeight)
 
     def sendEmail(self):
         try:

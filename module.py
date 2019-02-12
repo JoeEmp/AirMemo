@@ -19,6 +19,8 @@ def getSize(divide):
 # 设置app
 def setApp(app):
     app.setStyle(QStyleFactory.create('Fusion'))
+    # 关闭所有窗口,也不关闭应用程序
+    QApplication.setQuitOnLastWindowClosed(False)
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap("./ui/app_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     app.setWindowIcon(icon)
