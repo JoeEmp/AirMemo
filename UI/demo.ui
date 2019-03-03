@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>app_icon.png</normaloff>app_icon.png</iconset>
+    <normaloff>C:/Users/joe/.designer/backup/app_icon.png</normaloff>C:/Users/joe/.designer/backup/app_icon.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -60,6 +60,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="login_btn">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="homology_btn">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -73,7 +87,14 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="recycle_bin_btn">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="close_btn">
          <property name="text">
           <string/>
          </property>
@@ -129,8 +150,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>label</zorder>
   </widget>
  </widget>
  <resources/>

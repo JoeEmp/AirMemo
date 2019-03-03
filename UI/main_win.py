@@ -8,7 +8,7 @@
 
 # 有注释部分基本为生成后的作者插入代码的注释
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore,  QtWidgets
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication
@@ -65,9 +65,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.title_lab.setObjectName("label_2")
         self.titleLayout.addWidget(self.title_lab)
         self.title_lab.setText('AirMemo')
+        #登录按钮
+        self.login_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.login_btn.setText("")
+        self.login_btn.setObjectName("login_btn")
+        self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH,config.MICRO_BTN_HEIGHT)
+        self.titleLayout.addWidget(self.login_btn)
+        #回收站按钮
+        self.homology_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.homology_btn.setText("")
+        self.homology_btn.setObjectName("homology_btn")
+        self.homology_btn.setMaximumSize(config.MICRO_BTN_WIDTH,config.MICRO_BTN_HEIGHT)
+        self.titleLayout.addWidget(self.homology_btn)
         #空白
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.titleLayout.addItem(spacerItem)
+        #回收按钮
+        self.recycle_bin_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.recycle_bin_btn.setText("")
+        self.recycle_bin_btn.setObjectName("recycle_bin_btn")
+        self.recycle_bin_btn.setMaximumSize(config.MICRO_BTN_WIDTH,config.MICRO_BTN_HEIGHT)
+        self.titleLayout.addWidget(self.recycle_bin_btn)
         #关闭按钮
         self.close_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.close_btn.setText("")
@@ -100,7 +118,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(len(self.records)):
             self.noteLayout = QtWidgets.QGridLayout()
             self.noteLayout.setObjectName("noteLayout" + str(i))
-            self.noteLayout
+            # self.noteLayout
 
             #短消息编辑框
             self.note_le = customWidget.AirLineEdit(self.verticalLayoutWidget)
@@ -110,6 +128,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 加入相应列表，禁用LineEdit
             self.note_le_list.append(self.note_le)
             self.note_le.setEnabled(False)
+            self.note_le.setMaxLength(30)
             # self.noteLineEdit.clicked.connect(self.swithEdit_state)
 
             #发送按钮
