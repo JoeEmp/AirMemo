@@ -32,6 +32,6 @@ Sync_icon='./icon/Sync.ico'
 
 homo_icon='./icon/recycle.svg'
 
-send_icon='./icon/send.svg'
+title_icon='./icon/title.svg'
 
 hide_icon='./icon/hide.ico'

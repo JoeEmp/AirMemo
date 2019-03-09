@@ -65,7 +65,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.icon_lab.setObjectName("icon")
         self.icon_lab.setBaseSize(32,27)
         self.titleLayout.addWidget(self.icon_lab)
-        self.icon_lab.setStyleSheet('border-image:url(./UI/send.ico);')
+        self.icon_lab.setStyleSheet('border-image:url(./UI/title.ico);')
         self.icon_lab.setText('    ')
         #标题标签
         self.title_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
