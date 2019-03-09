@@ -6,10 +6,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QPushButton,QLineEdit,QTextEdit,QSystemTrayIcon, \
     QMenu, QAction,QDialog, QMessageBox
 import logging
-# from UI.settings import settings_Dialog
-from module import update_records
+from module import update_records,add_records
 import config
-import re
 
 class AirLineEdit(QLineEdit):
     __eld_text=''
@@ -19,7 +17,6 @@ class AirLineEdit(QLineEdit):
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
-        # self.focusInEvent()
         self.setEnabled(False)
         data={'id':-1,'text':'','col':'message'}
         try:
@@ -28,8 +25,14 @@ class AirLineEdit(QLineEdit):
         except Exception as e:
             print(e)
         data['text']=self.text()
-        if data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME,data)
+        #插入新的数据
+        if data['id'] == -1 and data['text']:
+            print(data)
+            new_id=add_records(config.LDB_FILENAME,data)
+            self.setObjectName('note_le'+str(new_id))
+        #更新旧的数据
+        elif data['text'] != self.__eld_text:
+            update_records(config.LDB_FILENAME,data,self.objectName())
 
 class AirTextEdit(QTextEdit):
     __eld_text=''
@@ -47,8 +50,9 @@ class AirTextEdit(QTextEdit):
         except Exception as e:
             print(e)
         data['text']=self.toPlainText()
+        # 更新数据库
         if data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME,data)
+            update_records(config.LDB_FILENAME,data,self.objectName())
 
 class hideButton(QPushButton):
 

@@ -25,3 +25,13 @@ DIVIDE = {'width': 6}
 SIZEMODE = 'pixel'
 
 WIDGET_FLAG = False
+
+login_icon='./icon/user.ico'
+
+Sync_icon='./icon/Sync.ico'
+
+homo_icon='./icon/recycle.svg'
+
+send_icon='./icon/send.svg'
+
+hide_icon='./icon/hide.ico'

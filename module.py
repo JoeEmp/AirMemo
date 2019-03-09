@@ -2,6 +2,7 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyleFactory
 import sqlite3
+import config
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -39,27 +40,34 @@ def get_records(filename, filter=None):
         logging.error(e)
     return cur.fetchall()
 
-def update_records(filename, data):
+def update_records(filename, data,ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
         if data['id'] != -1:
             c.execute("update  Msg set %s='%s' WHERE id=%d;"%(data['col'],data['text'],data['id']))
-            logging.info('update record successfully!!!')
+            logging.info('%s update record successfully!!!'%str(ele))
             db.commit()
             return True
     except Exception as e:
+        print('update error')
         print(e)
         return False
 
-def add_records(filename):
+def add_records(filename,data):
     db = sqlite3.connect(filename)
     c = db.cursor()
-    logging.info('link db successfully')
-    for i in range(2, 4):
-        cur = c.execute("insert into Msg(id, Message) VALUES(%d,'123')" % i)
-    db.commit()
-    logging.info('done')
+    try:
+        if data['id'] == -1:
+            # print("insert into Msg (%s) VALUES (%s)"%(data['col'],data['text']))
+            c.execute("insert into Msg (%s) VALUES ('%s')"%(data['col'],data['text']))
+            db.commit()
+            logging.info('add records done')
+            return len(get_records(config.LDB_FILENAME))+1
+    except Exception as e:
+        print('add error ',data)
+        print(e)
+        return -1
 
 # 根据系统返回天数删除软删除记录
 def clear_records(filename, Severdate):
@@ -70,10 +78,21 @@ def clear_records(filename, Severdate):
     logging.info('clear done')
 
 
+def get_index(dict,keys):
+    if not keys or not dict:
+        return None
+    index_list=[]
+    for key in keys:
+        try:
+            index_list.append(list(dict.keys()).index(key))
+        except Exception as e:
+            print(e)
+    return index_list
+
 if __name__ == '__main__':
     pass
-    dbName = r'AirMemo.db'
-    # add_records(dbName)
-    print(get_records(dbName))
-    # clear_records(filename=dbName,Severdate='2019-01-05')
-    print(get_records(dbName))
+    # dbName = r'AirMemo.db'
+    # # add_records(dbName)
+    # print(get_records(dbName))
+    # # clear_records(filename=dbName,Severdate='2019-01-05')
+    # print(get_records(dbName))
