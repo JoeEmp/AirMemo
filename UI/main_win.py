@@ -13,9 +13,10 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication
 from time import sleep
-from module import get_records,getSize
+from module import get_records,getSize,login_state
 import config
 import customWidget
+from UI.user_dlg import Ui_login_Dialog,Ui_logout_Dialog,Ui_register_Dialog
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -30,14 +31,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
-        logging.info("init")
+        logging.info("mainwindow init")
         self.setData()
         self.setupLayout()
         self.retranslateUi()
         self.TrayIcon()
 
     # 初始化 窗口布局及控件
-    def setupLayout(self,is_add=0):
+    def setupLayout(self):
         #窗口
         self.setObjectName("MainWindow")
         self.setWindowModality(QtCore.Qt.NonModal)
@@ -78,6 +79,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.login_btn.setObjectName("login_btn")
         self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH,config.MICRO_BTN_HEIGHT)
         self.login_btn.setStyleSheet('border-image:url(%s);'%config.login_icon)
+        # 请求登录
+        self.login_btn.clicked.connect(self.show_login_dlg)
         self.titleLayout.addWidget(self.login_btn)
         #同步按钮
         self.Sync_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -276,6 +279,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 sleep(0.001)
             # self.sender().setSytleSheet('')
 
+    def show_login_dlg(self):
+        self.login_dlg = QtWidgets.QDialog()
+        state=login_state()
+        if state == 1:
+            ui =Ui_login_Dialog()
+        elif state ==2:
+            ui =Ui_logout_Dialog()
+        ui.setupUi(self.login_dlg)
+        self.login_dlg.show()
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
@@ -292,6 +304,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def mouseReleaseEvent(self, e: QMouseEvent):
         if e.button() == Qt.LeftButton:# and not self.geometry().contains(self.pos()):
             width=QApplication.desktop().screenGeometry().width()
+
+            #x轴判断
             if self.x() > width - config.WELT_BTN_WIDTH:
                 for i in range(self.x()-(width - config.WELT_BTN_WIDTH)):
                     self.move(self.x()-1,self.y())

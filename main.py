@@ -6,7 +6,7 @@ from module import setApp
 from PyQt5.QtCore import Qt
 
 if __name__ == '__main__':
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("AirMemo_appid")
     app = QApplication(sys.argv)
     setApp(app)
     mainWindow = Ui_MainWindow()

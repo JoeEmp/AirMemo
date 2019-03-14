@@ -8,16 +8,28 @@ from PyQt5.QtWidgets import QPushButton,QLineEdit,QTextEdit,QSystemTrayIcon, \
 import logging
 from module import update_records,add_records
 import config
+import module
 
 class AirLineEdit(QLineEdit):
     __eld_text=''
+    
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        self.add_menu()
+
+    def add_menu(self):
+        # self.del_menu=QMenu()
+        # self.show_action=QAction('&delete note',triggered=module.remove_note)
+        # self.del_menu.addAction(self.show_action)
+        # self.setContextMenuPolicy(self.del_menu)
+        pass
 
     def enterEvent(self, *args, **kwargs):
         self.__eld_text=self.text()
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
-        self.setEnabled(False)
+        # self.setEnabled(False)
         data={'id':-1,'text':'','col':'message'}
         try:
             #使用 objName 获取id bwrb
@@ -27,7 +39,7 @@ class AirLineEdit(QLineEdit):
         data['text']=self.text()
         #插入新的数据
         if data['id'] == -1 and data['text']:
-            print(data)
+            # print(data)
             new_id=add_records(config.LDB_FILENAME,data)
             self.setObjectName('note_le'+str(new_id))
         #更新旧的数据
@@ -85,8 +97,9 @@ class AirTray(QSystemTrayIcon):
         self.main_menu.addAction(self.show_action)
         self.main_menu.addAction(self.settings_action)
         self.main_menu.addAction(self.quit_action)
+
         self.setContextMenu(self.main_menu)
-        pass
+
 
     def set_icon(self):
         self.setIcon(QIcon('./UI/app_icon.png'))

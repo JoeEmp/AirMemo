@@ -1,9 +1,10 @@
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QStyleFactory,QDialog
 import sqlite3
 import config
 import logging
+import requests
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,6 +41,7 @@ def get_records(filename, filter=None):
         logging.error(e)
     return cur.fetchall()
 
+
 def update_records(filename, data,ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -53,6 +55,7 @@ def update_records(filename, data,ele):
         print('update error')
         print(e)
         return False
+
 
 def add_records(filename,data):
     db = sqlite3.connect(filename)
@@ -78,6 +81,10 @@ def clear_records(filename, Severdate):
     logging.info('clear done')
 
 
+def remove_note():
+    pass
+
+
 def get_index(dict,keys):
     if not keys or not dict:
         return None
@@ -88,6 +95,18 @@ def get_index(dict,keys):
         except Exception as e:
             print(e)
     return index_list
+
+
+def login(username,password):
+    protocol = 'http://'
+    dev_url = '127.0.0.1:5000/login'
+    env_url = '149.129.125.8/login'
+    data={'username':username,'password':password}
+    r=requests.post(protocol + dev_url,data=data)
+    print(r.text)
+
+def login_state():
+    return 2
 
 if __name__ == '__main__':
     pass
