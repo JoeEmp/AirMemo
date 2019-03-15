@@ -105,8 +105,13 @@ def login(username,password):
     r=requests.post(protocol + dev_url,data=data)
     print(r.text)
 
-def login_state():
-    return 2
+def login_state(username):
+    protocol = 'http://'
+    dev_url = '127.0.0.1:5000/login'
+    env_url = '149.129.125.8/check_login'
+    data={'username':username}
+    r=requests.post(protocol + dev_url,data=data)
+    return int(r.text)
 
 if __name__ == '__main__':
     pass

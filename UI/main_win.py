@@ -300,7 +300,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self._isTracking = True
             self._startPos = QPoint(e.x(), e.y())
 
-    #释放鼠标时做出判断保证正常贴边
+    #释放鼠标时做出判断保证正常贴边 bug：y轴没做限制
     def mouseReleaseEvent(self, e: QMouseEvent):
         if e.button() == Qt.LeftButton:# and not self.geometry().contains(self.pos()):
             width=QApplication.desktop().screenGeometry().width()
