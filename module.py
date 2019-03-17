@@ -5,6 +5,7 @@ import sqlite3
 import config
 import logging
 import requests
+from utils import be_sql
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,20 +29,25 @@ def setApp(app):
     app.setWindowIcon(icon)
     app.setWindowIcon(QIcon('./ui/app_icon.png'))
 
-def get_records(filename, filter=None):
+# 查询当前用户的笔记
+def get_records(filename, username='visitor'):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
-        if filter == None:
-            cur = c.execute('SELECT * FROM Msg WHERE is_del=0;')
-        else:
-            # sql="select %s,%s from Msg where is_del=0;"%(for s in filter)
-            pass
+        table = 'msg'
+        filter_list = [
+            ['username','=',username],
+            ['is_del','=','0']
+        ]
+        sql = be_sql().sel_sql(table,filter_list=filter_list)
+        # print(sql)
+        cur = c.execute(sql)
     except Exception as e:
         logging.error(e)
     return cur.fetchall()
 
 
+# 更新数据 wrb
 def update_records(filename, data,ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -57,6 +63,7 @@ def update_records(filename, data,ele):
         return False
 
 
+# 添加数据
 def add_records(filename,data):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -68,7 +75,7 @@ def add_records(filename,data):
             logging.info('add records done')
             return len(get_records(config.LDB_FILENAME))+1
     except Exception as e:
-        print('add error ',data)
+        logging.error('add error ',data)
         print(e)
         return -1
 
@@ -105,12 +112,24 @@ def login(username,password):
     r=requests.post(protocol + dev_url,data=data)
     print(r.text)
 
-def login_state(username):
+def login_state():
     protocol = 'http://'
-    dev_url = '127.0.0.1:5000/login'
+    dev_url = '127.0.0.1:5000/check_login'
     env_url = '149.129.125.8/check_login'
-    data={'username':username}
+
+    table = 'user'
+    need_col_list = ['username','token']
+    filter_list = [['token','is not','NULL']]
+    sql = be_sql().sel_sql(table,need_col_list,filter_list)
+    
+    data={'username':'joe','token':}
     r=requests.post(protocol + dev_url,data=data)
+    try:
+        type(r.text)
+        int(r.text)
+    except Exception as e:
+        logging.error('接口返回数据出错',e)
+        return -1
     return int(r.text)
 
 if __name__ == '__main__':

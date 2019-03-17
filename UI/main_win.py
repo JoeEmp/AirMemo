@@ -286,6 +286,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             ui =Ui_login_Dialog()
         elif state ==2:
             ui =Ui_logout_Dialog()
+        else:
+            logging.warning('接口无正确返回状态')
+            return None
         ui.setupUi(self.login_dlg)
         self.login_dlg.show()
 
