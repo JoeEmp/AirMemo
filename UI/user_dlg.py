@@ -5,7 +5,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # 登录渲染
 class Ui_login_Dialog(object):
 
-    def setupUi(self, Dialog):
+    def setupUi(self, Dialog,username):
+        self.username = username
+
         Dialog.setObjectName("Dialog")
         Dialog.resize(293, 192)
         Dialog.setSizeGripEnabled(False)
@@ -61,8 +63,13 @@ class Ui_login_Dialog(object):
 
 # 注销渲染
 class Ui_logout_Dialog(object):
+    # def __init__(self):
+    #     super().__init__()
+    #     # self.username = username
 
-    def setupUi(self, Dialog):
+    def setupUi(self, Dialog,username):
+        self.username = username
+
         Dialog.setObjectName("Dialog")
         Dialog.resize(293, 210)
         Dialog.setStyleSheet('background-color:rgba(255,255,255,1);')
@@ -94,7 +101,7 @@ class Ui_logout_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Welcome"))
         self.logout_btn.setText(_translate("Dialog", "注销"))
-        self.wel_lab.setText(_translate("Dialog", "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:96; color:#5f6266; background-color:#ffffff;\">Thank you support!!!</span></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; color:#5f6266; background-color:#ffffff;\">We will then keep you up to date</span><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:600; color:#5f6266; background-color:#ffffff;\">%s</span></p></body></html>"))
+        self.wel_lab.setText(_translate("Dialog", "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:96; color:#5f6266; background-color:#ffffff;\">Thank you support!!!</span></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; color:#5f6266; background-color:#ffffff;\">We will then keep you up to date</span><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:600; color:#5f6266; background-color:#ffffff;\">%s</span></p></body></html>")%(self.username))
 
 # 注册渲染
 class Ui_register_Dialog(object):

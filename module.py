@@ -5,9 +5,10 @@ import sqlite3
 import config
 import logging
 import requests
-from utils import be_sql
+from utils import be_sql,exec_sql
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO,format="%(levelname)s:%(name)s:%(message)s")
+
 
 
 # 返回等分字典
@@ -113,24 +114,35 @@ def login(username,password):
     print(r.text)
 
 def login_state():
-    protocol = 'http://'
-    dev_url = '127.0.0.1:5000/check_login'
-    env_url = '149.129.125.8/check_login'
-
+    # 检查本地token
     table = 'user'
     need_col_list = ['username','token']
     filter_list = [['token','is not','NULL']]
     sql = be_sql().sel_sql(table,need_col_list,filter_list)
-    
-    data={'username':'joe','token':}
-    r=requests.post(protocol + dev_url,data=data)
-    try:
-        type(r.text)
-        int(r.text)
-    except Exception as e:
-        logging.error('接口返回数据出错',e)
-        return -1
-    return int(r.text)
+    result = exec_sql(config.LDB_FILENAME,sql)
+    if not result:
+        return {'state': 1}
+    # 本地有token的用户去服务器校验
+    else:
+        result = result[0]
+        try:
+            protocol = 'http://'
+            dev_url = '127.0.0.1:5000/check_login'
+            headers={
+                'User-Agent':'AirMemo'
+            }
+            data={'username':result[0],'token':result[1]}
+            r=requests.post(protocol + dev_url,headers=headers,data=data)
+        except Exception as e:
+            logging.error(e)
+            return {'errMsg':'无法连接服务器'}
+        try:
+            state = r.json()
+        except Exception as e:
+            logging.error(e)
+            return {'errMsg':'接口返回数据出错'}
+    # print(state)
+    return state
 
 if __name__ == '__main__':
     pass

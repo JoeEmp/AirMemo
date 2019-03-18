@@ -1,3 +1,6 @@
+# 这个工具类 操作 sqlite3
+import logging
+import sqlite3
 # 构建字符串 提供 简单查询、更新，插入。
 class be_sql(object):
     '''
@@ -73,6 +76,17 @@ class be_sql(object):
             s_filter = s_filter[:-4]+';'
             sql = 'select %s from %s where %s'%(s_need[:-1],table,s_filter)
         return sql
+
+
+def exec_sql(filename, sql):
+    db = sqlite3.connect(filename)
+    c = db.cursor()
+    try:
+        cur = c.execute(sql)
+    except Exception as e:
+        logging.error(e)
+        return None
+    return cur.fetchall()
 
 if __name__ == '__main__':
     pass
