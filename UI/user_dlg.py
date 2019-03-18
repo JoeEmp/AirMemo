@@ -1,11 +1,12 @@
 # 此文件为用户对话框的渲染
 #包括 login_dlg register_dlg logout_dlg
 from PyQt5 import QtCore, QtGui, QtWidgets
+import module
 
 # 登录渲染
 class Ui_login_Dialog(object):
 
-    def setupUi(self, Dialog,username):
+    def setupUi(self, Dialog,username=None):
         self.username = username
 
         Dialog.setObjectName("Dialog")
@@ -27,16 +28,22 @@ class Ui_login_Dialog(object):
         self.gridLayout.addWidget(self.username_lab, 1, 1, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+        #登录按钮
         self.login_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.login_btn.setObjectName("login_btn")
+        #绑定登录
+        self.login_btn.clicked.connect(self.do_login)
+
         self.horizontalLayout.addWidget(self.login_btn)
         self.register_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.register_btn.setObjectName("register_btn")
         self.horizontalLayout.addWidget(self.register_btn)
         self.gridLayout.addLayout(self.horizontalLayout, 6, 2, 1, 1)
-        self.lineEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.lineEdit.setObjectName("lineEdit")
-        self.gridLayout.addWidget(self.lineEdit, 1, 2, 1, 1)
+        #账号输入框
+        self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.username_le.setObjectName("lineEdit")
+        self.gridLayout.addWidget(self.username_le, 1, 2, 1, 1)
+
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 4, 2, 1, 1)
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -50,6 +57,8 @@ class Ui_login_Dialog(object):
         spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem4, 0, 2, 1, 1)
 
+
+
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -60,6 +69,14 @@ class Ui_login_Dialog(object):
         self.login_btn.setText(_translate("Dialog", "登录"))
         self.register_btn.setText(_translate("Dialog", "注册"))
         self.password_lab.setText(_translate("Dialog", "    密码："))
+
+    def do_login(self):
+        if self.username_le.text() and self.password_le.text():
+            module.login(username=self.username_le.text(),password=self.password_le.text())
+        pass
+
+    def do_register(self):
+        pass
 
 # 注销渲染
 class Ui_logout_Dialog(object):
@@ -165,4 +182,3 @@ class Ui_register_Dialog(object):
         self.username_lab.setText(_translate("Dialog", "     账号："))
         self.login_btn.setText(_translate("Dialog", "注册"))
         self.register_btn.setText(_translate("Dialog", "返回"))
- 
