@@ -1,54 +1,99 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './UI\logout_dlg.ui'
+# Form implementation generated from reading ui file './UI\demo.ui'
 #
-# Created by: PyQt5 UI code generator 5.10
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
-class Ui_Dialog(QtWidgets.QDialog):
-    def __init__(self, username):
-        super().__init__()
-        self.username = username
-        self.setupUi()
-
-    def setupUi(self):
-        self.setObjectName("Dialog")
-        self.resize(293, 210)
-        self.setSizeGripEnabled(False)
-        self.setModal(False)
-        #栅格布局
-        self.gridLayoutWidget = QtWidgets.QWidget()
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 271, 189))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
-
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout.setObjectName("gridLayout")
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.setWindowModality(QtCore.Qt.NonModal)
+        MainWindow.resize(583, 386)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("C:/Users/joe/.designer/backup/app_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setAutoFillBackground(True)
+        MainWindow.setUnifiedTitleAndToolBarOnMac(False)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setMouseTracking(True)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 291, 216))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.rootLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.rootLayout.setContentsMargins(0, 0, 0, 0)
+        self.rootLayout.setObjectName("rootLayout")
+        self.titleLayout = QtWidgets.QHBoxLayout()
+        self.titleLayout.setObjectName("titleLayout")
+        self.label = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.label.setAutoFillBackground(True)
+        self.label.setObjectName("label")
+        self.titleLayout.addWidget(self.label)
+        self.label_2 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.label_2.setObjectName("label_2")
+        self.titleLayout.addWidget(self.label_2)
+        self.login_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.login_btn.setText("")
+        self.login_btn.setObjectName("login_btn")
+        self.titleLayout.addWidget(self.login_btn)
+        self.homology_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.homology_btn.setText("")
+        self.homology_btn.setObjectName("homology_btn")
+        self.titleLayout.addWidget(self.homology_btn)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 1, 2, 1, 1)
-        self.logout_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
-        self.logout_btn.setObjectName("logout_btn")
-        self.gridLayout.addWidget(self.logout_btn, 1, 1, 1, 1)
-        self.wel_lab = QtWidgets.QLabel(self.gridLayoutWidget)
-        self.wel_lab.setObjectName("wel_lab")
-        self.gridLayout.addWidget(self.wel_lab, 0, 1, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem1, 1, 0, 1, 1)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem2, 2, 1, 1, 1)
+        self.titleLayout.addItem(spacerItem)
+        self.recycle_bin_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.recycle_bin_btn.setText("")
+        self.recycle_bin_btn.setObjectName("recycle_bin_btn")
+        self.titleLayout.addWidget(self.recycle_bin_btn)
+        self.close_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.close_btn.setText("")
+        self.close_btn.setObjectName("close_btn")
+        self.titleLayout.addWidget(self.close_btn)
+        self.rootLayout.addLayout(self.titleLayout)
+        self.winLayout = QtWidgets.QHBoxLayout()
+        self.winLayout.setObjectName("winLayout")
+        self.hideBtn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.hideBtn.setObjectName("hideBtn")
+        self.winLayout.addWidget(self.hideBtn)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.noteLayout = QtWidgets.QGridLayout()
+        self.noteLayout.setObjectName("noteLayout")
+        self.note_le = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.note_le.setObjectName("note_le")
+        self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
+        self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.send_btn.setText("")
+        self.send_btn.setObjectName("send_btn")
+        self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
+        self.hide_detail_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.hide_detail_btn.setText("")
+        self.hide_detail_btn.setObjectName("hide_detail_btn")
+        self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
+        self.detail_tx = QtWidgets.QTextEdit(self.verticalLayoutWidget)
+        self.detail_tx.setObjectName("detail_tx")
+        self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
+        self.verticalLayout.addLayout(self.noteLayout)
+        self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.add_btn.setObjectName("add_btn")
+        self.verticalLayout.addWidget(self.add_btn)
+        self.winLayout.addLayout(self.verticalLayout)
+        self.rootLayout.addLayout(self.winLayout)
+        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("Dialog", "Welcome"))
-        self.logout_btn.setText(_translate("Dialog", "logout"))
-        self.wel_lab.setText(_translate("Dialog", "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:96; color:#5f6266; background-color:#f9fbfc;\">Thank you support!!!</span></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; color:#5f6266; background-color:#f9fbfc;\">We will then keep you up to date</span><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:600; color:#5f6266; background-color:#f9fbfc;\">%s</span></p></body></html>")%(self.username))
+        MainWindow.setWindowTitle(_translate("MainWindow", "demo"))
+        self.label.setText(_translate("MainWindow", "icon"))
+        self.label_2.setText(_translate("MainWindow", "demo"))
+        self.hideBtn.setText(_translate("MainWindow", "hide"))
+        self.add_btn.setText(_translate("MainWindow", "add"))
 
-if __name__ == '__main__':
-    Ui_Dialog()

@@ -19,9 +19,6 @@ import customWidget
 from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog, Ui_register_Dialog
 import logging
 
-logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     _startPos = None
@@ -33,7 +30,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
-        logger.info("mainwindow init")
+        logging.info("mainwindow init")
         self.setData()
         self.setupLayout()
         self.retranslateUi()
@@ -288,18 +285,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 # self.sender().setSytleSheet('')
 
     def show_user_dlg(self):
-        self.login_dlg = QtWidgets.QDialog()
+        # login_dlg = QtWidgets.QDialog(self)
         # 检测登录状态
         result = login_state()
+        result['state'] = 1
         if result['state'] == 1:
-            ui = Ui_login_Dialog()
+            ui = Ui_login_Dialog(self)
         elif result['state'] == 2:
-            ui = Ui_logout_Dialog()
+            ui = Ui_logout_Dialog(self, result['username'])
         else:
             QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
-            return None
-        ui.setupUi(self.login_dlg,result['username'])
-        self.login_dlg.show()
+        ui.show()
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

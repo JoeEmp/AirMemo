@@ -30,10 +30,10 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="3" column="2">
-     <widget class="QLineEdit" name="lineEdit_2"/>
+     <widget class="QLineEdit" name="password_le"/>
     </item>
     <item row="3" column="1">
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="password_lab">
       <property name="text">
        <string>     密码：</string>
       </property>
@@ -66,21 +66,21 @@
      </spacer>
     </item>
     <item row="1" column="2">
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="username_le"/>
     </item>
     <item row="6" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QPushButton" name="login_btn">
         <property name="text">
-         <string>注册</string>
+         <string>登录</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="register_btn">
         <property name="text">
-         <string>返回</string>
+         <string>注册</string>
         </property>
        </widget>
       </item>
@@ -123,5 +123,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>register_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>410</x>
+     <y>213</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

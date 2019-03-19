@@ -7,8 +7,6 @@ import logging
 import requests
 from utils import be_sql,exec_sql
 
-logging.basicConfig(level=logging.INFO,format="%(levelname)s:%(name)s:%(message)s")
-
 
 
 # 返回等分字典
@@ -111,7 +109,7 @@ def login(username,password):
     env_url = '149.129.125.8/login'
     data={'username':username,'password':password}
     r=requests.post(protocol + dev_url,data=data)
-    print(r.text)
+    return r.json()
 
 def login_state():
     # 检查本地token
@@ -135,7 +133,7 @@ def login_state():
             r=requests.post(protocol + dev_url,headers=headers,data=data)
         except Exception as e:
             logging.error(e)
-            return {'errMsg':'无法连接服务器'}
+            return {'state': -1, 'errMsg': '无法连接服务器'}
         try:
             state = r.json()
         except Exception as e:
