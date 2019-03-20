@@ -13,11 +13,13 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from time import sleep
-from module import get_records, getSize, login_state
+from module import get_records, getSize, login_state,check_login_state,add_records
 import config
 import customWidget
 from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog, Ui_register_Dialog
 import logging
+
+from utils import be_sql, exec_sql
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -31,7 +33,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         logging.info("mainwindow init")
-        self.setData()
+        username = self.check()
+        self.setData(username= username)
         self.setupLayout()
         self.retranslateUi()
         self.TrayIcon()
@@ -201,8 +204,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
 
     # 初始化数据
-    def setData(self):
-        self.records = get_records(config.LDB_FILENAME)
+    def setData(self,username=None):
+        # 判断用户
+        if username:
+            self.records = get_records(config.LDB_FILENAME,username)
+        else:
+            self.records = get_records(config.LDB_FILENAME)
+
+        # 尺寸模式
         if config.SIZEMODE == 'divide':
             divide = getSize(config.divide)
             self.layoutWidth = divide['width']
@@ -288,21 +297,53 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # login_dlg = QtWidgets.QDialog(self)
         # 检测登录状态
         result = login_state()
-        result['state'] = 1
+        # result['state'] = 1
         if result['state'] == 1:
             ui = Ui_login_Dialog(self)
-            ui.login_state.connect(self.getDialogSignal())
+            ui.login_signal.connect(self.getDialogSignal)
         elif result['state'] == 2:
-            ui = Ui_logout_Dialog(self, result['username'])
+            try:
+                ui = Ui_logout_Dialog(self, result['username'])
+            except Exception as e:
+                logging.error(e)
         else:
             QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+            return -1
         ui.show()
 
     """
     实现槽函数
     """
-    def getDialogSignal(self, co):
-        self.label.setText(connect)
+    def getDialogSignal(self, username):
+        if username:
+            self.reset(username)
+        else:
+            QMessageBox.information(self, '提示', "{}".format('登录错误'), QMessageBox.Yes)
+
+
+    def reset(self,username):
+        self.check()
+        self.setData(username)
+        self.setupLayout()
+        self.retranslateUi()
+        self.show()
+
+
+    def check(self):
+        result = check_login_state()
+        if not result:
+            return 'visitor'
+        else:
+            # wrb
+            result = result[0]
+            records = get_records(config.LDB_FILENAME,result[0])
+            if not records:
+                table = 'Msg'
+                col_list = ['message','detail','username']
+                value_list = ['Welcome','Thanks you support',result[0]]
+                sql =be_sql().ins_sql(table,col_list,value_list)
+                exec_sql(config.LDB_FILENAME,sql)
+            return result[0]
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
