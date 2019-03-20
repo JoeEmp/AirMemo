@@ -1,6 +1,7 @@
-# 此文件为用户对话框的渲染
+# 此文件为用户对话框的窗口
 # 包括 login_dlg register_dlg logout_dlg
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
 
 import module
@@ -9,13 +10,15 @@ import config
 import logging
 
 
-# 登录渲染
+# 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
     def __init__(self, parent):
         logging.info('__init__')
         super().__init__(parent=parent)
         self.setupUi()
         self.retranslateUi()
+        # 自定义信号
+        self.login_state = pyqtSignal(str)
         logging.info('end init')
 
     def setupUi(self):
@@ -91,6 +94,10 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_register(self):
         pass
+
+    def sendEditContent(self):
+        content = self.edit.text()
+        self.login_state.emit(content) # 发射信号
 
 
 # 注销渲染

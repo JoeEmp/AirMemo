@@ -291,11 +291,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         result['state'] = 1
         if result['state'] == 1:
             ui = Ui_login_Dialog(self)
+            ui.login_state.connect(self.getDialogSignal())
         elif result['state'] == 2:
             ui = Ui_logout_Dialog(self, result['username'])
         else:
             QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
         ui.show()
+
+    """
+    实现槽函数
+    """
+    def getDialogSignal(self, co):
+        self.label.setText(connect)
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

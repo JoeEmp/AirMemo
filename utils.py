@@ -6,24 +6,28 @@ class be_sql(object):
     '''
     doc
     '''
-    def update_sql(self,table,value_dict,filter_list=None):
+    def update_sql(self, table, value_dict, filter_list=None):
+        """
+
+        :rtype: str
+        """
         s_value = ''
-        for k,v in value_dict.items():
-            s_value += k + '=' + "'"+ k +"',"
+        for k, v in value_dict.items():
+            s_value += k + '=' + "'" + v + "',"
         if not filter_list:
-            return 'update %s set %s ;'%(table,s_value[:-1])
+            return 'update %s set %s ;' % (table, s_value[:-1])
         else:
             s_filter = ''
             for item in filter_list:
                 for i in item:
                     # 做了 空判断
                     if i is item[-1] and i != 'NULL':
-                        s_filter += "'" + i + "'"+' '
+                        s_filter += "'" + i + "'" + ' '
                     else:
-                        s_filter += i+' '
+                        s_filter += i + ' '
                 s_filter += ' and '
-            s_filter = s_filter[:-4]+';'
-            sql = 'update %s set %s where %s;'%(table,s_value[:-1],s_filter)
+            s_filter = s_filter[:-4]
+            sql = 'update %s set %s where %s;' % (table, s_value[:-1], s_filter)
         return sql
 
     def ins_sql(self,table,col_list,value_list):
@@ -83,6 +87,7 @@ def exec_sql(filename, sql):
     c = db.cursor()
     try:
         cur = c.execute(sql)
+        db.commit()
     except Exception as e:
         logging.error(e)
         return None
