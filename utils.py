@@ -7,13 +7,19 @@ class be_sql(object):
     doc
     '''
     def update_sql(self, table, value_dict, filter_list=None):
-        """
+        '''
 
-        :rtype: str
-        """
+        :param table:
+        :param value_dict:
+        :param filter_list:
+        :return: str
+        '''
         s_value = ''
         for k, v in value_dict.items():
-            s_value += k + '=' + "'" + v + "',"
+            if v == 'NULL':
+                s_value += k + ' = ' + v + ","
+            else:
+                s_value += k + ' = ' + "'" + v + "',"
         if not filter_list:
             return 'update %s set %s ;' % (table, s_value[:-1])
         else:
@@ -28,6 +34,7 @@ class be_sql(object):
                 s_filter += ' and '
             s_filter = s_filter[:-4]
             sql = 'update %s set %s where %s;' % (table, s_value[:-1], s_filter)
+        # print(sql)
         return sql
 
     def ins_sql(self,table,col_list,value_list):

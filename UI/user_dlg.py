@@ -110,18 +110,16 @@ class Ui_login_Dialog(QtWidgets.QDialog):
     def do_register(self):
         pass
 
-    # 发送
-    def send_username(self):
-        username = str(self.username_le.text())
-        # 自定义信号
 
 
 
 # 注销渲染
 class Ui_logout_Dialog(QtWidgets.QDialog):
-    def __init__(self, parent, username):
+    logout_signal = pyqtSignal(str)
+
+    def __init__(self, parent,username=''):
         super().__init__(parent=parent)
-        self.username = username
+        self.username=username
         self.setupUi()
         self.retranslateUi()
 
@@ -159,7 +157,9 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 2, 1, 1, 1)
 
+        self.logout_btn.clicked.connect(self.do_logout)
         QtCore.QMetaObject.connectSlotsByName(self)
+
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -169,6 +169,22 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
                                         "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:96; color:#5f6266; background-color:#ffffff;\">Thank you support!!!</span></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; color:#5f6266; background-color:#ffffff;\">We will then keep you up to date</span><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:600; color:#5f6266; background-color:#ffffff;\">%s</span></p></body></html>") % (
                                  self.username))
 
+    def do_logout(self):
+        #请求登出
+        state = module.logout(self.username)
+        if state['state'] == 1:
+            table = 'user'
+            value_dict = {'token': 'NULL'}
+            filter_list = [
+                ['username', '=', self.username]
+            ]
+            sql = utils.be_sql().update_sql(table, value_dict, filter_list)
+            # print(sql)
+            utils.exec_sql(config.LDB_FILENAME, sql)
+            self.close()
+            self.logout_signal.emit('visitor')
+        else:
+            QMessageBox.information(self, '提示', "{}".format('请检查数据库文件和网络状态'), QMessageBox.Yes)
 
 # 注册渲染
 class Ui_register_Dialog(object):

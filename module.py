@@ -96,6 +96,7 @@ def clear_records(filename, Severdate):
     db.commit()
     logging.info('clear done')
 
+
 # 未实现
 def remove_note():
     pass
@@ -115,12 +116,19 @@ def get_index(dict, keys):
 
 def login(username, password):
     url = '/login'
+    headers = {
+        'User-Agent': 'AirMemo'
+    }
     data = {'username': username, 'password': password}
-    r = requests.post(protocol + user_host + url, data=data)
+    r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
 
-
+# wrb
 def login_state():
+    '''
+
+    :return:
+    '''
     # 检查本地token
     result = check_login_state()
     # 本地无用户登录
@@ -148,13 +156,35 @@ def login_state():
     # print(state)
     return state
 
-
+# wrb  目标将 list 转成 dict
 def check_login_state():
+    '''
+    查找token非空的人
+    :return: 查询结果 结构[username,token]
+    '''
     table = 'user'
     need_col_list = ['username', 'token']
     filter_list = [['token', 'is not', 'NULL']]
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
     return exec_sql(config.LDB_FILENAME, sql)
+
+# wrb after check_login
+def logout(username):
+    '''
+    :return:
+    '''
+    result = check_login_state()
+    if result:
+        result = result[0]
+        url = '/logout'
+        headers = {
+            'User-Agent': 'AirMemo'
+        }
+        data = {'username':username, 'token': result[1]}
+        r = requests.post(protocol + user_host + url, headers=headers, data=data)
+        return r.json()
+    else:
+        return {'state':'-1'}
 
 
 if __name__ == '__main__':
