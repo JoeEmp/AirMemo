@@ -2,10 +2,10 @@
 # 包括 login_dlg register_dlg logout_dlg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
 import module
-import utils
+import operateSqlite
 import config
 import logging
 
@@ -42,6 +42,8 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.password_lab.setObjectName("password_lab")
         self.gridLayout.addWidget(self.password_lab, 3, 1, 1, 1)
+        # 设置模式
+        self.password_le.setEchoMode(QLineEdit.Password)
 
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 0, 2, 1, 1)
@@ -78,6 +80,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         QtCore.QMetaObject.connectSlotsByName(self)
         self.login_btn.clicked.connect(self.do_login)
+        self.register_btn.clicked.connect(self.do_register)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -93,10 +96,10 @@ class Ui_login_Dialog(QtWidgets.QDialog):
             if result['token']:
                 value_dict = {'token': result['token']}
                 filter_list = [['username', '=', self.username_le.text()]]
-                sql = utils.be_sql().update_sql(table='user', value_dict=value_dict, filter_list=filter_list)
-                utils.exec_sql(config.LDB_FILENAME,sql)
+                sql = operateSqlite.be_sql().update_sql(table='user', value_dict=value_dict, filter_list=filter_list)
+                operateSqlite.exec_sql(config.LDB_FILENAME, sql)
                 try:
-                    self.login_signal.emit(self.username_le.text()) # 发射信号
+                    self.login_signal.emit(self.username_le.text())  # 发射信号
                 except Exception as e:
                     logging.error(e)
                 self.close()
@@ -108,21 +111,19 @@ class Ui_login_Dialog(QtWidgets.QDialog):
             QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
 
     def do_register(self):
-        pass
-
-
+        ui = Ui_register_Dialog()
+        ui.show()
 
 
 # 注销渲染
 class Ui_logout_Dialog(QtWidgets.QDialog):
     logout_signal = pyqtSignal(str)
 
-    def __init__(self, parent,username=''):
+    def __init__(self, parent, username=''):
         super().__init__(parent=parent)
-        self.username=username
+        self.username = username
         self.setupUi()
         self.retranslateUi()
-
 
     def setupUi(self):
         self.setObjectName("logout_Dialog")
@@ -160,7 +161,6 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         self.logout_btn.clicked.connect(self.do_logout)
         QtCore.QMetaObject.connectSlotsByName(self)
 
-
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Dialog", "Welcome"))
@@ -170,7 +170,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
                                  self.username))
 
     def do_logout(self):
-        #请求登出
+        # 请求登出
         state = module.logout(self.username)
         if state['state'] == 1:
             table = 'user'
@@ -178,22 +178,24 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             filter_list = [
                 ['username', '=', self.username]
             ]
-            sql = utils.be_sql().update_sql(table, value_dict, filter_list)
+            sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
             # print(sql)
-            utils.exec_sql(config.LDB_FILENAME, sql)
+            operateSqlite.exec_sql(config.LDB_FILENAME, sql)
             self.close()
             self.logout_signal.emit('visitor')
         else:
             QMessageBox.information(self, '提示', "{}".format('请检查数据库文件和网络状态'), QMessageBox.Yes)
 
+
 # 注册渲染
-class Ui_register_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(293, 192)
-        Dialog.setSizeGripEnabled(False)
-        Dialog.setModal(False)
-        self.gridLayoutWidget = QtWidgets.QWidget(Dialog)
+class Ui_register_Dialog(QtWidgets.QDialog):
+
+    def setupUi(self):
+        self.setObjectName("Dialog")
+        self.resize(293, 192)
+        self.setSizeGripEnabled(False)
+        self.setModal(False)
+        self.gridLayoutWidget = QtWidgets.QWidget(self)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 271, 171))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
@@ -237,12 +239,12 @@ class Ui_register_Dialog(object):
         self.horizontalLayout.addWidget(self.register_btn)
         self.gridLayout.addLayout(self.horizontalLayout, 8, 2, 1, 1)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(self)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "     密码："))
         self.password_lab.setText(_translate("Dialog", " 再次确认："))
         self.username_lab.setText(_translate("Dialog", "     账号："))

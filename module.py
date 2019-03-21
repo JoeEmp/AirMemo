@@ -5,7 +5,7 @@ import sqlite3
 import config
 import logging
 import requests
-from utils import be_sql, exec_sql
+from operateSqlite import be_sql, exec_sql
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -88,11 +88,11 @@ def add_records(filename, data):
 
 
 # 根据系统返回天数删除软删除记录
-def clear_records(filename, Severdate):
+def clear_records(filename, sever_date):
     db = sqlite3.connect(filename)
     c = db.cursor()
     cur = c.execute(
-            "delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % Severdate)
+            "delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date)
     db.commit()
     logging.info('clear done')
 
@@ -122,6 +122,7 @@ def login(username, password):
     data = {'username': username, 'password': password}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
+
 
 # wrb
 def login_state():
@@ -156,6 +157,7 @@ def login_state():
     # print(state)
     return state
 
+
 # wrb  目标将 list 转成 dict
 def check_login_state():
     '''
@@ -168,23 +170,27 @@ def check_login_state():
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
     return exec_sql(config.LDB_FILENAME, sql)
 
+
 # wrb after check_login
 def logout(username):
     '''
     :return:
     '''
     result = check_login_state()
-    if result:
-        result = result[0]
-        url = '/logout'
-        headers = {
-            'User-Agent': 'AirMemo'
-        }
-        data = {'username':username, 'token': result[1]}
-        r = requests.post(protocol + user_host + url, headers=headers, data=data)
-        return r.json()
-    else:
-        return {'state':'-1'}
+    print(result)
+    try:
+        if result:
+            result = result[0]
+            url = '/logout'
+            headers = {
+                'User-Agent': 'AirMemo'
+            }
+            data = {'username': username, 'token': result[1]}
+            r = requests.post(protocol + user_host + url, headers=headers, data=data)
+            return r.json()
+    except Exception as e:
+        logging.error(e)
+        return {'state': '-1'}
 
 
 if __name__ == '__main__':

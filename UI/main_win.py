@@ -20,7 +20,7 @@ import customWidget
 from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog, Ui_register_Dialog
 import logging
 
-from utils import be_sql, exec_sql
+from operateSqlite import be_sql, exec_sql
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -84,7 +84,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                       config.MICRO_BTN_HEIGHT)
         self.login_btn.setStyleSheet(
-            'border-image:url(%s);' % config.login_icon)
+            'border-image:url(%s);' % config.LOGIN_ICON)
         # 请求登录
         self.login_btn.clicked.connect(self.show_user_dlg)
         self.titleLayout.addWidget(self.login_btn)
@@ -94,7 +94,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Sync_btn.setObjectName("homology_btn")
         self.Sync_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                      config.MICRO_BTN_HEIGHT)
-        self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.Sync_icon)
+        self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.SYNC_ICON)
         self.titleLayout.addWidget(self.Sync_btn)
         # 空白
         spacerItem = QtWidgets.QSpacerItem(40, 20,
@@ -108,7 +108,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.recycle_bin_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                             config.MICRO_BTN_HEIGHT)
         self.recycle_bin_btn.setStyleSheet(
-            'border-image:url(%s);' % config.homo_icon)
+            'border-image:url(%s);' % config.HOMO_ICON)
         self.titleLayout.addWidget(self.recycle_bin_btn)
         # 关闭按钮
         self.close_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -117,7 +117,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.titleLayout.addWidget(self.close_btn)
         self.close_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
         self.close_btn.setStyleSheet(
-            'border-image:url(%s);' % config.close_icon)
+            'border-image:url(%s);' % config.CLOSE_ICON)
         self.close_btn.clicked.connect(self.close)
 
         self.rootLayout.addLayout(self.titleLayout)
@@ -176,7 +176,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.hide_detail_btn.setMaximumSize(config.BTN_WIDTH,
                                                 config.BTN_HEIGHT)
             self.hide_detail_btn.setStyleSheet(
-                'border-image:url(%s);' % config.hide_icon)
+                'border-image:url(%s);' % config.HIDE_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
@@ -257,14 +257,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 1
             self.sender().setStyleSheet(
-                'border-image:url(%s);' % config.show_icon)
+                'border-image:url(%s);' % config.SHOW_ICON)
         else:
             self.detail_tx_list[index].hide()
             self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 0
             self.sender().setStyleSheet(
-                'border-image:url(%s);' % config.hide_icon)
+                'border-image:url(%s);' % config.HIDE_ICON)
 
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)

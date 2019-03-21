@@ -3,17 +3,18 @@
 '''
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QPushButton,QLineEdit,QTextEdit,QSystemTrayIcon, \
-    QMenu, QAction,QDialog, QMessageBox
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
+    QMenu, QAction, QDialog, QMessageBox
 import logging
-from module import update_records,add_records
+from module import update_records, add_records
 import config
 import module
 
+
 class AirLineEdit(QLineEdit):
-    __eld_text=''
-    
-    def __init__(self,parent=None):
+    __eld_text = ''
+
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.add_menu()
 
@@ -25,51 +26,52 @@ class AirLineEdit(QLineEdit):
         pass
 
     def enterEvent(self, *args, **kwargs):
-        self.__eld_text=self.text()
+        self.__eld_text = self.text()
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
-        data={'id':-1,'text':'','col':'message'}
+        data = {'id': -1, 'text': '', 'col': 'message'}
         try:
-            #使用 objName 获取id bwrb
-            data['id']=int(self.objectName().replace('note_le',''))
+            # 使用 objName 获取id bwrb
+            data['id'] = int(self.objectName().replace('note_le', ''))
         except Exception as e:
             print(e)
-        data['text']=self.text()
-        #插入新的数据
+        data['text'] = self.text()
+        # 插入新的数据
         if data['id'] == -1 and data['text']:
             # print(data)
-            new_id=add_records(config.LDB_FILENAME,data)
-            self.setObjectName('note_le'+str(new_id))
-        #更新旧的数据
+            new_id = add_records(config.LDB_FILENAME, data)
+            self.setObjectName('note_le' + str(new_id))
+        # 更新旧的数据
         elif data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME,data,self.objectName())
+            update_records(config.LDB_FILENAME, data, self.objectName())
+
 
 class AirTextEdit(QTextEdit):
-    __eld_text=''
+    __eld_text = ''
 
     def enterEvent(self, *args, **kwargs):
-        self.__eld_text=self.toPlainText()
+        self.__eld_text = self.toPlainText()
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
         self.setEnabled(False)
-        data={'id':-1,'text':'','col':'detail'}
+        data = {'id': -1, 'text': '', 'col': 'detail'}
         try:
-            #使用 objName 获取id bwrb
-            data['id']=int(self.objectName().replace('detail_tx',''))
+            # 使用 objName 获取id bwrb
+            data['id'] = int(self.objectName().replace('detail_tx', ''))
         except Exception as e:
             print(e)
-        data['text']=self.toPlainText()
+        data['text'] = self.toPlainText()
         # 更新数据库
         if data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME,data,self.objectName())
+            update_records(config.LDB_FILENAME, data, self.objectName())
+
 
 class hideButton(QPushButton):
-
-    #flag 为Ture时为展开
-    def switch(self,ele,flag):
+    # flag 为Ture时为展开
+    def switch(self, ele, flag):
         try:
             if flag:
                 ele.hide()
@@ -78,28 +80,28 @@ class hideButton(QPushButton):
         except Exception as e:
             logging.error(e)
 
-class AirTray(QSystemTrayIcon):
-    widget=None
 
-    def __init__(self,widget):
+class AirTray(QSystemTrayIcon):
+    widget = None
+
+    def __init__(self, widget):
         super().__init__(widget)
-        self.widget=widget
+        self.widget = widget
         self.set_menu()
         self.set_icon()
         self.show()
 
     def set_menu(self):
-        self.main_menu=QMenu()
-        self.show_action=QAction('&show',triggered=self.widget.show)
-        self.settings_action=QAction('&settings',triggered=QDialog.show)
-        self.quit_action=QAction('&exit',triggered=self.quitapp)
+        self.main_menu = QMenu()
+        self.show_action = QAction('&show', triggered=self.widget.show)
+        self.settings_action = QAction('&settings', triggered=QDialog.show)
+        self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
         self.main_menu.addAction(self.settings_action)
         self.main_menu.addAction(self.quit_action)
 
         self.setContextMenu(self.main_menu)
-
 
     def set_icon(self):
         self.setIcon(QIcon('./UI/app_icon.png'))
@@ -116,7 +118,7 @@ class AirTray(QSystemTrayIcon):
         print(reason)
 
     def quitapp(self):
-        self.parent().show() # w.hide() #隐藏
+        self.parent().show()  # w.hide() #隐藏
         sel = QMessageBox.question(self.widget, "提示", "确定要退出Airmemo", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if sel == QMessageBox.Yes:
             QCoreApplication.instance().quit()

@@ -1,5 +1,6 @@
 import logging
-logging.basicConfig(level = logging.WARNING, format = '%(asctime)s %(levelname)s %(filename)s %(module)s %(message)s')
+
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(filename)s %(module)s %(message)s')
 
 # 详情编辑框大小
 TEXT_WIDTH = 320
@@ -29,16 +30,16 @@ SIZEMODE = 'pixel'
 
 WIDGET_FLAG = False
 
-login_icon = './icon/user.ico'
+LOGIN_ICON = './icon/user.ico'
 
-Sync_icon = './icon/Sync.ico'
+SYNC_ICON = './icon/Sync.ico'
 
-homo_icon = './icon/recycle.svg'
+HOMO_ICON = './icon/recycle.svg'
 
-title_icon = './icon/title.svg'
+TITLE_ICON = './icon/title.svg'
 
-hide_icon = './icon/hide.ico'
+HIDE_ICON = './icon/hide.ico'
 
-show_icon = './icon/show.ico'
+SHOW_ICON = './icon/show.ico'
 
-close_icon = './icon/close_btn.png'
+CLOSE_ICON = './icon/close_btn.png'
