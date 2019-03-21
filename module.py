@@ -193,6 +193,16 @@ def logout(username):
         return {'state': '-1'}
 
 
+# 同login
+def register(username,password):
+    url = '/register'
+    headers = {
+        'User-Agent': 'AirMemo'
+    }
+    data = {'username': username, 'password': password}
+    r = requests.post(protocol + user_host + url, headers=headers, data=data)
+    return r.json()
+
 if __name__ == '__main__':
     pass
     # dbName = r'AirMemo.db'

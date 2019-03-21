@@ -25,7 +25,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.setObjectName("login_Dialog")
         self.resize(293, 192)
         self.setSizeGripEnabled(False)
-        self.setModal(True)
+        self.setModal(False)
 
         self.gridLayoutWidget = QtWidgets.QWidget(self)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 271, 171))
@@ -111,8 +111,9 @@ class Ui_login_Dialog(QtWidgets.QDialog):
             QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
 
     def do_register(self):
-        ui = Ui_register_Dialog()
+        ui = Ui_register_Dialog(self)
         ui.show()
+        # print('123')
 
 
 # 注销渲染
@@ -189,64 +190,104 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
 # 注册渲染
 class Ui_register_Dialog(QtWidgets.QDialog):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
-        self.setObjectName("Dialog")
+        self.setObjectName("register_Dialog")
         self.resize(293, 192)
         self.setSizeGripEnabled(False)
         self.setModal(False)
+
         self.gridLayoutWidget = QtWidgets.QWidget(self)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 271, 171))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
+
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 0, 2, 1, 1)
+
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 4, 2, 1, 1)
+
         self.label = QtWidgets.QLabel(self.gridLayoutWidget)
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 3, 1, 1, 1)
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.gridLayout.addWidget(self.lineEdit_2, 3, 2, 1, 1)
+
+        self.password_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.password_le.setObjectName("lineEdit_2")
+        self.gridLayout.addWidget(self.password_le, 3, 2, 1, 1)
+
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 2, 2, 1, 1)
-        self.lineEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.lineEdit.setObjectName("lineEdit")
-        self.gridLayout.addWidget(self.lineEdit, 1, 2, 1, 1)
+
+        self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.username_le.setObjectName("lineEdit")
+        self.gridLayout.addWidget(self.username_le, 1, 2, 1, 1)
+
         spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem3, 6, 2, 1, 1)
+
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.password_lab.setObjectName("password_lab")
         self.gridLayout.addWidget(self.password_lab, 5, 1, 1, 1)
-        self.password_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.password_le.setObjectName("password_le")
-        self.gridLayout.addWidget(self.password_le, 5, 2, 1, 1)
+
+        self.again_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.again_le.setObjectName("password_le")
+        self.gridLayout.addWidget(self.again_le, 5, 2, 1, 1)
+
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem4, 5, 0, 1, 1)
+
         self.username_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.username_lab.setObjectName("username_lab")
         self.gridLayout.addWidget(self.username_lab, 1, 1, 1, 1)
+
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.login_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
-        self.login_btn.setObjectName("login_btn")
-        self.horizontalLayout.addWidget(self.login_btn)
+
         self.register_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
-        self.register_btn.setObjectName("register_btn")
+        self.register_btn.setObjectName("login_btn")
         self.horizontalLayout.addWidget(self.register_btn)
+
+        self.close_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
+        self.close_btn.setObjectName("register_btn")
+        self.horizontalLayout.addWidget(self.close_btn)
+
         self.gridLayout.addLayout(self.horizontalLayout, 8, 2, 1, 1)
 
-        self.retranslateUi(self)
+        self.register_btn.clicked.connect(self.do_register)
+        self.close_btn.clicked.connect(self.close)
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.setWindowTitle(_translate("Dialog", "注册"))
         self.label.setText(_translate("Dialog", "     密码："))
         self.password_lab.setText(_translate("Dialog", " 再次确认："))
         self.username_lab.setText(_translate("Dialog", "     账号："))
-        self.login_btn.setText(_translate("Dialog", "注册"))
-        self.register_btn.setText(_translate("Dialog", "返回"))
+        self.register_btn.setText(_translate("Dialog", "注册"))
+        self.close_btn.setText(_translate("Dialog", "返回"))
+
+    def do_register(self):
+        if self.username_le.text() and self.password_le.text() and self.again_le.text() and (self.password_le.text() == self.again_le.text()):
+            result = module.register(username=self.username_le.text(), password=self.again_le.text())
+            if result:
+                if result['state'] == 1:
+                    self.close()
+            else:
+                QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+        elif not self.username_le.text():
+            QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
+        elif not self.password_le.text():
+            QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
+        elif not self.again_le.text():
+            QMessageBox.information(self, '提示', "{}".format('请再次确认密码'), QMessageBox.Yes)
+        elif self.password_le.text() != self.again_le.text():
+            QMessageBox.information(self, '提示', "{}".format('两次密码不正确'), QMessageBox.Yes)
+
