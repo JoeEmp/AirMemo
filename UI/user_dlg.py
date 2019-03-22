@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
-import module
+import utils
 import operateSqlite
 import config
 import logging
@@ -92,19 +92,34 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_login(self):
         if self.username_le.text() and self.password_le.text():
-            result = module.login(username=self.username_le.text(), password=self.password_le.text())
-            if result['token']:
-                value_dict = {'token': result['token']}
-                filter_list = [['username', '=', self.username_le.text()]]
-                sql = operateSqlite.be_sql().update_sql(table='user', value_dict=value_dict, filter_list=filter_list)
-                operateSqlite.exec_sql(config.LDB_FILENAME, sql)
-                try:
-                    self.login_signal.emit(self.username_le.text())  # 发射信号
-                except Exception as e:
-                    logging.error(e)
-                self.close()
-            else:
-                QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+            result = utils.login(username=self.username_le.text(), password=self.password_le.text())
+            # assert result['token'], '本地无记录'
+            try:
+                if result['token']:
+                    table = 'user'
+                    if not utils.get_user_info(table, self.username_le.text()):
+                        # 没有用户直接插入
+                        col_list = ['username', 'token']
+                        value_list = [self.username_le.text(), result['token']]
+                        sql = operateSqlite.be_sql().ins_sql(table,col_list,value_list)
+                        operateSqlite.exec_sql(config.LDB_FILENAME,sql)
+                    # 已有用户更新数据
+                    else:
+                        value_dict = {'token': result['token']}
+                        filter_list = [['username', '=', self.username_le.text()]]
+                        sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
+                                                                filter_list=filter_list)
+                        operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+                    try:
+                        self.login_signal.emit(self.username_le.text())  # 发射信号
+                    except Exception as e:
+                        logging.error(e)
+                    self.close()
+                else:
+                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+            except Exception as e:
+                logging.error(e)
+
         elif not self.username_le.text():
             QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
         elif not self.password_le.text():
@@ -172,7 +187,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        state = module.logout(self.username)
+        state = utils.logout(self.username)
         if state['state'] == 1:
             table = 'user'
             value_dict = {'token': 'NULL'}
@@ -190,7 +205,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
 # 注册渲染
 class Ui_register_Dialog(QtWidgets.QDialog):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
         self.retranslateUi()
@@ -275,11 +290,14 @@ class Ui_register_Dialog(QtWidgets.QDialog):
         self.close_btn.setText(_translate("Dialog", "返回"))
 
     def do_register(self):
-        if self.username_le.text() and self.password_le.text() and self.again_le.text() and (self.password_le.text() == self.again_le.text()):
-            result = module.register(username=self.username_le.text(), password=self.again_le.text())
+        if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
+                    self.password_le.text() == self.again_le.text()):
+            result = utils.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['state'] == 1:
                     self.close()
+                else:
+                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
             else:
                 QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
         elif not self.username_le.text():
@@ -290,4 +308,3 @@ class Ui_register_Dialog(QtWidgets.QDialog):
             QMessageBox.information(self, '提示', "{}".format('请再次确认密码'), QMessageBox.Yes)
         elif self.password_le.text() != self.again_le.text():
             QMessageBox.information(self, '提示', "{}".format('两次密码不正确'), QMessageBox.Yes)
-

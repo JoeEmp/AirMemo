@@ -97,6 +97,13 @@ def clear_records(filename, sever_date):
     logging.info('clear done')
 
 
+# 获取用户信息
+def get_user_info(table, username):
+    filter_list = [['username', '=', username]]
+    sql = be_sql().sel_sql(table, filter_list=filter_list)
+    return  exec_sql(config.LDB_FILENAME,sql)
+
+
 # 未实现
 def remove_note():
     pass
@@ -121,6 +128,7 @@ def login(username, password):
     }
     data = {'username': username, 'password': password}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
+    print(r.json())
     return r.json()
 
 
@@ -194,7 +202,7 @@ def logout(username):
 
 
 # 同login
-def register(username,password):
+def register(username, password):
     url = '/register'
     headers = {
         'User-Agent': 'AirMemo'
@@ -202,6 +210,7 @@ def register(username,password):
     data = {'username': username, 'password': password}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
+
 
 if __name__ == '__main__':
     pass

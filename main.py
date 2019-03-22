@@ -2,7 +2,7 @@ import sys
 from UI.main_win import *
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import ctypes
-from module import setApp
+from utils import setApp
 from PyQt5.QtCore import Qt
 
 if __name__ == '__main__':

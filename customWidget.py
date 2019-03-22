@@ -1,14 +1,16 @@
 '''
 为qt控件加入所需的方法
 '''
+from PyQt5 import QtCore
+
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
     QMenu, QAction, QDialog, QMessageBox
 import logging
-from module import update_records, add_records
+from utils import update_records, add_records
 import config
-import module
+import utils
 
 
 class AirLineEdit(QLineEdit):
@@ -19,11 +21,11 @@ class AirLineEdit(QLineEdit):
         self.add_menu()
 
     def add_menu(self):
-        # self.del_menu=QMenu()
-        # self.show_action=QAction('&delete note',triggered=module.remove_note)
-        # self.del_menu.addAction(self.show_action)
-        # self.setContextMenuPolicy(self.del_menu)
-        pass
+        self.del_menu = QtCore.Qt.CustomContextMenu()
+        self.show_action = QAction('&delete note', triggered=utils.remove_note)
+        self.del_menu.addAction(self.show_action)
+        self.setContextMenuPolicy(self.del_menu)
+        # pass
 
     def enterEvent(self, *args, **kwargs):
         self.__eld_text = self.text()

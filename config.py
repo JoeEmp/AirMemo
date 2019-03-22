@@ -1,6 +1,6 @@
 import logging
 
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(filename)s %(module)s %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
 
 # 详情编辑框大小
 TEXT_WIDTH = 320

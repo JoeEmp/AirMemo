@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from time import sleep
-from module import get_records, getSize, login_state, check_login_state, \
+from utils import get_records, getSize, login_state, check_login_state, \
     add_records
 import config
 import customWidget
