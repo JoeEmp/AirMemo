@@ -109,7 +109,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         filter_list = [['username', '=', self.username_le.text()]]
                         sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
                                                                 filter_list=filter_list)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+                        operateSqlite.exec_sql(config.LDB_FILENAME, sql,is_update=1)
                     try:
                         self.login_signal.emit(self.username_le.text())  # 发射信号
                     except Exception as e:
@@ -128,7 +128,6 @@ class Ui_login_Dialog(QtWidgets.QDialog):
     def do_register(self):
         ui = Ui_register_Dialog(self)
         ui.show()
-        # print('123')
 
 
 # 注销渲染
@@ -173,7 +172,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 2, 1, 1, 1)
-
+        #
         self.logout_btn.clicked.connect(self.do_logout)
         QtCore.QMetaObject.connectSlotsByName(self)
 
@@ -196,7 +195,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             ]
             sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
             # print(sql)
-            operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+            operateSqlite.exec_sql(config.LDB_FILENAME, sql,is_update=1)
             self.close()
             self.logout_signal.emit('visitor')
         else:

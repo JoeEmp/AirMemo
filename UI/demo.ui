@@ -13,6 +13,9 @@
     <height>386</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>demo</string>
   </property>
@@ -116,7 +119,11 @@
          <item>
           <layout class="QGridLayout" name="noteLayout">
            <item row="0" column="1">
-            <widget class="QLineEdit" name="note_le"/>
+            <widget class="QLineEdit" name="note_le">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+            </widget>
            </item>
            <item row="0" column="0">
             <widget class="QPushButton" name="send_btn">

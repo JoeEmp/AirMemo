@@ -1,31 +1,70 @@
 '''
 为qt控件加入所需的方法
 '''
-from PyQt5 import QtCore
+import os
 
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QCoreApplication,Qt,QPoint, pyqtSignal
+from PyQt5.QtGui import QIcon, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
     QMenu, QAction, QDialog, QMessageBox
 import logging
-from utils import update_records, add_records
+from utils import update_records, add_records,delete_records,check_login_state
 import config
-import utils
-
+import re
 
 class AirLineEdit(QLineEdit):
     __eld_text = ''
+    __lineSignal = pyqtSignal(str,int)
 
-    def __init__(self, parent=None):
+    def __init__(self, main_win,parent=None):
         super().__init__(parent)
-        self.add_menu()
+        self.createContextMenu()
+        self.main_win = main_win
+        # 绑定槽
+        self.__lineSignal.connect(main_win.get_update_Signal)
 
-    def add_menu(self):
-        self.del_menu = QtCore.Qt.CustomContextMenu()
-        self.show_action = QAction('&delete note', triggered=utils.remove_note)
-        self.del_menu.addAction(self.show_action)
-        self.setContextMenuPolicy(self.del_menu)
-        # pass
+    def createContextMenu(self):
+        ''' 
+        创建右键菜单 
+        '''
+        #  必须将ContextMenuPolicy设置为Qt.CustomContextMenu  
+        #  否则无法使用customContextMenuRequested信号  
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
+
+        #  创建QMenu  
+        self.contextMenu = QMenu(self)
+
+        self.act_copy = QAction('复制',triggered = self.copy)
+        self.act_paste = QAction('粘贴',triggered = self.paste)
+        self.act_undo = QAction('撤销',triggered = self.undo)
+        self.act_selall = QAction('全选',triggered = self.selectAll)
+        self.act_del = QAction('删除该消息',triggered = self.delete_record)
+
+        self.contextMenu.addAction(self.act_copy)
+        self.contextMenu.addAction(self.act_paste)
+        self.contextMenu.addAction(self.act_undo)
+        self.contextMenu.addAction(self.act_selall)
+        self.contextMenu.addAction(self.act_del)
+
+    def showContextMenu(self,pos):
+        ''' 
+        右键点击时调用的函数 
+        '''
+        #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(0, 20) 20为微调结果
+        self.contextMenu.move(pos+self.main_win.pos()+QPoint(95,20))
+        print(pos+self.main_win.pos()+QPoint(95,20))
+        self.contextMenu.show()
+
+    def delete_record(self):
+        id = re.findall('\d+',self.objectName())[0]
+        filter_list = [
+                ['id','=',id]
+                           ]
+        if delete_records(config.LDB_FILENAME,filer_list=filter_list) == 0:
+            QMessageBox.information(self,'提示',{}.format('无法删除空数据'))
+        else:
+            self.__lineSignal.emit(check_login_state()[0][0],1)
 
     def enterEvent(self, *args, **kwargs):
         self.__eld_text = self.text()
@@ -33,7 +72,8 @@ class AirLineEdit(QLineEdit):
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
-        data = {'id': -1, 'text': '', 'col': 'message'}
+        username = self.main_win.get_info['username']
+        data = {'id': -1, 'text': self.text()+','+username, 'col': 'message'+','+'username'}
         try:
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('note_le', ''))
@@ -48,6 +88,9 @@ class AirLineEdit(QLineEdit):
         # 更新旧的数据
         elif data['text'] != self.__eld_text:
             update_records(config.LDB_FILENAME, data, self.objectName())
+
+    def actionHandler(self):
+        print(self.objectName())
 
 
 class AirTextEdit(QTextEdit):
@@ -83,49 +126,3 @@ class hideButton(QPushButton):
             logging.error(e)
 
 
-class AirTray(QSystemTrayIcon):
-    widget = None
-
-    def __init__(self, widget):
-        super().__init__(widget)
-        self.widget = widget
-        self.set_menu()
-        self.set_icon()
-        self.show()
-
-    def set_menu(self):
-        self.main_menu = QMenu()
-        self.show_action = QAction('&show', triggered=self.widget.show)
-        self.settings_action = QAction('&settings', triggered=QDialog.show)
-        self.quit_action = QAction('&exit', triggered=self.quitapp)
-
-        self.main_menu.addAction(self.show_action)
-        self.main_menu.addAction(self.settings_action)
-        self.main_menu.addAction(self.quit_action)
-
-        self.setContextMenu(self.main_menu)
-
-    def set_icon(self):
-        self.setIcon(QIcon('./UI/app_icon.png'))
-        pass
-
-    def iconClied(self, reason):
-        "鼠标点击icon传递的信号会带有一个整形的值，1是表示单击右键，2是双击，3是单击左键，4是用鼠标中键点击"
-        if reason == 2 or reason == 3:
-            pw = self.parent()
-            if pw.isVisible():
-                pw.hide()
-            else:
-                pw.show()
-        print(reason)
-
-    def quitapp(self):
-        self.parent().show()  # w.hide() #隐藏
-        sel = QMessageBox.question(self.widget, "提示", "确定要退出Airmemo", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if sel == QMessageBox.Yes:
-            QCoreApplication.instance().quit()
-            # 在应用程序全部关闭后，TrayIcon其实还不会自动消失，
-            # 直到你的鼠标移动到上面去后，才会消失，
-            # 这是个问题，（如同你terminate一些带TrayIcon的应用程序时出现的状况），
-            # 这种问题的解决我是通过在程序退出前将其setVisible(False)来完成的。
-            self.setVisible(False)

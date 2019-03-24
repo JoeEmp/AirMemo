@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './UI\demo.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,6 +13,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.NonModal)
         MainWindow.resize(583, 386)
+        MainWindow.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("C:/Users/joe/.designer/backup/app_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -65,6 +66,7 @@ class Ui_MainWindow(object):
         self.noteLayout = QtWidgets.QGridLayout()
         self.noteLayout.setObjectName("noteLayout")
         self.note_le = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.note_le.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.note_le.setObjectName("note_le")
         self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
         self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)

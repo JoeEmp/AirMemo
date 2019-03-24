@@ -2,21 +2,16 @@
 
 # Form implementation generated from reading ui file './UI\settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from basiccolorarea import BasicColorArea
-from customcolorarea import CustomColorArea
-from hcolorarea import HColorArea
-from previewcolorarea import PreviewColorArea
-from svcolorarea import SVColorArea
 
 class Ui_Settings(object):
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
-        Settings.resize(790, 445)
+        Settings.resize(771, 422)
         self.centralwidget = QtWidgets.QWidget(Settings)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -132,7 +127,7 @@ class Ui_Settings(object):
         self.addCustomColorBtn.setObjectName("addCustomColorBtn")
         self.horizontalLayout_4.addWidget(self.addCustomColorBtn)
         self.layoutWidget1 = QtWidgets.QWidget(self.mainWgt)
-        self.layoutWidget1.setGeometry(QtCore.QRect(340, 20, 211, 201))
+        self.layoutWidget1.setGeometry(QtCore.QRect(340, 20, 301, 272))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.layoutWidget1)
         self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
@@ -363,4 +358,8 @@ class Ui_Settings(object):
         self.listWidget_2.setSortingEnabled(__sortingEnabled)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.color_tab1), _translate("Settings", "color"))
 
-
+from basiccolorarea import BasicColorArea
+from customcolorarea import CustomColorArea
+from hcolorarea import HColorArea
+from previewcolorarea import PreviewColorArea
+from svcolorarea import SVColorArea

@@ -1,6 +1,13 @@
 import logging
 
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
+# pro
+'''
+logging.basicConfig(level=logging.WARNING, filename='log.txt', filemode='a',
+                    format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
+'''
+# dev
+logging.basicConfig(level=logging.WARNING,
+                    format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
 
 # 详情编辑框大小
 TEXT_WIDTH = 320

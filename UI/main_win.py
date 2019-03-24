@@ -13,13 +13,13 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from time import sleep
-from utils import get_records, getSize, login_state, check_login_state, \
+from utils import get_records, getSize, get_login_state, check_login_state, \
     add_records
 import config
 import customWidget
-from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog, Ui_register_Dialog
+from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 import logging
-
+from UI.recycle import Ui_recycle_Dialog
 from operateSqlite import be_sql, exec_sql
 
 
@@ -30,15 +30,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     layoutWidth = 0
     layoutHeight = 0
     _records = None
+    user_info = {}
 
-    def __init__(self):
+    def __init__(self,parent=None):
         super().__init__()
         logging.info("mainwindow init")
-        username = self.check()
-        self.setData(username=username)
+        self.user_info = parent.get_info()
+        self.setData(username=self.user_info['username'])
         self.setupLayout()
         self.retranslateUi()
-        self.TrayIcon()
 
     # 初始化 窗口布局及控件
     def setupLayout(self):
@@ -47,6 +47,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowModality(QtCore.Qt.NonModal)
         self.resize(self.layoutWidth, self.layoutHeight)
         self.setFixedSize(self.layoutWidth, self.layoutHeight)
+        # 置顶
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         # 窗口总布局
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setMouseTracking(True)
@@ -54,7 +56,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(
-            QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
+                QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         # 总布局
         self.rootLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
@@ -84,7 +86,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                       config.MICRO_BTN_HEIGHT)
         self.login_btn.setStyleSheet(
-            'border-image:url(%s);' % config.LOGIN_ICON)
+                'border-image:url(%s);' % config.LOGIN_ICON)
         # 请求登录
         self.login_btn.clicked.connect(self.show_user_dlg)
         self.titleLayout.addWidget(self.login_btn)
@@ -108,7 +110,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.recycle_bin_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                             config.MICRO_BTN_HEIGHT)
         self.recycle_bin_btn.setStyleSheet(
-            'border-image:url(%s);' % config.HOMO_ICON)
+                'border-image:url(%s);' % config.HOMO_ICON)
+        self.recycle_bin_btn.clicked.connect(self.show_recycle_dlg)
+
         self.titleLayout.addWidget(self.recycle_bin_btn)
         # 关闭按钮
         self.close_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -117,7 +121,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.titleLayout.addWidget(self.close_btn)
         self.close_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
         self.close_btn.setStyleSheet(
-            'border-image:url(%s);' % config.CLOSE_ICON)
+                'border-image:url(%s);' % config.CLOSE_ICON)
         self.close_btn.clicked.connect(self.close)
 
         self.rootLayout.addLayout(self.titleLayout)
@@ -147,7 +151,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # self.noteLayout
 
             # 短消息编辑框
-            self.note_le = customWidget.AirLineEdit(self.verticalLayoutWidget)
+            self.note_le = customWidget.AirLineEdit(main_win=self,
+                                                    parent=self.verticalLayoutWidget)
             self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
             # 将id写入objName里 bwrb 必须重构
             self.note_le.setObjectName("note_le" + str(self.records[i][0]))
@@ -169,14 +174,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
             # 收起/展开按钮
             self.hide_detail_btn = QtWidgets.QPushButton(
-                self.verticalLayoutWidget)
+                    self.verticalLayoutWidget)
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))
             self.hide_detail_btn.setMaximumSize(config.BTN_WIDTH,
                                                 config.BTN_HEIGHT)
             self.hide_detail_btn.setStyleSheet(
-                'border-image:url(%s);' % config.HIDE_ICON)
+                    'border-image:url(%s);' % config.HIDE_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
@@ -235,10 +240,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Text_isShow = False
         logging.info('set data')
 
-    # 系统托盘
-    def TrayIcon(self):
-        tray = customWidget.AirTray(self)
-
     # 笔记详情的展开和收起
     def ishide(self):
         index = self.hide_detail_btn_list.index(self.sender())
@@ -257,14 +258,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 1
             self.sender().setStyleSheet(
-                'border-image:url(%s);' % config.SHOW_ICON)
+                    'border-image:url(%s);' % config.SHOW_ICON)
         else:
             self.detail_tx_list[index].hide()
             self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 0
             self.sender().setStyleSheet(
-                'border-image:url(%s);' % config.HIDE_ICON)
+                    'border-image:url(%s);' % config.HIDE_ICON)
 
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)
@@ -283,8 +284,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     # bwrb 关闭窗口后重新渲染了GUI交互不友好，希望找到方法动态插入
     def addNote(self):
-        self.setData()
-        new_record = [-1, '', '', '', 0, '']
+        self.setData(username=self.user_info['username'])
+        new_record = [-1, '', '', self.user_info['username'], 0, '']
         self.layoutHeight += config.MICRO_BTN_HEIGHT
         self.records.append(new_record)
         self.setupLayout()
@@ -312,16 +313,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def show_user_dlg(self):
         # login_dlg = QtWidgets.QDialog(self)
         # 检测登录状态
-        result = login_state()
+        result = get_login_state()
         # result['state'] = 1
         ui = None
         if result['state'] == 1:
             ui = Ui_login_Dialog(self)
-            ui.login_signal.connect(self.getDialogSignal)
+            ui.login_signal.connect(self.get_update_Signal)
         elif result['state'] == 2:
             try:
-                ui = Ui_logout_Dialog(self,result['username'])
-                ui.logout_signal.connect(self.getDialogSignal)
+                ui = Ui_logout_Dialog(self, result['username'])
+                ui.logout_signal.connect(self.get_update_Signal)
             except Exception as e:
                 logging.error(e)
         else:
@@ -331,16 +332,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if ui:
             ui.show()
 
-    """
-    实现槽函数
-    """
 
-    def getDialogSignal(self, username):
+    def get_update_Signal(self, username, is_welcome=0):
+        if is_welcome == 1:
+            return True
         if username:
             self.reset(username)
+            return True
         else:
-            QMessageBox.information(self, '提示', "{}".format('登录错误'),
+            QMessageBox.information(self, '提示', "{}".format('登录信息错误'),
                                     QMessageBox.Yes)
+            return False
 
     def reset(self, username):
         self.check()
@@ -364,6 +366,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 sql = be_sql().ins_sql(table, col_list, value_list)
                 exec_sql(config.LDB_FILENAME, sql)
             return result[0]
+
+    def show_recycle_dlg(self):
+        dlg = Ui_recycle_Dialog(parent=self, username='koko')
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

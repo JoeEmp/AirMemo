@@ -35,14 +35,14 @@ def setApp(app):
 
 
 # 查询当前用户的笔记
-def get_records(filename, username='visitor'):
+def get_records(filename, username='visitor',is_del='0'):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
         table = 'msg'
         filter_list = [
             ['username', '=', username],
-            ['is_del', '=', '0']
+            ['is_del', '=', is_del]
         ]
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
@@ -52,7 +52,7 @@ def get_records(filename, username='visitor'):
     return cur.fetchall()
 
 
-# 更新数据 wrb
+# 更新数据 wrb 更改会影响 修改逻辑
 def update_records(filename, data, ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -82,9 +82,20 @@ def add_records(filename, data):
             logging.info('add records done')
             return len(get_records(config.LDB_FILENAME)) + 1
     except Exception as e:
-        logging.error('add error ', data)
+        logging.error('add error ')
+        logging.error("insert into Msg (%s) VALUES ('%s')" % (
+                data['col'], data['text']))
         print(e)
         return -1
+
+
+# 软删除 数据
+def delete_records(filename, filer_list):
+    table = 'Msg'
+    sql = be_sql().update_sql(table=table, value_dict={'is_del': '1'},
+                              filter_list=filer_list)
+    print(sql)
+    return exec_sql(filename, sql, is_update=1)
 
 
 # 根据系统返回天数删除软删除记录
@@ -101,7 +112,7 @@ def clear_records(filename, sever_date):
 def get_user_info(table, username):
     filter_list = [['username', '=', username]]
     sql = be_sql().sel_sql(table, filter_list=filter_list)
-    return  exec_sql(config.LDB_FILENAME,sql)
+    return exec_sql(config.LDB_FILENAME, sql)
 
 
 # 未实现
@@ -133,9 +144,9 @@ def login(username, password):
 
 
 # wrb
-def login_state():
+def get_login_state():
     '''
-
+    查询 服务器的登录状态
     :return:
     '''
     # 检查本地token
@@ -166,11 +177,11 @@ def login_state():
     return state
 
 
-# wrb  目标将 list 转成 dict
+# wrb  目标将 list 转成 dict 本地状态查询
 def check_login_state():
     '''
     查找token非空的人
-    :return: 查询结果 结构[username,token]
+    :return: 查询结果 结构[(username,token)]
     '''
     table = 'user'
     need_col_list = ['username', 'token']
@@ -194,7 +205,8 @@ def logout(username):
                 'User-Agent': 'AirMemo'
             }
             data = {'username': username, 'token': result[1]}
-            r = requests.post(protocol + user_host + url, headers=headers, data=data)
+            r = requests.post(protocol + user_host + url, headers=headers,
+                              data=data)
             return r.json()
     except Exception as e:
         logging.error(e)
@@ -219,3 +231,10 @@ if __name__ == '__main__':
     # print(get_records(dbName))
     # # clear_records(filename=dbName,Severdate='2019-01-05')
     # print(get_records(dbName))
+    filter_list = [
+        ['id', '=', str(-1)]
+    ]
+    ret = delete_records(config.LDB_FILENAME, filter_list)
+    print(ret)
+
+    print([] is None)

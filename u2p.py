@@ -38,7 +38,7 @@ if __name__ == "__main__":
     ulist = []
     findUI(ulist)
     # 只转化指定文件
-    sub_ulist = []
+    sub_ulist = ['UI/recycle.ui']
     if not sub_ulist:
         translation(ulist)
     else:
