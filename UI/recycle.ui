@@ -19,14 +19,21 @@
      <x>10</x>
      <y>10</y>
      <width>341</width>
-     <height>61</height>
+     <height>67</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QCheckBox" name="checkBox">
+     <widget class="QCheckBox" name="message_check">
       <property name="text">
        <string>CheckBox</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="detail_sub_lab">
+      <property name="text">
+       <string>TextLabel</string>
       </property>
      </widget>
     </item>
@@ -46,7 +53,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="restore_btn">
         <property name="text">
          <string>还原</string>
         </property>

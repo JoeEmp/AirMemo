@@ -35,6 +35,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         logging.info("mainwindow init")
+        self.parent = parent
         self.user_info = parent.get_info()
         self.setData(username=self.user_info['username'])
         self.setupLayout()
@@ -351,23 +352,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def check(self):
-        result = check_login_state()
-        if not result:
-            return 'visitor'
-        else:
-            # wrb
-            result = result[0]
-            records = get_records(config.LDB_FILENAME, result[0])
-            if not records:
-                table = 'Msg'
-                col_list = ['message', 'detail', 'username']
-                value_list = ['Welcome', 'Thanks you support', result[0]]
-                sql = be_sql().ins_sql(table, col_list, value_list)
-                exec_sql(config.LDB_FILENAME, sql)
-            return result[0]
+        self.parent.update_info()
+        self.user_info = self.parent.get_info()
+        records = get_records(config.LDB_FILENAME, self.user_info['username'])
+        if not records:
+            table = 'Msg'
+            col_list = ['message', 'detail', 'username']
+            value_list = ['Welcome', 'Thanks you support', self.user_info['username']]
+            sql = be_sql().ins_sql(table, col_list, value_list)
+            exec_sql(config.LDB_FILENAME, sql)
+        return self.user_info['username']
 
     def show_recycle_dlg(self):
-        dlg = Ui_recycle_Dialog(parent=self, username=self.user_info['username'])
+        dlg = Ui_recycle_Dialog(parent=self)
+        dlg.updateSignal.connect(self.get_update_Signal)
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

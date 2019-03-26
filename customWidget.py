@@ -64,7 +64,8 @@ class AirLineEdit(QLineEdit):
         if delete_records(config.LDB_FILENAME,filer_list=filter_list) == 0:
             QMessageBox.information(self,'提示',{}.format('无法删除空数据'))
         else:
-            self.__lineSignal.emit(check_login_state()[0][0],1)
+            # 期望不删除预设数据 未实现 wrb
+            self.__lineSignal.emit(self.main_win.user_info['username'],0)
 
     def enterEvent(self, *args, **kwargs):
         self.__eld_text = self.text()
@@ -72,7 +73,6 @@ class AirLineEdit(QLineEdit):
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
-
         data = {'id': -1, 'text': self.text(), 'col': 'message'+','+'username'}
         try:
             # 使用 objName 获取id bwrb
@@ -84,15 +84,12 @@ class AirLineEdit(QLineEdit):
         if data['id'] == -1 and data['text']:
             # print(data)
             username = self.main_win.user_info['username']
-            data['text'] = text = self.text()+"','"+username
+            data['text'] = self.text()+"','"+username
             new_id = add_records(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
         # 更新旧的数据
         elif data['text'] != self.__eld_text:
             update_records(config.LDB_FILENAME, data, self.objectName())
-
-    def actionHandler(self):
-        print(self.objectName())
 
 
 class AirTextEdit(QTextEdit):

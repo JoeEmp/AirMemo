@@ -1,3 +1,5 @@
+import hashlib
+
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyleFactory, QDialog
@@ -115,11 +117,7 @@ def get_user_info(table, username):
     return exec_sql(config.LDB_FILENAME, sql)
 
 
-# 未实现
-def remove_note():
-    pass
-
-
+# 获取索引
 def get_index(dict, keys):
     if not keys or not dict:
         return None
@@ -137,7 +135,8 @@ def login(username, password):
     headers = {
         'User-Agent': 'AirMemo'
     }
-    data = {'username': username, 'password': password}
+    cryptograph_password()
+    data = {'username': username, 'password': cryptograph_password(password)}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     print(r.json())
     return r.json()
@@ -224,6 +223,16 @@ def register(username, password):
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
 
+
+# 产生密文密码
+def cryptograph_password(password):
+    if password:
+        m = hashlib.md5()
+        m.update(password.encode('utf-8'))
+        cryptograph = m.hexdigest()
+    else:
+        cryptograph = None
+    return cryptograph
 
 if __name__ == '__main__':
     pass
