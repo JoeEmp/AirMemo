@@ -18,11 +18,11 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
     def __init__(self, parent, username):
         super().__init__(parent=parent)
-        self.set_data()
+        self.set_data(username)
         self.setupUi()
         self.show()
 
-    def set_data(self, username='koko'):
+    def set_data(self, username):
         self.del_records = utils.get_records(config.LDB_FILENAME, username,
                                              is_del='1')
 

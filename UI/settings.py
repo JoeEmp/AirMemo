@@ -358,8 +358,8 @@ class Ui_Settings(object):
         self.listWidget_2.setSortingEnabled(__sortingEnabled)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.color_tab1), _translate("Settings", "color"))
 
-from basiccolorarea import BasicColorArea
-from customcolorarea import CustomColorArea
-from hcolorarea import HColorArea
-from previewcolorarea import PreviewColorArea
-from svcolorarea import SVColorArea
+# from basiccolorarea import BasicColorArea
+# from customcolorarea import CustomColorArea
+# from hcolorarea import HColorArea
+# from previewcolorarea import PreviewColorArea
+# from svcolorarea import SVColorArea

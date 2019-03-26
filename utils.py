@@ -177,11 +177,12 @@ def get_login_state():
     return state
 
 
-# wrb  目标将 list 转成 dict 本地状态查询
+# wrb  目标将 list 转成 dict 本地状态
 def check_login_state():
     '''
     查找token非空的人
     :return: 查询结果 结构[(username,token)]
+             无查询结果时 结构为[]
     '''
     table = 'user'
     need_col_list = ['username', 'token']

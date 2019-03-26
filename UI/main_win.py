@@ -32,7 +32,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     _records = None
     user_info = {}
 
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__()
         logging.info("mainwindow init")
         self.user_info = parent.get_info()
@@ -332,7 +332,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if ui:
             ui.show()
 
-
     def get_update_Signal(self, username, is_welcome=0):
         if is_welcome == 1:
             return True
@@ -368,7 +367,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             return result[0]
 
     def show_recycle_dlg(self):
-        dlg = Ui_recycle_Dialog(parent=self, username='koko')
+        dlg = Ui_recycle_Dialog(parent=self, username=self.user_info['username'])
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

@@ -41,12 +41,13 @@ class AirTray(QSystemTrayIcon):
         self.__user_info = self.check()
         self.set_icon()
 
+    # 获取 username 以及 token ，默认为 'visitor'
     def check(self):
         result = check_login_state()
-        if not result:
-            return {'username': 'visitor', 'token': ''}
-        else:
+        if result:
             return {'username': result[0][0], 'token': result[0][1]}
+        else:
+            return {'username': 'visitor', 'token': ''}
 
     def iconClied(self, reason):
         "鼠标点击icon传递的信号会带有一个整形的值，1是表示单击右键，2是双击，3是单击左键，4是用鼠标中键点击"
@@ -60,6 +61,9 @@ class AirTray(QSystemTrayIcon):
 
     def get_info(self):
         return self.__user_info
+
+    def update_info(self):
+        self.__user_info = self.check()
 
     def quitapp(self):
         try:

@@ -72,8 +72,8 @@ class AirLineEdit(QLineEdit):
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
-        username = self.main_win.get_info['username']
-        data = {'id': -1, 'text': self.text()+','+username, 'col': 'message'+','+'username'}
+
+        data = {'id': -1, 'text': self.text(), 'col': 'message'+','+'username'}
         try:
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('note_le', ''))
@@ -83,6 +83,8 @@ class AirLineEdit(QLineEdit):
         # 插入新的数据
         if data['id'] == -1 and data['text']:
             # print(data)
+            username = self.main_win.user_info['username']
+            data['text'] = text = self.text()+"','"+username
             new_id = add_records(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
         # 更新旧的数据
