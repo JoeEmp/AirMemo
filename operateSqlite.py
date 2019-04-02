@@ -91,7 +91,7 @@ class be_sql(object):
         return sql
 
 
-def exec_sql(filename, sql,is_update = None):
+def exec_sql(filename, sql, is_update=None):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
@@ -104,6 +104,7 @@ def exec_sql(filename, sql,is_update = None):
         return cur.fetchall()
     else:
         return cur.rowcount
+
 
 if __name__ == '__main__':
     pass

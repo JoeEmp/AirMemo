@@ -51,9 +51,9 @@ class AirLineEdit(QLineEdit):
         ''' 
         右键点击时调用的函数 
         '''
-        #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(0, 20) 20为微调结果
+        #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(95, 20) 20为微调结果
         self.contextMenu.move(pos+self.main_win.pos()+QPoint(95,20))
-        print(pos+self.main_win.pos()+QPoint(95,20))
+        # logging.warning(pos+self.main_win.pos()+QPoint(95,20))
         self.contextMenu.show()
 
     def delete_record(self):
@@ -78,11 +78,11 @@ class AirLineEdit(QLineEdit):
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('note_le', ''))
         except Exception as e:
-            print(e)
+            logging.warning(e)
         data['text'] = self.text()
         # 插入新的数据
         if data['id'] == -1 and data['text']:
-            # print(data)
+            # logging.warning(data)
             username = self.main_win.user_info['username']
             data['text'] = self.text()+"','"+username
             new_id = add_records(config.LDB_FILENAME, data)
@@ -106,7 +106,7 @@ class AirTextEdit(QTextEdit):
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('detail_tx', ''))
         except Exception as e:
-            print(e)
+            logging.warning(e)
         data['text'] = self.toPlainText()
         # 更新数据库
         if data['text'] != self.__eld_text:

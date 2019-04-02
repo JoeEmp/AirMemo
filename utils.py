@@ -37,7 +37,7 @@ def setApp(app):
 
 
 # 查询当前用户的笔记
-def get_records(filename, username='visitor',is_del='0'):
+def get_records(filename, username='visitor', is_del='0'):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
@@ -86,7 +86,7 @@ def add_records(filename, data):
     except Exception as e:
         logging.error('add error ')
         logging.error("insert into Msg (%s) VALUES ('%s')" % (
-                data['col'], data['text']))
+            data['col'], data['text']))
         print(e)
         return -1
 
@@ -233,6 +233,7 @@ def cryptograph_password(password):
     else:
         cryptograph = None
     return cryptograph
+
 
 if __name__ == '__main__':
     pass

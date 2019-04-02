@@ -1,101 +1,137 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './UI\demo.ui'
+# Form implementation generated from reading ui file './UI\recycle.ui'
 #
 # Created by: PyQt5 UI code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
-
+import re
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal
+import operateSqlite
+import config
+import utils
+import logging
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.setWindowModality(QtCore.Qt.NonModal)
-        MainWindow.resize(583, 386)
-        MainWindow.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("C:/Users/joe/.designer/backup/app_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-        MainWindow.setAutoFillBackground(True)
-        MainWindow.setUnifiedTitleAndToolBarOnMac(False)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+
+class Ui_recycle_Dialog(QtWidgets.QDialog):
+    updateSignal = pyqtSignal(str)
+    item_set = set()
+
+    def __init__(self, parent):
+        super().__init__(parent=parent)
+        self.set_data(parent.user_info['username'])
+        self.parent = parent
+        self.setupUi()
+        self.show()
+
+    def set_data(self, username):
+        self.del_records = utils.get_records(config.LDB_FILENAME, username,
+                                             is_del='1')
+
+    def setupUi(self):
+        self.setObjectName("recycle_Dialog")
+        self.resize(config.TEXT_WIDTH,
+                    config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
+        # self.setFixedSize(config.TEXT_WIDTH,
+        #             config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
+        # 窗口总布局
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setMouseTracking(True)
         self.centralwidget.setObjectName("centralwidget")
+
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 291, 216))
+        self.verticalLayoutWidget.setGeometry(
+                QtCore.QRect(10, 10, config.TEXT_WIDTH,
+                             config.BTN_HEIGHT * len(
+                                     self.del_records) * 2 + 30))
+        #打印 布局高度
+        print(self.verticalLayoutWidget.height())
+
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
-        self.rootLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-        self.rootLayout.setContentsMargins(0, 0, 0, 0)
-        self.rootLayout.setObjectName("rootLayout")
-        self.titleLayout = QtWidgets.QHBoxLayout()
-        self.titleLayout.setObjectName("titleLayout")
-        self.label = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.label.setAutoFillBackground(True)
-        self.label.setObjectName("label")
-        self.titleLayout.addWidget(self.label)
-        self.label_2 = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.label_2.setObjectName("label_2")
-        self.titleLayout.addWidget(self.label_2)
-        self.login_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.login_btn.setText("")
-        self.login_btn.setObjectName("login_btn")
-        self.titleLayout.addWidget(self.login_btn)
-        self.homology_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.homology_btn.setText("")
-        self.homology_btn.setObjectName("homology_btn")
-        self.titleLayout.addWidget(self.homology_btn)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.titleLayout.addItem(spacerItem)
-        self.recycle_bin_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.recycle_bin_btn.setText("")
-        self.recycle_bin_btn.setObjectName("recycle_bin_btn")
-        self.titleLayout.addWidget(self.recycle_bin_btn)
-        self.close_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.close_btn.setText("")
-        self.close_btn.setObjectName("close_btn")
-        self.titleLayout.addWidget(self.close_btn)
-        self.rootLayout.addLayout(self.titleLayout)
-        self.winLayout = QtWidgets.QHBoxLayout()
-        self.winLayout.setObjectName("winLayout")
-        self.hideBtn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.hideBtn.setObjectName("hideBtn")
-        self.winLayout.addWidget(self.hideBtn)
-        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+
         self.verticalLayout.setObjectName("verticalLayout")
-        self.noteLayout = QtWidgets.QGridLayout()
-        self.noteLayout.setObjectName("noteLayout")
-        self.note_le = QtWidgets.QLineEdit(self.verticalLayoutWidget)
-        self.note_le.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.note_le.setObjectName("note_le")
-        self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
-        self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.send_btn.setText("")
-        self.send_btn.setObjectName("send_btn")
-        self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
-        self.hide_detail_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.hide_detail_btn.setText("")
-        self.hide_detail_btn.setObjectName("hide_detail_btn")
-        self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
-        self.detail_tx = QtWidgets.QTextEdit(self.verticalLayoutWidget)
-        self.detail_tx.setObjectName("detail_tx")
-        self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
-        self.verticalLayout.addLayout(self.noteLayout)
-        self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.add_btn.setObjectName("add_btn")
-        self.verticalLayout.addWidget(self.add_btn)
-        self.winLayout.addLayout(self.verticalLayout)
-        self.rootLayout.addLayout(self.winLayout)
-        MainWindow.setCentralWidget(self.centralwidget)
+        for i in range(len(self.del_records)):
+            self.message_check = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+            self.message_check.setObjectName(
+                    "message_check" + str(self.del_records[i][0]))
+            # 设置 msg
+            self.message_check.setText(self.del_records[i][1])
+            self.message_check.setChecked(False)
+            self.message_check.clicked.connect(self.set_list)
+            self.verticalLayout.addWidget(self.message_check)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+            self.detail_sub_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
+            self.detail_sub_lab.setObjectName(
+                    "detail_sub_lab" + str(self.del_records[i][0]))
+            # 设置 detail
+            if not self.del_records[i][2]:
+                self.detail_sub_lab.setText('无详细信息')
+            elif len(self.del_records[i][2]) > config.TEXT_WIDTH:
+                self.detail_sub_lab.setText(
+                        self.del_records[i][2][:config.TEXT_WIDTH - 3] + '...')
+            else:
+                self.detail_sub_lab.setText(self.del_records[i][2])
+            self.verticalLayout.addWidget(self.detail_sub_lab)
 
-    def retranslateUi(self, MainWindow):
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtWidgets.QSpacerItem(40, 20,
+                                           QtWidgets.QSizePolicy.Expanding,
+                                           QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.restore_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.restore_btn.setObjectName("restore_btn")
+        self.horizontalLayout.addWidget(self.restore_btn)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20,
+                                            QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem1)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.retranslateUi()
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+        self.restore_btn.clicked.connect(self.restore_records)
+
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "demo"))
-        self.label.setText(_translate("MainWindow", "icon"))
-        self.label_2.setText(_translate("MainWindow", "demo"))
-        self.hideBtn.setText(_translate("MainWindow", "hide"))
-        self.add_btn.setText(_translate("MainWindow", "add"))
+        self.setWindowTitle(_translate("Dialog", "回收站"))
+        self.restore_btn.setText(_translate("Dialog", "还原"))
 
+    def reset(self):
+        self.set_data(self.parent.user_info['username'])
+        self.setupUi()
+        self.show()
+
+    def restore_records(self):
+        table = 'Msg'
+        value_dict = {'is_del': '0'}
+        for i in self.item_set:
+            filter_list = [
+                ['id', '=', str(i)]
+            ]
+            sql = operateSqlite.be_sql().update_sql(table=table,
+                                                    value_dict=value_dict,
+                                                    filter_list=filter_list)
+            operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+        self.reset()
+        self.item_set.clear()
+
+    def set_list(self):
+        # print(self.sender().objectName())
+        try:
+            id = int(re.findall('\d+', self.sender().objectName())[0])
+        except Exception as e:
+            logging.info(e)
+        if self.sender().isChecked():
+            self.item_set.add(id)
+        else:
+            self.item_set.remove(id)
+        # print(self.item_set)
+
+    def closeEvent(self, QCloseEvent):
+        self.updateSignal.emit(self.parent.user_info['username'])
+        self.item_set.clear()
