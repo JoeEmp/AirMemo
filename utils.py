@@ -11,7 +11,7 @@ from operateSqlite import be_sql, exec_sql
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
-pro_host = '149.129.125:5000'
+pro_host = '149.129.125.8:5000'
 user_host = local_host
 
 
@@ -196,7 +196,7 @@ def logout(username):
     :return:
     '''
     result = check_login_state()
-    print(result)
+    logging.debug(result)
     try:
         if result:
             result = result[0]

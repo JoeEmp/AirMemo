@@ -12,6 +12,7 @@ import operateSqlite
 import config
 import utils
 import logging
+import sip
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):
@@ -98,7 +99,9 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        self.restore_btn.clicked.connect(self.restore_records)
+
+
+    def restore_records(self):        self.restore_btn.clicked.connect(self.restore_records)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -106,11 +109,12 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.restore_btn.setText(_translate("Dialog", "还原"))
 
     def reset(self):
+        self.verticalLayout.removeWidget(self.detail_sub_lab)
+        sip.delete(self.detail_sub_lab)
+        self.repaint()
         self.set_data(self.parent.user_info['username'])
         self.setupUi()
         self.show()
-
-    def restore_records(self):
         table = 'Msg'
         value_dict = {'is_del': '0'}
         for i in self.item_set:
