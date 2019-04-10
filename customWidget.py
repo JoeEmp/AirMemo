@@ -6,22 +6,12 @@ import os
 from PyQt5.QtCore import QCoreApplication, Qt, QPoint, pyqtSignal
 from PyQt5.QtGui import QIcon, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
-    QMenu, QAction, QDialog, QMessageBox
+    QMenu, QAction, QMessageBox
 import logging
 from utils import update_records, add_records, delete_records, check_login_state
 import config
 import re
 
-<<<<<<< HEAD
-from PyQt5.QtWidgets import *
-
-class AirLineEdit(QLineEdit):
-    def focusOutEvent(self, QFocusEvent):
-        self.setDisabled(True)
-
-    def focusInEvent(self, QFocusEvent):
-        self.setDisabled(False)
-=======
 
 class AirLineEdit(QLineEdit):
     __eld_text = ''
@@ -134,4 +124,3 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
->>>>>>> joe
