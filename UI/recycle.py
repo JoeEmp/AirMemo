@@ -10,85 +10,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 import operateSqlite
 import config
-<<<<<<< HEAD
-from customWidget import AirLineEdit
-
-class Ui_MainWindow(object):
-
-    def setUi(self,MainWindow):
-        self.setData(MainWindow)
-        self.setupLaylout(MainWindow)
-        self.retranslateUi(MainWindow)
-        # self.TrayIcon(MainWindow)
-
-    #初始化数据
-    def setData(self,MainWindow):
-        self.records=get_records(config.LDB_FILENAME)
-        self.layoutWidth=config.BASEWIDTH
-        self.layoutHeight=(len(self.records)+1)*config.BTN_HEIGHT
-
-        self.Text_isShow=False
-        MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint|QtCore.Qt.WindowTitleHint)
-        # MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        # MainWindow.setWindowFlags(QtCore.Qt.WindowTitleHint)
-
-        pass
-
-    def setupLaylout(self, MainWindow):
-        #窗口
-        records=get_records(config.LDB_FILENAME)
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(self.layoutWidth,self.layoutHeight)
-
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(self.layoutWidth,self.layoutHeight)
-
-        #窗口总布局
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        #窗口大小
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 0, config.BASEWIDTH, (len(records) + 1) * config.BTN_HEIGHT))
-        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
-        #Memo总布局
-        self.rootLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
-        self.rootLayout.setContentsMargins(0, 0, 0, 0)
-        self.rootLayout.setObjectName("rootLayout")
-        self.rootLayout.setGeometry(QtCore.QRect(0, 0,560,550))
-        #收起按钮
-        self.hideBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.hideBtn.setObjectName("hideBtn")
-        #尺寸限制
-        self.hideBtn.setMaximumSize(config.HIDE_BTN_WIDTH, 20)
-        self.rootLayout.addWidget(self.hideBtn)
-
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setObjectName("verticalLayout")
-
-        self.noteLineEditList=[]
-        self.hide_detailBtnList=[]
-        self.detailTextEditList=[]
-        self.detailTextEdit_state_List=[]
-
-        for i in range(len(get_records(config.LDB_FILENAME))):
-            self.noteLayout = QtWidgets.QGridLayout()
-            self.noteLayout.setObjectName("noteLayout"+str(i))
-
-            #收起/展开按钮
-            self.hide_detailBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-            self.hide_detailBtn.setObjectName("hide_detailBtn"+str(i))
-            self.noteLayout.addWidget(self.hide_detailBtn, 0, 2, 1, 1)
-            #加入相应列表
-            self.hide_detailBtnList.append(self.hide_detailBtn)
-
-            #发送按钮
-            self.sendBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-            self.sendBtn.setObjectName("sendBtn"+str(i))
-            self.sendBtn.setText(str(i+1))
-            self.noteLayout.addWidget(self.sendBtn, 0, 0, 1, 1)
-=======
 import utils
 import logging
+import sip
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):
@@ -103,28 +27,30 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.show()
 
     def set_data(self, username):
-        self.del_records = utils.get_records(config.LDB_FILENAME, username,
-                                             is_del='1')
+        self.del_records = utils.get_records(config.LDB_FILENAME, username, is_del='1')
+        self.records_len = len(self.del_records)
 
     def setupUi(self):
         self.setObjectName("recycle_Dialog")
         self.resize(config.TEXT_WIDTH,
-                    config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
+                    config.BTN_HEIGHT * self.records_len * 2 + 50)
         # self.setFixedSize(config.TEXT_WIDTH,
         #             config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
         # 窗口总布局
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setMouseTracking(True)
         self.centralwidget.setObjectName("centralwidget")
->>>>>>> joe
+        # self.centralwidget.setGeometry(
+        #         QtCore.QRect(0, 0, config.TEXT_WIDTH + 20,
+        #                      config.BTN_HEIGHT * len(
+        #                              self.del_records) * 2 + 30) + 20)
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(
                 QtCore.QRect(10, 10, config.TEXT_WIDTH,
-                             config.BTN_HEIGHT * len(
-                                     self.del_records) * 2 + 30))
-        #打印 布局高度
-        print(self.verticalLayoutWidget.height())
+                             config.BTN_HEIGHT * self.records_len * 2 + 30))
+        # 打印 布局高度
+        logging.warning(self.verticalLayoutWidget.height())
 
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
@@ -172,6 +98,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
+    def restore_records(self):
         self.restore_btn.clicked.connect(self.restore_records)
 
     def retranslateUi(self):
@@ -180,11 +107,12 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.restore_btn.setText(_translate("Dialog", "还原"))
 
     def reset(self):
+        self.verticalLayout.removeWidget(self.detail_sub_lab)
+        sip.delete(self.detail_sub_lab)
+        self.repaint()
         self.set_data(self.parent.user_info['username'])
         self.setupUi()
         self.show()
-
-    def restore_records(self):
         table = 'Msg'
         value_dict = {'is_del': '0'}
         for i in self.item_set:
@@ -208,7 +136,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
             self.item_set.add(id)
         else:
             self.item_set.remove(id)
-        # print(self.item_set)
+            # print(self.item_set)
 
     def closeEvent(self, QCloseEvent):
         self.updateSignal.emit(self.parent.user_info['username'])

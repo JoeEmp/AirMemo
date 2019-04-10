@@ -1,0 +1,7 @@
+##ignore dir file##
+__pycache__
+.idea
+.vscode
+
+##ignore file ##
+*.db

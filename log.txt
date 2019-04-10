@@ -1,0 +1,5 @@
+2019-03-24 23:18:50,048 ERROR AirTray.py quitapp 'NoneType' object has no attribute 'show'
+2019-03-24 23:20:09,268 ERROR AirTray.py quitapp 'NoneType' object has no attribute 'show'
+2019-03-24 23:35:19,107 ERROR AirTray.py quitapp too many values to unpack (expected 2)
+2019-03-24 23:35:59,072 ERROR AirTray.py quitapp too many values to unpack (expected 2)
+2019-03-24 23:37:53,527 ERROR AirTray.py quitapp too many values to unpack (expected 2)
