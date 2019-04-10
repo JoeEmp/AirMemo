@@ -27,8 +27,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.show()
 
     def set_data(self, username):
-        self.del_records = utils.get_records(config.LDB_FILENAME, username,
-                                             is_del='1')
+        self.del_records = utils.get_records(config.LDB_FILENAME, username, is_del='1')
         self.records_len = len(self.del_records)
 
     def setupUi(self):
@@ -99,9 +98,8 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
-
-
-    def restore_records(self):        self.restore_btn.clicked.connect(self.restore_records)
+    def restore_records(self):
+        self.restore_btn.clicked.connect(self.restore_records)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

@@ -357,9 +357,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         records = get_records(config.LDB_FILENAME, self.user_info['username'])
         if not records:
             table = 'Msg'
-            col_list = ['message', 'detail', 'username']
-            value_list = ['Welcome', 'Thanks you support', self.user_info['username']]
-            sql = be_sql().ins_sql(table, col_list, value_list)
+            dict = {'message': 'Welcome', 'detail': 'Thanks you support',
+                    'username': self.user_info['username']}
+            sql = be_sql().ins_sql(table, dict)
             exec_sql(config.LDB_FILENAME, sql)
         return self.user_info['username']
 

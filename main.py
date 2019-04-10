@@ -14,7 +14,7 @@ if __name__ == '__main__':
     tray = AirTray()
     mainWindow = Ui_MainWindow(tray)
     setting_win = 1
-    dict = {'main_win':mainWindow,'setting_win':setting_win}
+    dict = {'main_win': mainWindow, 'setting_win': setting_win}
     tray.set_menu(dict)
     tray.show()
     mainWindow.show()

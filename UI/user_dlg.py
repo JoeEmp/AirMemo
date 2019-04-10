@@ -45,10 +45,12 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         # 设置模式
         self.password_le.setEchoMode(QLineEdit.Password)
 
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                           QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 0, 2, 1, 1)
 
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 4, 2, 1, 1)
 
         self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
@@ -72,10 +74,12 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.username_lab.setObjectName("username_lab")
         self.gridLayout.addWidget(self.username_lab, 1, 1, 1, 1)
 
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem2, 3, 0, 1, 1)
 
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem3, 2, 2, 1, 1)
 
         QtCore.QMetaObject.connectSlotsByName(self)
@@ -99,24 +103,24 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                     table = 'user'
                     if not utils.get_user_info(table, self.username_le.text()):
                         # 没有用户直接插入
-                        col_list = ['username', 'token']
-                        value_list = [self.username_le.text(), result['token']]
-                        sql = operateSqlite.be_sql().ins_sql(table,col_list,value_list)
-                        operateSqlite.exec_sql(config.LDB_FILENAME,sql)
+                        dict = {'username': self.username_le.text(), 'token': result['token']}
+                        sql = operateSqlite.be_sql().ins_sql(table, dict)
+                        operateSqlite.exec_sql(config.LDB_FILENAME, sql)
                     # 已有用户更新数据
                     else:
                         value_dict = {'token': result['token']}
                         filter_list = [['username', '=', self.username_le.text()]]
                         sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
                                                                 filter_list=filter_list)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql,is_update=1)
+                        operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
                     try:
                         self.login_signal.emit(self.username_le.text())  # 发射信号
                     except Exception as e:
                         logging.error(e)
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
+                                            QMessageBox.Yes)
             except Exception as e:
                 logging.error(e)
 
@@ -155,7 +159,8 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
 
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                           QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 1, 2, 1, 1)
 
         self.logout_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
@@ -167,10 +172,12 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
         self.gridLayout.addWidget(self.wel_lab, 0, 1, 1, 1)
 
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem1, 1, 0, 1, 1)
 
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 2, 1, 1, 1)
         #
         self.logout_btn.clicked.connect(self.do_logout)
@@ -195,7 +202,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             ]
             sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
             # print(sql)
-            operateSqlite.exec_sql(config.LDB_FILENAME, sql,is_update=1)
+            operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
             self.close()
             self.logout_signal.emit('visitor')
         else:
@@ -223,10 +230,12 @@ class Ui_register_Dialog(QtWidgets.QDialog):
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
 
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                           QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 0, 2, 1, 1)
 
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 4, 2, 1, 1)
 
         self.label = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -237,14 +246,16 @@ class Ui_register_Dialog(QtWidgets.QDialog):
         self.password_le.setObjectName("lineEdit_2")
         self.gridLayout.addWidget(self.password_le, 3, 2, 1, 1)
 
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 2, 2, 1, 1)
 
         self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.username_le.setObjectName("lineEdit")
         self.gridLayout.addWidget(self.username_le, 1, 2, 1, 1)
 
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem3, 6, 2, 1, 1)
 
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -255,7 +266,8 @@ class Ui_register_Dialog(QtWidgets.QDialog):
         self.again_le.setObjectName("password_le")
         self.gridLayout.addWidget(self.again_le, 5, 2, 1, 1)
 
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem4, 5, 0, 1, 1)
 
         self.username_lab = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -296,7 +308,8 @@ class Ui_register_Dialog(QtWidgets.QDialog):
                 if result['state'] == 1:
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
+                                            QMessageBox.Yes)
             else:
                 QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
         elif not self.username_le.text():
