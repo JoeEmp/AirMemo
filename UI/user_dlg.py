@@ -25,6 +25,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.setObjectName("login_Dialog")
         self.resize(293, 192)
         self.setSizeGripEnabled(False)
+        # 非模模式
         self.setModal(False)
 
         self.gridLayoutWidget = QtWidgets.QWidget(self)

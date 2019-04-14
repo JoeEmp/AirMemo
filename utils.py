@@ -131,11 +131,11 @@ def get_index(dict, keys):
 
 
 def login(username, password):
-    url = '/login'
+    url = '/api/login'
     headers = {
         'User-Agent': 'AirMemo'
     }
-    cryptograph_password()
+    # cryptograph_password()
     data = {'username': username, 'password': cryptograph_password(password)}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     print(r.json())
@@ -157,7 +157,7 @@ def get_login_state():
     else:
         result = result[0]
         try:
-            url = '/check_login'
+            url = '/api/check_login'
             headers = {
                 'User-Agent': 'AirMemo'
             }
@@ -200,7 +200,7 @@ def logout(username):
     try:
         if result:
             result = result[0]
-            url = '/logout'
+            url = '/api/logout'
             headers = {
                 'User-Agent': 'AirMemo'
             }
@@ -215,7 +215,7 @@ def logout(username):
 
 # 同login
 def register(username, password):
-    url = '/register'
+    url = '/api/register'
     headers = {
         'User-Agent': 'AirMemo'
     }

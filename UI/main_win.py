@@ -215,8 +215,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle(_translate("MainWindow", "AirMemo"))
         for i in range(len(self.records)):
             # 根据表结构写死了两个索引值，后面再改 wrb
-            self.note_le_list[i].setText(self.records[i][1])
-            self.detail_tx_list[i].setText(self.records[i][2])
+            self.note_le_list[i].setText(self.records[i][2])
+            self.detail_tx_list[i].setText(self.records[i][3])
         self.welt_btn.setText(_translate("MainWindow", "welt"))
         self.add_btn.setText(_translate("MainWindow", "add"))
         self.setStyleSheet('QMainWindow{background-color:rgba(196,255,255,1);}')
