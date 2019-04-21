@@ -8,6 +8,10 @@ import config
 import logging
 import requests
 from operateSqlite import be_sql, exec_sql
+import smtplib
+from email.mime.text import MIMEText
+from email.utils import formataddr
+import re
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -161,7 +165,7 @@ def get_login_state():
             headers = {
                 'User-Agent': 'AirMemo'
             }
-            data = {'username': result[0], 'token': result[1]}
+            data = {'username': result['username'], 'token': result['token']}
             r = requests.post(protocol + user_host + url, headers=headers,
                               data=data)
         except Exception as e:
@@ -235,6 +239,38 @@ def cryptograph_password(password):
     return cryptograph
 
 
+def mail(info, title, recipients, content):
+    # 获取授权密码
+    record = exec_sql(config.LDB_FILENAME,
+                      "select * from email_settings where username ='%s'" % info['username'])[0]
+    password = record['password']
+
+    # ssl 端口设置
+    port = 25
+    if record['user_ssl'] == 1:
+        port = record['ssl_port']
+
+    ret = {'state': 1, 'errMsg': ''}
+    try:
+        msg = MIMEText(content, 'plain', 'utf-8')
+        msg['From'] = formataddr([record['sender_name'], info['addr']])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+        msg['To'] = ','.join([recipients])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+        msg['Subject'] = title  # 邮件的主题，也可以说是标题
+
+        if port != 25:
+            server = smtplib.SMTP_SSL("smtp.163.com", port)  # 发件人邮箱中的SMTP服务器，端口是25
+
+        server.login(info['addr'], password)  # 括号中对应的是发件人邮箱账号、邮箱密码
+
+        server.sendmail(info['addr'], msg['To'].split(','),
+                        msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+        server.quit()
+    except Exception as e:
+        logging.warning(str(e.smtp_error, encoding='gbk'))
+        ret = {'state': -1, 'errMsg': '账号%s %s' % (info['addr'], str(e.smtp_error, encoding='gbk'))}
+    return ret
+
+
 if __name__ == '__main__':
     pass
     # dbName = r'AirMemo.db'
@@ -242,10 +278,3 @@ if __name__ == '__main__':
     # print(get_records(dbName))
     # # clear_records(filename=dbName,Severdate='2019-01-05')
     # print(get_records(dbName))
-    filter_list = [
-        ['id', '=', str(-1)]
-    ]
-    ret = delete_records(config.LDB_FILENAME, filter_list)
-    print(ret)
-
-    print([] is None)

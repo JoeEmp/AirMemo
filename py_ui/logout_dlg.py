@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './UI\logout_dlg.ui'
+# Form implementation generated from reading ui file './ui\logout_dlg.ui'
 #
-# Created by: PyQt5 UI code generator 5.10
+# Created by: PyQt5 ui code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
 

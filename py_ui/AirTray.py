@@ -34,7 +34,7 @@ class AirTray(QSystemTrayIcon):
 
     def set_icon(self):
         # 这里的路径从main.py 算起
-        self.setIcon(QIcon('./UI/app_icon.png'))
+        self.setIcon(QIcon('./ui/app_icon.png'))
         pass
 
     def set_data(self):
@@ -45,7 +45,7 @@ class AirTray(QSystemTrayIcon):
     def check(self):
         result = check_login_state()
         if result:
-            return {'username': result[0][0], 'token': result[0][1]}
+            return {'username': result[0]['username'], 'token': result[0]['token']}
         else:
             return {'username': 'visitor', 'token': ''}
 

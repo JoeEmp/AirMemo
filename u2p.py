@@ -2,10 +2,10 @@
 import os
 
 
-def findUI(ulist, dir="./UI",need_suffix='.ui'):
+def findUI(ulist, dir="./ui", need_suffix='.ui'):
     # 是否存在目录
     if not os.path.exists(dir):
-        print("UI director inexistence ")
+        print("ui director inexistence ")
         exit(-1)
     # 存在目录
     for filename in os.listdir(dir):
@@ -26,10 +26,10 @@ def dirAlter(clist):
 
 
 # 执行命令行将 .ui 转换成 .py
-def translation(clist):
+def translation(clist, tag_dir='./py_'):
     for file in clist:
         try:
-            os.system("python -m PyQt5.uic.pyuic " + file + " -o " + file[0:-3] + ".py  ")
+            os.system("python -m PyQt5.uic.pyuic " + file + " -o " + tag_dir + file[0:-3] + ".py  ")
         except:
             print(str(file) + "translation failed")
 
@@ -37,9 +37,10 @@ def translation(clist):
 if __name__ == "__main__":
     ulist = []
     findUI(ulist)
+    # print(ulist)
     # 只转化指定文件
-    sub_ulist = ['UI/recycle.ui']
-    if not sub_ulist:
-        translation(ulist)
+    sub_ulist = ['ui/email.ui']
+    if sub_ulist:
+        translation(sub_ulist)
     else:
         translation(ulist)

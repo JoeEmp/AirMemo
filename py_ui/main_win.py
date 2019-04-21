@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './UI\demo.ui'
+# Form implementation generated from reading ui file './ui\demo.ui'
 #
-# Created by: PyQt5 UI code generator 5.10
+# Created by: PyQt5 ui code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
 
 # 有注释部分基本为生成后的作者插入代码的注释
 
+import logging
+from time import sleep
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from time import sleep
-from utils import get_records, getSize, get_login_state, check_login_state, \
-    add_records
+from py_ui.recycle import Ui_recycle_Dialog
+from py_ui.email import Ui_Email_Dialog
+
 import config
 import customWidget
-from UI.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-import logging
-from UI.recycle import Ui_recycle_Dialog
 from operateSqlite import be_sql, exec_sql
+from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
+from utils import get_records, getSize, get_login_state
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -73,7 +75,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.icon_lab.setObjectName("icon")
         self.icon_lab.setBaseSize(32, 27)
         self.titleLayout.addWidget(self.icon_lab)
-        self.icon_lab.setStyleSheet('border-image:url(./UI/title.ico);')
+        self.icon_lab.setStyleSheet('border-image:url(./ui/title.ico);')
         self.icon_lab.setText('    ')
         # 标题标签
         self.title_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
@@ -84,19 +86,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.login_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.login_btn.setText("")
         self.login_btn.setObjectName("login_btn")
-        self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
-                                      config.MICRO_BTN_HEIGHT)
-        self.login_btn.setStyleSheet(
-                'border-image:url(%s);' % config.LOGIN_ICON)
+        self.login_btn.setMaximumSize(config.MICRO_BTN_WIDTH, config.MICRO_BTN_HEIGHT)
+        self.login_btn.setStyleSheet('border-image:url(%s);' % config.LOGIN_ICON)
         # 请求登录
-        self.login_btn.clicked.connect(self.show_user_dlg)
+        self.login_btn.clicked.connect(self.show_user_dlg_slot)
         self.titleLayout.addWidget(self.login_btn)
         # 同步按钮
         self.Sync_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Sync_btn.setText("")
         self.Sync_btn.setObjectName("homology_btn")
-        self.Sync_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
-                                     config.MICRO_BTN_HEIGHT)
+        self.Sync_btn.setMaximumSize(config.MICRO_BTN_WIDTH, config.MICRO_BTN_HEIGHT)
         self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.SYNC_ICON)
         self.titleLayout.addWidget(self.Sync_btn)
         # 空白
@@ -110,9 +109,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.recycle_bin_btn.setObjectName("recycle_bin_btn")
         self.recycle_bin_btn.setMaximumSize(config.MICRO_BTN_WIDTH,
                                             config.MICRO_BTN_HEIGHT)
-        self.recycle_bin_btn.setStyleSheet(
-                'border-image:url(%s);' % config.HOMO_ICON)
-        self.recycle_bin_btn.clicked.connect(self.show_recycle_dlg)
+        self.recycle_bin_btn.setStyleSheet('border-image:url(%s);' % config.HOMO_ICON)
+        self.recycle_bin_btn.clicked.connect(self.show_recycle_dlg_slot)
 
         self.titleLayout.addWidget(self.recycle_bin_btn)
         # 关闭按钮
@@ -121,8 +119,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close_btn.setObjectName("closeButton")
         self.titleLayout.addWidget(self.close_btn)
         self.close_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
-        self.close_btn.setStyleSheet(
-                'border-image:url(%s);' % config.CLOSE_ICON)
+        self.close_btn.setStyleSheet('border-image:url(%s);' % config.CLOSE_ICON)
         self.close_btn.clicked.connect(self.close)
 
         self.rootLayout.addLayout(self.titleLayout)
@@ -136,7 +133,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.winLayout.addWidget(self.welt_btn)
         # 使用 self.layoutHeight 直接占满
         self.welt_btn.setMaximumSize(config.WELT_BTN_WIDTH, self.layoutHeight)
-        self.welt_btn.clicked.connect(self.welt)
+        self.welt_btn.clicked.connect(self.welt_slot)
 
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -167,7 +164,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 发送按钮
             self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
             self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
-            self.send_btn.setObjectName("send_btn" + str(i))
+            self.send_btn.setObjectName("send_btn" + str(self.records[i][0]))
             self.send_btn.setText(str(i + 1))
             self.send_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
             self.send_btn.setStyleSheet('border-image:url(%s);' % '')
@@ -179,10 +176,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))
-            self.hide_detail_btn.setMaximumSize(config.BTN_WIDTH,
-                                                config.BTN_HEIGHT)
-            self.hide_detail_btn.setStyleSheet(
-                    'border-image:url(%s);' % config.HIDE_ICON)
+            self.hide_detail_btn.setMaximumSize(config.BTN_WIDTH, config.BTN_HEIGHT)
+            self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
@@ -196,13 +191,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.detail_tx_list.append(self.detail_tx)
             # 绑定槽
             self.hide_detail_btn.clicked.connect(self.ishide)
-            self.send_btn.clicked.connect(self.send_Email)
+            self.send_btn.clicked.connect(self.send_Email_slot)
             QtCore.QMetaObject.connectSlotsByName(self)
             self.verticalLayout.addLayout(self.noteLayout)
 
         self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.add_btn.setObjectName("add_btn")
-        self.add_btn.clicked.connect(self.addNote)
+        self.add_btn.clicked.connect(self.addNote_slot)
         self.verticalLayout.addWidget(self.add_btn)
 
         self.winLayout.addLayout(self.verticalLayout)
@@ -258,15 +253,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutHeight = self.layoutHeight + config.TEXT_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 1
-            self.sender().setStyleSheet(
-                    'border-image:url(%s);' % config.SHOW_ICON)
+            self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
         else:
             self.detail_tx_list[index].hide()
             self.layoutHeight = self.layoutHeight - config.TEXT_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 0
-            self.sender().setStyleSheet(
-                    'border-image:url(%s);' % config.HIDE_ICON)
+            self.sender().setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
 
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)
@@ -275,16 +268,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.welt_btn.setMaximumSize(config.WELT_BTN_WIDTH, self.layoutHeight)
 
     # 发送邮件 未实现
-    def send_Email(self):
-        try:
-            index = int(self.sender().text())
-        except Exception as e:
-            print('程序初始化出错')
-        self.detail_tx_list[index].setText(str(index))
+    def send_Email_slot(self):
+        info={'msg':'test','detail':'123456'}
+        email_dlg = Ui_Email_Dialog(self,info)
+        email_dlg.show()
         pass
 
     # bwrb 关闭窗口后重新渲染了GUI交互不友好，希望找到方法动态插入
-    def addNote(self):
+    def addNote_slot(self):
         self.setData(username=self.user_info['username'])
         new_record = [-1, '', '', self.user_info['username'], 0, '']
         self.layoutHeight += config.MICRO_BTN_HEIGHT
@@ -298,7 +289,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # if(self.note_le_list[index].isEnabled()):
         self.note_le_list[index].setEnable(True)
 
-    def welt(self):
+    def welt_slot(self):
         width = QApplication.desktop().screenGeometry().width()
         if self.x() <= width - config.BASEWIDTH:
             for i in range(width - self.x() - config.WELT_BTN_WIDTH):
@@ -311,7 +302,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 sleep(0.001)
                 # self.sender().setSytleSheet('')
 
-    def show_user_dlg(self):
+    def show_user_dlg_slot(self):
         # login_dlg = QtWidgets.QDialog(self)
         # 检测登录状态
         result = get_login_state()
@@ -327,8 +318,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 logging.error(e)
         else:
-            QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
-                                    QMessageBox.Yes)
+            QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
             return -1
         if ui:
             ui.show()
@@ -340,8 +330,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.reset(username)
             return True
         else:
-            QMessageBox.information(self, '提示', "{}".format('登录信息错误'),
-                                    QMessageBox.Yes)
+            QMessageBox.information(self, '提示', "{}".format('登录信息错误'), QMessageBox.Yes)
             return False
 
     def reset(self, username):
@@ -363,7 +352,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             exec_sql(config.LDB_FILENAME, sql)
         return self.user_info['username']
 
-    def show_recycle_dlg(self):
+    def show_recycle_dlg_slot(self):
         dlg = Ui_recycle_Dialog(parent=self)
         dlg.updateSignal.connect(self.get_update_Signal)
 

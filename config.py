@@ -50,3 +50,5 @@ HIDE_ICON = './icon/hide.ico'
 SHOW_ICON = './icon/show.ico'
 
 CLOSE_ICON = './icon/close_btn.png'
+
+#

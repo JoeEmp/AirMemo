@@ -1,11 +1,11 @@
-import sys
-from UI.main_win import *
-from PyQt5.QtWidgets import QApplication, QMainWindow
 import ctypes
+import sys
+
+from PyQt5.QtWidgets import QApplication
+from py_ui.AirTray import AirTray
+from py_ui.main_win import *
+
 from utils import setApp
-from PyQt5.QtCore import Qt
-from UI.AirTray import AirTray
-from UI.settings import Ui_Settings
 
 if __name__ == '__main__':
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("AirMemo_appid")

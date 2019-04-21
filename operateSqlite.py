@@ -93,6 +93,7 @@ class be_sql(object):
 
 def exec_sql(filename, sql, is_update=None):
     db = sqlite3.connect(filename)
+    db.row_factory =dict_factory
     c = db.cursor()
     try:
         cur = c.execute(sql)
@@ -106,10 +107,15 @@ def exec_sql(filename, sql, is_update=None):
         return cur.rowcount
 
 
+def dict_factory(cursor, row):
+    dict = {}
+    for idx, col in enumerate(cursor.description):
+        dict[col[0]] = row[idx]
+    return dict
+
 if __name__ == '__main__':
     pass
     table = 'user'
-    dict = {'username': 'loli', 'password': '123456'}
-    dict1 = {'username': 'loli'}
-    sql = be_sql().ins_sql(table, dict1)
-    print(sql)
+    sql = 'select * from user;'
+    r= exec_sql('AirMemo.db',sql)
+    print(r)

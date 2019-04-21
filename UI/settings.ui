@@ -17,7 +17,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>0</y>
       <width>761</width>
       <height>421</height>
@@ -40,62 +40,96 @@
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1">
-        <widget class="QLabel" name="email_lab">
-         <property name="text">
-          <string>Email地址</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" rowspan="4">
-        <widget class="QListWidget" name="listWidget"/>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="sender_lab">
-         <property name="text">
-          <string>发信名称</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="password_lab">
-         <property name="text">
-          <string>密码</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="ssl_lab">
-         <property name="text">
-          <string>ssl端口</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QRadioButton" name="ssl_rbtn">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2" colspan="2">
-        <widget class="QLineEdit" name="password_le"/>
-       </item>
-       <item row="2" column="3">
-        <widget class="QLineEdit" name="ssl_le"/>
-       </item>
-       <item row="0" column="2" colspan="2">
-        <widget class="QLineEdit" name="email_le"/>
-       </item>
-       <item row="4" column="3">
+       <item row="5" column="6">
         <widget class="QPushButton" name="save1_btn">
          <property name="text">
           <string>保存</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2" colspan="2">
+       <item row="5" column="3">
+        <widget class="QPushButton" name="del_btn">
+         <property name="text">
+          <string>删除</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5" colspan="2">
+        <widget class="QLineEdit" name="email_le"/>
+       </item>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="add_btn">
+         <property name="text">
+          <string>添加</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <widget class="QRadioButton" name="ssl_rbtn">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="QLabel" name="sender_lab">
+         <property name="text">
+          <string>发信名称</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
+        <widget class="QLabel" name="password_lab">
+         <property name="text">
+          <string>密码</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="4">
+        <widget class="QLabel" name="ssl_lab">
+         <property name="text">
+          <string>ssl端口</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QLabel" name="email_lab">
+         <property name="text">
+          <string>Email地址</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5" colspan="2">
+        <widget class="QLineEdit" name="password_le"/>
+       </item>
+       <item row="4" column="5" colspan="2">
         <widget class="QLineEdit" name="sender_le"/>
+       </item>
+       <item row="3" column="6">
+        <widget class="QLineEdit" name="ssl_le"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>默认使用</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" rowspan="4" colspan="4">
+        <widget class="QListWidget" name="listWidget"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="maximumSize">
+          <size>
+           <width>130</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>暂仅支持stmp</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
