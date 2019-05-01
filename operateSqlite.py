@@ -93,7 +93,8 @@ class be_sql(object):
 
 def exec_sql(filename, sql, is_update=None):
     db = sqlite3.connect(filename)
-    db.row_factory =dict_factory
+    # sqlite 以字典格式返回查询结果
+    db.row_factory = dict_factory
     c = db.cursor()
     try:
         cur = c.execute(sql)
@@ -113,9 +114,10 @@ def dict_factory(cursor, row):
         dict[col[0]] = row[idx]
     return dict
 
+
 if __name__ == '__main__':
     pass
     table = 'user'
     sql = 'select * from user;'
-    r= exec_sql('AirMemo.db',sql)
+    r = exec_sql('AirMemo.db', sql)
     print(r)

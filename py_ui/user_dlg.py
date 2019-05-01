@@ -38,6 +38,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         self.password_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.password_le.setObjectName("password_le")
+        self.password_le.setPlaceholderText('密码')
         self.gridLayout.addWidget(self.password_le, 3, 2, 1, 1)
 
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -56,6 +57,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.username_le.setObjectName("username_le")
+        self.username_le.setPlaceholderText('邮箱')
         self.gridLayout.addWidget(self.username_le, 1, 2, 1, 1)
 
         self.horizontalLayout = QtWidgets.QHBoxLayout()

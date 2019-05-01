@@ -8,7 +8,7 @@ from PyQt5.QtGui import QIcon, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
     QMenu, QAction, QDialog, QMessageBox
 import logging
-from utils import update_records, add_records, delete_records, check_login_state
+from utils import update_notes, add_notes, delete_records, check_login_state
 import config
 import re
 
@@ -74,23 +74,22 @@ class AirLineEdit(QLineEdit):
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
-        data = {'id': -1, 'text': self.text(), 'col': 'message' + ',' + 'username'}
+        data = {'id': -1, 'message': '', 'username': ''}
         try:
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('note_le', ''))
         except Exception as e:
             logging.warning(e)
-        data['text'] = self.text()
+        data['message'] = self.text()
         # 插入新的数据
-        if data['id'] == -1 and data['text']:
+        if data['id'] == -1 and data['message']:
             # logging.warning(data)
-            username = self.main_win.user_info['username']
-            data['text'] = self.text() + "','" + username
-            new_id = add_records(config.LDB_FILENAME, data)
+            data['username'] = self.main_win.user_info['username']
+            new_id = add_notes(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
         # 更新旧的数据
-        elif data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME, data, self.objectName())
+        elif data['message'] != self.__eld_text:
+            update_notes(config.LDB_FILENAME, data, self.objectName())
 
 
 class AirTextEdit(QTextEdit):
@@ -111,7 +110,7 @@ class AirTextEdit(QTextEdit):
         data['text'] = self.toPlainText()
         # 更新数据库
         if data['text'] != self.__eld_text:
-            update_records(config.LDB_FILENAME, data, self.objectName())
+            update_notes(config.LDB_FILENAME, data, self.objectName())
 
 
 class hideButton(QPushButton):

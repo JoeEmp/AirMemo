@@ -11,7 +11,6 @@ from operateSqlite import be_sql, exec_sql
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
-import re
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -59,7 +58,7 @@ def get_records(filename, username='visitor', is_del='0'):
 
 
 # 更新数据 wrb 更改会影响 修改逻辑
-def update_records(filename, data, ele):
+def update_notes(filename, data, ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
@@ -76,15 +75,14 @@ def update_records(filename, data, ele):
 
 
 # 添加数据 wrb 更改会影响 增加逻辑
-def add_records(filename, data):
+def add_notes(filename, data):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
         if data['id'] == -1:
-            # print("insert into Msg (%s) VALUES (%s)"%(data['col'],data['text']))
-            c.execute("insert into Msg (%s) VALUES ('%s')" % (
-                data['col'], data['text']))
-            db.commit()
+            del data['id']
+            sql = be_sql().ins_sql('Msg',data)
+            exec_sql(config.LDB_FILENAME,sql)
             logging.info('add records done')
             return len(get_records(config.LDB_FILENAME)) + 1
     except Exception as e:
@@ -217,7 +215,7 @@ def logout(username):
         return {'state': '-1'}
 
 
-# 同login
+# wrb 同login
 def register(username, password):
     url = '/api/register'
     headers = {
@@ -227,18 +225,7 @@ def register(username, password):
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
 
-
-# 产生密文密码
-def cryptograph_password(password):
-    if password:
-        m = hashlib.md5()
-        m.update(password.encode('utf-8'))
-        cryptograph = m.hexdigest()
-    else:
-        cryptograph = None
-    return cryptograph
-
-
+# 发送邮件
 def mail(info, title, recipients, content):
     # 获取授权密码
     record = exec_sql(config.LDB_FILENAME,
@@ -257,8 +244,9 @@ def mail(info, title, recipients, content):
         msg['To'] = ','.join([recipients])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
         msg['Subject'] = title  # 邮件的主题，也可以说是标题
 
+        # server_offer = re.findall('@(.+?)\.',info['addr'])
         if port != 25:
-            server = smtplib.SMTP_SSL("smtp.163.com", port)  # 发件人邮箱中的SMTP服务器，端口是25
+            server = smtplib.SMTP_SSL("smtp.%s"%info['addr'].split('@')[-1], port)  # 发件人邮箱中的SMTP服务器，端口是25
 
         server.login(info['addr'], password)  # 括号中对应的是发件人邮箱账号、邮箱密码
 
@@ -269,6 +257,16 @@ def mail(info, title, recipients, content):
         logging.warning(str(e.smtp_error, encoding='gbk'))
         ret = {'state': -1, 'errMsg': '账号%s %s' % (info['addr'], str(e.smtp_error, encoding='gbk'))}
     return ret
+
+# 产生密文密码
+def cryptograph_password(password):
+    if password:
+        m = hashlib.md5()
+        m.update(password.encode('utf-8'))
+        cryptograph = m.hexdigest()
+    else:
+        cryptograph = None
+    return cryptograph
 
 
 if __name__ == '__main__':

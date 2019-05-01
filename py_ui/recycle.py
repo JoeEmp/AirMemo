@@ -32,8 +32,8 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
     def setupUi(self):
         self.setObjectName("recycle_Dialog")
-        self.resize(config.TEXT_WIDTH,
-                    config.BTN_HEIGHT * self.records_len * 2 + 50)
+        self.resize(config.COM_TE_WIDTH,
+                    config.COM_BTN_HEIGHT * self.records_len * 2 + 50)
         # self.setFixedSize(config.TEXT_WIDTH,
         #             config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
         # 窗口总布局
@@ -47,8 +47,8 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(
-                QtCore.QRect(10, 10, config.TEXT_WIDTH,
-                             config.BTN_HEIGHT * self.records_len * 2 + 30))
+                QtCore.QRect(10, 10, config.COM_TE_WIDTH,
+                             config.COM_BTN_HEIGHT * self.records_len * 2 + 30))
         # 打印 布局高度
         logging.warning(self.verticalLayoutWidget.height())
 
@@ -73,9 +73,9 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
             # 设置 detail
             if not self.del_records[i][2]:
                 self.detail_sub_lab.setText('无详细信息')
-            elif len(self.del_records[i][2]) > config.TEXT_WIDTH:
+            elif len(self.del_records[i][2]) > config.COM_TE_WIDTH:
                 self.detail_sub_lab.setText(
-                        self.del_records[i][2][:config.TEXT_WIDTH - 3] + '...')
+                        self.del_records[i][2][:config.COM_TE_WIDTH - 3] + '...')
             else:
                 self.detail_sub_lab.setText(self.del_records[i][2])
             self.verticalLayout.addWidget(self.detail_sub_lab)
