@@ -17,27 +17,31 @@ class be_sql(object):
         :param filter_list:
         :return: str
         '''
-        s_value = ''
-        for k, v in value_dict.items():
-            if v == 'NULL':
-                s_value += k + ' = ' + v + ","
+        try:
+            s_value = ''
+            for k, v in value_dict.items():
+                if v == 'NULL':
+                    s_value += k + ' = ' + v + ","
+                else:
+                    s_value += k + ' = ' + "'" + v + "',"
+            if not filter_list:
+                return 'update %s set %s' % (table, s_value[:-1])
             else:
-                s_value += k + ' = ' + "'" + v + "',"
-        if not filter_list:
-            return 'update %s set %s' % (table, s_value[:-1])
-        else:
-            s_filter = ''
-            for item in filter_list:
-                for i in item:
-                    # 做了 空判断
-                    if i is item[-1] and i != 'NULL':
-                        s_filter += "'" + i + "'" + ' '
-                    else:
-                        s_filter += i + ' '
-                s_filter += ' and '
-            s_filter = s_filter[:-4]
-            sql = 'update %s set %s where %s' % (table, s_value[:-1], s_filter)
-        # print(sql)
+                s_filter = ''
+                for item in filter_list:
+                    for i in item:
+                        # 做了 空判断
+                        if i is item[-1] and i != 'NULL':
+                            s_filter += "'" + i + "'" + ' '
+                        else:
+                            s_filter += i + ' '
+                    s_filter += ' and '
+                s_filter = s_filter[:-4]
+                sql = 'update %s set %s where %s' % (table, s_value[:-1], s_filter)
+            # print(sql)
+        except Exception as e:
+            logging.warning(e)
+            return ''
         return sql
 
     def ins_sql(self, table, dict):
@@ -86,10 +90,25 @@ class be_sql(object):
                     else:
                         s_filter += i + ' '
                 s_filter += ' and '
-            s_filter = s_filter[:-4] + ';'
+            s_filter = s_filter[:-4]
             sql = 'select %s from %s where %s' % (s_need[:-1], table, s_filter)
         return sql
 
+    def del_sql(self,table,filter_list=None):
+        if not filter_list:
+            return 'delete from %s ;' % (table)
+        else:
+            s_filter = ''
+            for item in filter_list:
+                for i in item:
+                    # 做了 空判断
+                    if i is item[-1] and i != 'NULL':
+                        s_filter += "'" + i + "'" + ' '
+                    else:
+                        s_filter += i + ' '
+                s_filter += ' and '
+            s_filter = s_filter[:-4] + ';'
+            return 'delete from %s where %s' % (table, s_filter)
 
 def exec_sql(filename, sql, is_update=None):
     db = sqlite3.connect(filename)
@@ -107,7 +126,7 @@ def exec_sql(filename, sql, is_update=None):
     else:
         return cur.rowcount
 
-
+# 官方api提供，使返回的数据结构为 list of dict
 def dict_factory(cursor, row):
     dict = {}
     for idx, col in enumerate(cursor.description):

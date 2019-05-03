@@ -21,7 +21,7 @@ class AirTray(QSystemTrayIcon):
         self.main_menu = QMenu()
         self.show_action = QAction('&show',
                                    triggered=self.widget_dict['main_win'].show)
-        self.settings_action = QAction('&settings', triggered=QDialog.show)
+        self.settings_action = QAction('&settings', triggered=self.widget_dict['setting_win'].show)
         self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
@@ -68,11 +68,14 @@ class AirTray(QSystemTrayIcon):
     def quitapp(self):
         try:
             self.widget_dict['main_win'].show()
+            self.widget_dict['setting_win'].hide()
             sel = QMessageBox.question(self.widget_dict['main_win'], "提示", "确定要退出Airmemo",
                                        QMessageBox.Yes | QMessageBox.No,
                                        QMessageBox.No)
             if sel == QMessageBox.Yes:
+                # quitapp这个内建函数不可迭代，所以只能一个一个窗口写
                 self.widget_dict['main_win'].close()
+                self.widget_dict['setting_win'].close()
                 QCoreApplication.instance().quit()
                 # 在应用程序全部关闭后，TrayIcon其实还不会自动消失，
                 # 直到你的鼠标移动到上面去后，才会消失，

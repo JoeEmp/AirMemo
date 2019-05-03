@@ -26,7 +26,8 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         self.setupUi()
 
     def set_data(self):
-        sql = "select * from email_settings where username = '%s'" % self.user_info['username']
+        sql = "select * from email_settings where username = '%s' ORDER by is_default desc" % \
+              self.user_info['username']
         # test sql
         # sql = "select * from email_settings where username = '%s'" % 'joe'
         self.settings = exec_sql(LDB_FILENAME, sql)
@@ -65,7 +66,7 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         # 主题标签
         self.msg_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.msg_lab.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.msg_lab.setObjectName("Msg_lab")
         self.gridLayout.addWidget(self.msg_lab, 3, 1, 1, 1)
 
