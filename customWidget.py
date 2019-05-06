@@ -1,28 +1,28 @@
 '''
 为qt控件加入所需的方法
 '''
-import os
-
-from PyQt5.QtCore import QCoreApplication, Qt, QPoint, pyqtSignal
-from PyQt5.QtGui import QIcon, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QSystemTrayIcon, \
-    QMenu, QAction, QDialog, QMessageBox
-import logging
-from utils import update_notes, add_notes, delete_records, check_login_state
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit,QMenu, QAction,QMessageBox
+from utils import update_notes, add_notes, delete_records
 import config
+from operateSqlite import *
 import re
-
 
 class AirLineEdit(QLineEdit):
     __eld_text = ''
     __lineSignal = pyqtSignal(str, int)
 
-    def __init__(self, main_win, parent=None):
+    def __init__(self, main_win, info,parent=None):
         super().__init__(parent)
-        self.createContextMenu()
+        self.get_reminder(info)
         self.main_win = main_win
         # 绑定槽
         self.__lineSignal.connect(main_win.get_update_Signal)
+        self.createContextMenu()
+
+    def get_reminder(self,info):
+        sql = "select time from reminder where username = '%s' limit 3" % info['username']
+        self.times = exec_sql(config.LDB_FILENAME, sql)
 
     def createContextMenu(self):
         ''' 
@@ -41,12 +41,18 @@ class AirLineEdit(QLineEdit):
         self.act_undo = QAction('撤销', triggered=self.undo)
         self.act_selall = QAction('全选', triggered=self.selectAll)
         self.act_del = QAction('删除该消息', triggered=self.delete_record)
+        self.set_reminder0 = QAction(self.times[0]['time'],triggered=self.set_time)
+        self.set_reminder1 = QAction(self.times[1]['time'],triggered=self.set_time)
+        self.set_reminder2 = QAction(self.times[2]['time'],triggered=self.set_time)
 
         self.contextMenu.addAction(self.act_copy)
         self.contextMenu.addAction(self.act_paste)
         self.contextMenu.addAction(self.act_undo)
         self.contextMenu.addAction(self.act_selall)
         self.contextMenu.addAction(self.act_del)
+        self.contextMenu.addAction(self.set_reminder0)
+        self.contextMenu.addAction(self.set_reminder1)
+        self.contextMenu.addAction(self.set_reminder2)
 
     def showContextMenu(self, pos):
         ''' 
@@ -56,6 +62,10 @@ class AirLineEdit(QLineEdit):
         self.contextMenu.move(pos + self.main_win.pos() + QPoint(95, 20))
         # logging.warning(pos+self.main_win.pos()+QPoint(95,20))
         self.contextMenu.show()
+
+    def set_time(self):
+        logging.info('set time')
+        pass
 
     def delete_record(self):
         id = re.findall('\d+', self.objectName())[0]

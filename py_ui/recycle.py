@@ -5,21 +5,23 @@
 # Created by: PyQt5 ui code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
-import re
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-import operateSqlite
-import config
-import utils
 import logging
+import re
 import sip
+
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal
+
+import config
+import operateSqlite
+import utils
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):
     updateSignal = pyqtSignal(str)
     item_set = set()
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.set_data(parent.user_info['username'])
         self.parent = parent

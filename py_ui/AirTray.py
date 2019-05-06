@@ -2,10 +2,9 @@ import logging
 
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QDialog, \
-    QMessageBox
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
 
-from utils import check_login_state, get_records
+from utils import check_login_state
 
 class AirTray(QSystemTrayIcon):
     widget = None

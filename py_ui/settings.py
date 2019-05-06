@@ -143,7 +143,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
             # item.setFlags(
             #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.email_list.addItem(item)
-        self.email_list.setStyleSheet('QListWidget{background-color rgb(202, 208, 216)}')
+        # self.email_list.setStyleSheet('background-color:#c4ffff')
         self.email_list.itemClicked.connect(self._set_config_slot)
         self.gridLayout.addWidget(self.email_list, 1, 0, 4, 4)
 
@@ -489,16 +489,16 @@ class Ui_Settings(QtWidgets.QMainWindow):
         filter_list = [
             ['username', '=', self.user_info['username']],
             ['id', '=', -1],
-            ['time','=',-1]
+            ['time', '=', -1]
         ]
         ids = [record['id'] for record in self._reminder_records]
         times = [record['time'] for record in self._reminder_records]
         for i in range(len(ids)):
             value_dict['sequence'] = str(i)
-            filter_list[1][2]=str(ids[i])
-            filter_list[2][2]=times[i]
-            sql = be_sql().update_sql(table,value_dict,filter_list)
-            exec_sql(config.LDB_FILENAME,sql)
+            filter_list[1][2] = str(ids[i])
+            filter_list[2][2] = times[i]
+            sql = be_sql().update_sql(table, value_dict, filter_list)
+            exec_sql(config.LDB_FILENAME, sql)
         pass
 
     def closeEvent(self, *args, **kwargs):

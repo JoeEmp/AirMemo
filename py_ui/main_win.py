@@ -9,19 +9,23 @@
 # 有注释部分基本为生成后的作者插入代码的注释
 
 import logging
+import re
 from time import sleep
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from py_ui.recycle import Ui_recycle_Dialog
-from py_ui.email import Ui_Email_Dialog
+
 import config
 import customWidget
 from operateSqlite import be_sql, exec_sql
+from py_ui.email import Ui_Email_Dialog
+from py_ui.recycle import Ui_recycle_Dialog
+from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 from utils import get_records, getSize, get_login_state
-import re
+
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     _startPos = None
@@ -95,6 +99,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Sync_btn.setObjectName("homology_btn")
         self.Sync_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
         self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.SYNC_ICON)
+        self.Sync_btn.clicked.connect(self.Sync_dlg_slot)
         self.titleLayout.addWidget(self.Sync_btn)
         # 空白
         spacerItem = QtWidgets.QSpacerItem(40, 20,
@@ -148,7 +153,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
             # 短消息编辑框
             self.note_le = customWidget.AirLineEdit(main_win=self,
-                                                    parent=self.verticalLayoutWidget)
+                                                    parent=self.verticalLayoutWidget,
+                                                    info=self.user_info)
             self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
             # 将id写入objName里 bwrb 必须重构
             self.note_le.setObjectName("note_le" + str(self.records[i][0]))
@@ -156,7 +162,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.note_le_list.append(self.note_le)
             self.note_le.setEnabled(False)
             self.note_le.setMaxLength(30)
-            self.note_le.setStyleSheet('background-color:rgba(196,255,255,1);')
+            self.note_le.setStyleSheet('background-color:#%s'%'c4ffff')
             # self.note_le.editingFinished.connect(self.update_item_value)
 
             # 发送按钮
@@ -275,10 +281,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         获取序号对应的数据
         :return:
         '''
-        id = re.findall('\d+',self.sender().objectName())[0]
-        info = exec_sql(config.LDB_FILENAME,'select message,detail from Msg where id = %s'%id)[0]
+        id = re.findall('\d+', self.sender().objectName())[0]
+        info = exec_sql(config.LDB_FILENAME, 'select message,detail from Msg where id = %s' % id)[0]
         # info={'message':'test','detail':'123456'} #debug 使用
-        email_dlg = Ui_Email_Dialog(self,info)
+        email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
 
     # bwrb 关闭窗口后重新渲染了GUI交互不友好，希望找到方法动态插入
@@ -396,6 +402,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         dlg = Ui_recycle_Dialog(parent=self)
         dlg.updateSignal.connect(self.get_update_Signal)
+
+    def Sync_dlg_slot(self):
+        result = get_login_state()
+        result['state'] = 2
+        if result['state'] == 2:
+            try:
+                dlg = Ui_Sync_Dialog(parent=self)
+                dlg.updateSignal.connect(self.get_update_Signal)
+            except Exception as e:
+                print(e)
+        else:
+            QMessageBox.information(self, 'tips', result['errMsg'], QMessageBox.Ok)
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

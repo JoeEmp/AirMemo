@@ -6,11 +6,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-import logging
-
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-
 from utils import mail
 from operateSqlite import *
 from config import *

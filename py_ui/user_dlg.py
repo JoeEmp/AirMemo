@@ -1,13 +1,14 @@
 # 此文件为用户对话框的窗口
 # 包括 login_dlg register_dlg logout_dlg
-from PyQt5 import QtCore, QtGui, QtWidgets
+import logging
+
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
-import utils
-import operateSqlite
 import config
-import logging
+import operateSqlite
+import utils
 
 
 # 登录窗口

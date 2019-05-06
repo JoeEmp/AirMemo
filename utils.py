@@ -1,16 +1,19 @@
+import datetime
 import hashlib
-
-from PyQt5 import QtGui
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QStyleFactory, QDialog
-import sqlite3
-import config
 import logging
-import requests
-from operateSqlite import be_sql, exec_sql
 import smtplib
+import sqlite3
 from email.mime.text import MIMEText
 from email.utils import formataddr
+
+import requests
+import sys
+from PyQt5 import QtGui
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
+
+import config
+from operateSqlite import be_sql, exec_sql
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -39,7 +42,7 @@ def setApp(app):
     app.setWindowIcon(QIcon('./ui/app_icon.png'))
 
 
-# 查询当前用户的笔记
+# 查询当前用户的笔记 wrb
 def get_records(filename, username='visitor', is_del='0'):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -49,6 +52,8 @@ def get_records(filename, username='visitor', is_del='0'):
             ['username', '=', username],
             ['is_del', '=', is_del]
         ]
+        if is_del == 'all':
+            filter_list.pop()
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
         cur = c.execute(sql)
@@ -81,8 +86,8 @@ def add_notes(filename, data):
     try:
         if data['id'] == -1:
             del data['id']
-            sql = be_sql().ins_sql('Msg',data)
-            exec_sql(config.LDB_FILENAME,sql)
+            sql = be_sql().ins_sql('Msg', data)
+            exec_sql(config.LDB_FILENAME, sql)
             logging.info('add records done')
             return len(get_records(config.LDB_FILENAME)) + 1
     except Exception as e:
@@ -225,6 +230,7 @@ def register(username, password):
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
 
+
 # 发送邮件
 def mail(info, title, recipients, content):
     # 获取授权密码
@@ -246,7 +252,8 @@ def mail(info, title, recipients, content):
 
         # server_offer = re.findall('@(.+?)\.',info['addr'])
         if port != 25:
-            server = smtplib.SMTP_SSL("smtp.%s"%info['addr'].split('@')[-1], port)  # 发件人邮箱中的SMTP服务器，端口是25
+            server = smtplib.SMTP_SSL("smtp.%s" % info['addr'].split('@')[-1],
+                                      port)  # 发件人邮箱中的SMTP服务器，端口是25
 
         server.login(info['addr'], password)  # 括号中对应的是发件人邮箱账号、邮箱密码
 
@@ -257,6 +264,7 @@ def mail(info, title, recipients, content):
         logging.warning(str(e.smtp_error, encoding='gbk'))
         ret = {'state': -1, 'errMsg': '账号%s %s' % (info['addr'], str(e.smtp_error, encoding='gbk'))}
     return ret
+
 
 # 产生密文密码
 def cryptograph_password(password):
@@ -269,8 +277,40 @@ def cryptograph_password(password):
     return cryptograph
 
 
+def create_reminder(parent, time):
+    try:
+        time = datetime.datetime.strptime(time, '%H:%M:%S')
+    except Exception as e:
+        return QMessageBox.information(parent, ' ', str(e), QMessageBox.Ok)
+    sec = (time - datetime.datetime.strptime('00:00:00', '%H:%M:%S')).seconds
+
+
+def time_out_slot():
+    tips = QWidget()
+    tips.resize(300,120)
+
+    # tips.setGeometry(1366-300,768-140,300, 120)
+    tips.show()
+
+
+def cloud_records(username):
+    '''
+
+    :param username:
+    :return:
+    '''
+    pass
+
+
 if __name__ == '__main__':
     pass
+    app = QApplication(sys.argv)
+    tips = QWidget()
+    # tips.resize(300,120)
+
+    tips.setGeometry(1366-310,768-170,300, 120)
+    tips.show()
+    sys.exit(app.exec_())
     # dbName = r'AirMemo.db'
     # # add_records(dbName)
     # print(get_records(dbName))

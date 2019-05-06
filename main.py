@@ -5,7 +5,6 @@ import sys
 from py_ui.AirTray import AirTray
 from py_ui.main_win import *
 from py_ui.settings import *
-from py_ui.demo import *
 from utils import setApp
 
 if __name__ == '__main__':
@@ -18,5 +17,5 @@ if __name__ == '__main__':
     dict = {'main_win': mainWindow, 'setting_win': setting_win}
     tray.set_menu(dict)
     tray.show()
-    setting_win.show()
+    mainWindow.show()
     sys.exit(app.exec_())
