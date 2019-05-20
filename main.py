@@ -8,7 +8,7 @@ from py_ui.settings import *
 from utils import setApp
 
 if __name__ == '__main__':
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("AirMemo_appid")
+    # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("AirMemo_appid")
     app = QApplication(sys.argv)
     setApp(app)
     tray = AirTray()

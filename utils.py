@@ -62,15 +62,18 @@ def get_records(filename, username='visitor', is_del='0'):
     return cur.fetchall()
 
 
-# 更新数据 wrb 更改会影响 修改逻辑
 def update_notes(filename, data, ele):
     db = sqlite3.connect(filename)
     c = db.cursor()
     try:
         if data['id'] != -1:
-            c.execute("update  Msg set %s='%s' WHERE id=%d;" % (
-                data['col'], data['text'], data['id']))
-            logging.info('%s update record successfully!!!' % str(ele))
+            filter_list = [
+                ['id', '=', str(data['id'])]
+            ]
+            # wrb
+            sql = be_sql().update_sql('Msg', {ele: data[ele]}, filter_list)
+            c.execute(sql)
+            logging.info('%s update record successfully!!!' % ele)
             db.commit()
             return True
     except Exception as e:
@@ -79,7 +82,7 @@ def update_notes(filename, data, ele):
         return False
 
 
-# 添加数据 wrb 更改会影响 增加逻辑
+# 添加数据 wrb 更改会影响 增加逻辑 延后重构
 def add_notes(filename, data):
     db = sqlite3.connect(filename)
     c = db.cursor()
@@ -112,7 +115,7 @@ def clear_records(filename, sever_date):
     db = sqlite3.connect(filename)
     c = db.cursor()
     cur = c.execute(
-            "delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date)
+        "delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date)
     db.commit()
     logging.info('clear done')
 
@@ -287,7 +290,7 @@ def create_reminder(parent, time):
 
 def time_out_slot():
     tips = QWidget()
-    tips.resize(300,120)
+    tips.resize(300, 120)
 
     # tips.setGeometry(1366-300,768-140,300, 120)
     tips.show()
@@ -308,7 +311,7 @@ if __name__ == '__main__':
     tips = QWidget()
     # tips.resize(300,120)
 
-    tips.setGeometry(1366-310,768-170,300, 120)
+    tips.setGeometry(1366 - 310, 768 - 170, 300, 120)
     tips.show()
     sys.exit(app.exec_())
     # dbName = r'AirMemo.db'

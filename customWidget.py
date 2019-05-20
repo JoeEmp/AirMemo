@@ -99,7 +99,7 @@ class AirLineEdit(QLineEdit):
             self.setObjectName('note_le' + str(new_id))
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
-            update_notes(config.LDB_FILENAME, data, self.objectName())
+            update_notes(config.LDB_FILENAME, data, 'message')
 
 
 class AirTextEdit(QTextEdit):
@@ -111,16 +111,16 @@ class AirTextEdit(QTextEdit):
 
     def leaveEvent(self, *args, **kwargs):
         self.setEnabled(False)
-        data = {'id': -1, 'text': '', 'col': 'detail'}
+        data = {'id': -1, 'detail': ''}
         try:
             # 使用 objName 获取id bwrb
             data['id'] = int(self.objectName().replace('detail_tx', ''))
         except Exception as e:
             logging.warning(e)
-        data['text'] = self.toPlainText()
+        data['detail'] = self.toPlainText()
         # 更新数据库
-        if data['text'] != self.__eld_text:
-            update_notes(config.LDB_FILENAME, data, self.objectName())
+        if data['detail'] != self.__eld_text:
+            update_notes(config.LDB_FILENAME, data, 'detail')
 
 
 class hideButton(QPushButton):
