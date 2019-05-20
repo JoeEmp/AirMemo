@@ -18,6 +18,7 @@ from operateSqlite import be_sql, exec_sql
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
 pro_host = '149.129.125.8:5000'
+# 服务器切换
 user_host = local_host
 
 
@@ -114,8 +115,7 @@ def delete_records(filename, filer_list):
 def clear_records(filename, sever_date):
     db = sqlite3.connect(filename)
     c = db.cursor()
-    cur = c.execute(
-        "delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date)
+    cur = c.execute("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date)
     db.commit()
     logging.info('clear done')
 
@@ -296,13 +296,19 @@ def time_out_slot():
     tips.show()
 
 
-def cloud_records(username):
+def get_cloud_records(username):
     '''
 
     :param username:
     :return:
     '''
-    pass
+    url = '/api/get_cloud_records'
+    headers = {
+        'User-Agent': 'AirMemo'
+    }
+    data = {'username': username}
+    r = requests.post(protocol + user_host + url, headers=headers, data=data)
+    return r.json()
 
 
 if __name__ == '__main__':

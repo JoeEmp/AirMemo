@@ -61,7 +61,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(
-                QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
+            QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         # 总布局
         self.rootLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
@@ -162,7 +162,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.note_le_list.append(self.note_le)
             self.note_le.setEnabled(False)
             self.note_le.setMaxLength(30)
-            self.note_le.setStyleSheet('background-color:#%s'%'c4ffff')
+            self.note_le.setStyleSheet('background-color:#%s' % 'c4ffff')
             # self.note_le.editingFinished.connect(self.update_item_value)
 
             # 发送按钮
@@ -176,7 +176,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
             # 收起/展开按钮
             self.hide_detail_btn = QtWidgets.QPushButton(
-                    self.verticalLayoutWidget)
+                self.verticalLayoutWidget)
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))

@@ -146,7 +146,19 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
     def local_sync_slot(self):
         if self.local_list.selectedIndexes():
             # 请求
+            update_remote()
             # 对新数据接口newkey,newkey写入到记录里
+            update_local()
+            update_local_list()
+            update_local_list()
             pass
         else:
             QMessageBox.information(self, ' ', '请选择需要上传的消息', QMessageBox.Ok)
+
+
+    def del_local_record(self):
+        pass
+
+    # 关闭窗口，更新用户记录
+    def closeEvent(self, QCloseEvent):
+        self.updateSignal.emit(self.user_info['username'])
