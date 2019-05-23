@@ -11,7 +11,6 @@ import sip
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
-
 import config
 import operateSqlite
 import utils

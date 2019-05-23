@@ -296,17 +296,17 @@ def time_out_slot():
     tips.show()
 
 
-def get_cloud_records(username):
+def get_cloud_records(username,token):
     '''
 
     :param username:
     :return:
     '''
-    url = '/api/get_cloud_records'
+    url = '/api/cloud_page'
     headers = {
         'User-Agent': 'AirMemo'
     }
-    data = {'username': username}
+    data = {'username': username,'token':token,'page_id':'1','page_size':'5000'}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
 

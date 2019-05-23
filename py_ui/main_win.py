@@ -22,7 +22,7 @@ import customWidget
 from operateSqlite import be_sql, exec_sql
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
-from py_ui.demo import Ui_Sync_Dialog
+from py_ui.sync import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 from utils import get_records, getSize, get_login_state
 

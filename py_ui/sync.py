@@ -18,11 +18,11 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.set_data(parent.user_info['username'])
         self.parent = parent
         self.user_info = parent.user_info
+        self.set_data(username=self.user_info['username'],token=self.user_info['token'])
         self.setupUi()
-        self.show()
+        # self.show()
 
     def setupUi(self):
         self.setObjectName("Dialog")
@@ -112,6 +112,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.local_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.local_list.setObjectName("local_list")
 
+        # msg item
         item = QtWidgets.QListWidgetItem()
         self.local_list.addItem(item)
         self.local_gridLayout.addWidget(self.local_list, 1, 0, 1, 4)
@@ -152,11 +153,10 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.label.setText(_translate("Dialog", "绿色为云端已有消息"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def set_data(self,username='visitor'):
+    def set_data(self,token,username='visitor'):
         self.local_records = get_records(config.LDB_FILENAME, username, is_del='all')
-        self.cloud_records = get_cloud_records(username)
-        print(self.local_records)
-        print(self.cloud_records)
+        self.cloud_records = get_cloud_records(username,self.user_info['token'])
+
 
     # 备份按钮槽函数
     def sync_upload_slot(self):
@@ -169,3 +169,9 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
 
     def del_local_record(self):
         pass
+
+
+# if __name__ == "__main__":
+#     cloud_records = get_cloud_records('coco')
+#     for cloud in cloud_records:
+#         print()
