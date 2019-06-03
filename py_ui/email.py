@@ -23,7 +23,7 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         self.setupUi()
 
     def set_data(self):
-        sql = "select * from email_settings where username = '%s' ORDER by is_default desc" % \
+        sql = "select * from email_settings where username = '%s' and password is not null ORDER by is_default desc" % \
               self.user_info['username']
         # test sql
         # sql = "select * from email_settings where username = '%s'" % 'joe'
@@ -42,7 +42,7 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         # 发送标签
         self.sender_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.sender_lab.setAlignment(
-                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.sender_lab.setObjectName("sender_lab")
         self.sender_lab.setMaximumWidth(EMAIL_LAB_WIDTH)
         self.gridLayout.addWidget(self.sender_lab, 0, 1, 1, 1)
@@ -56,21 +56,21 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         # 内容标签
         self.content_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.content_lab.setAlignment(
-                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.content_lab.setObjectName("content_lab")
         self.gridLayout.addWidget(self.content_lab, 4, 1, 1, 1)
 
         # 主题标签
         self.msg_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.msg_lab.setAlignment(
-                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.msg_lab.setObjectName("Msg_lab")
         self.gridLayout.addWidget(self.msg_lab, 3, 1, 1, 1)
 
         # 抄送标签
         self.copy_to_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.copy_to_lab.setAlignment(
-                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.copy_to_lab.setObjectName("copy_to_lab")
         self.gridLayout.addWidget(self.copy_to_lab, 2, 1, 1, 1)
 
@@ -96,7 +96,7 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         # 收件人标签
         self.recipients_lab = QtWidgets.QLabel(self.gridLayoutWidget)
         self.recipients_lab.setAlignment(
-                QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
         self.recipients_lab.setObjectName("recipients_lab")
         self.gridLayout.addWidget(self.recipients_lab, 1, 1, 1, 1)
 
@@ -136,11 +136,17 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
 
     def send_email(self):
         self.send_btn.setDisabled(True)
+        if not self.sender_comb.currentText():
+            QMessageBox.information(self, '', '{}'.format('请在系统托盘->settings->email里配置邮箱'), QMessageBox.Ok)
+            self.send_btn.setEnabled(True)
+            return True
         info = {'username': self.user_info['username'], 'addr': self.sender_comb.currentText()}
         result = mail(info, self.Msg_tx.toPlainText(),
                       self.recipients_tx.toPlainText(), self.content_tx.toPlainText())
         if result['state'] == 1:
             self.close()
+            return True
         elif result['state'] == -1:
             self.send_btn.setEnabled(True)
             QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Ok)
+            return True

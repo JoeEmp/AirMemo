@@ -98,7 +98,6 @@ class AirLineEdit(QLineEdit):
             data['username'] = self.main_win.user_info['username']
             new_id = add_notes(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
-            print(new_id)
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:

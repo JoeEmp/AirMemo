@@ -215,7 +215,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "AirMemo"))
         for i in range(len(self.records)):
-            # 根据表结构写死了两个索引值，后面再改 wrb
             self.note_le_list[i].setText(self.records[i]['message'])
             self.detail_tx_list[i].setText(self.records[i]['detail'])
         self.welt_btn.setText(_translate("MainWindow", "welt"))
@@ -388,7 +387,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         self.parent.update_info()
         self.user_info = self.parent.get_info()
-        records = get_records(config.LDB_FILENAME, self.user_info['username'])
+        records = get_notes(config.LDB_FILENAME, self.user_info['username'])
         if not records:
             table = 'Msg'
             dict = {'message': 'Welcome', 'detail': 'Thanks you support',

@@ -8,7 +8,7 @@ import logging
 
 def get_notes(filename, username='visitor', is_del='0'):
     '''
-    查询当前用户的笔记 wrb
+    查询当前用户的笔记
     :param filename: sqlite3文件名
     :param username: 用户名
     :param is_del:   是否删除，默认为否
@@ -56,7 +56,7 @@ def update_notes(filename, data, ele):
 
 def add_notes(filename, data):
     '''
-    添加数据 wrb 更改会影响 增加逻辑 延后重构 wrb
+    添加数据 更改会影响 增加逻辑 延后重构 wrb
     :param filename: sqlit3文件名
     :param data:  dict {'id':-1,'{ele}':'','ussername':''}
     :return:
