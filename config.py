@@ -9,6 +9,10 @@ logging.basicConfig(level=logging.WARNING, filename='log.txt', filemode='a',
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
 
+#隐藏速度
+SPEED = 0.001
+
+
 # 公共长宽标准
 # 详情编辑框大小
 COM_TE_WIDTH = 320

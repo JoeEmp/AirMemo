@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
 import config
 import operateSqlite
-import utils
+import module
 
 
 # 登录窗口
@@ -100,7 +100,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_login(self):
         if self.username_le.text() and self.password_le.text():
-            result = utils.login(username=self.username_le.text(), password=self.password_le.text())
+            result = module.login(username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
             try:
                 if result['token']:

@@ -24,7 +24,8 @@ from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.sync import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-from utils import get_records, getSize, get_login_state
+from module import get_notes, get_login_state
+from utils import getSize
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -157,18 +158,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                     info=self.user_info)
             self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
             # 将id写入objName里 bwrb 必须重构
-            self.note_le.setObjectName("note_le" + str(self.records[i][0]))
+            self.note_le.setObjectName("note_le" + str(self.records[i]['id']))
             # 加入相应列表，禁用LineEdit
             self.note_le_list.append(self.note_le)
             self.note_le.setEnabled(False)
             self.note_le.setMaxLength(30)
             self.note_le.setStyleSheet('background-color:#%s' % 'c4ffff')
             # self.note_le.editingFinished.connect(self.update_item_value)
+            self.note_le.update_id_Signal.connect(self.update_tx_id)
 
             # 发送按钮
             self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
             self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
-            self.send_btn.setObjectName("send_btn" + str(self.records[i][0]))
+            self.send_btn.setObjectName("send_btn" + str(self.records[i]['id']))
             self.send_btn.setText(str(i + 1))
             self.send_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
             self.send_btn.setStyleSheet('border-image:url(%s);' % '')
@@ -187,7 +189,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 详情编辑框
             self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
             self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
-            self.detail_tx.setObjectName("detail_tx" + str(self.records[i][0]))
+            self.detail_tx.setObjectName("detail_tx" + str(self.records[i]['id']))
             # 隐藏文本框 初始化文本框状态数组
             self.detail_tx.hide()
             self.detail_tx.setEnabled(False)
@@ -214,8 +216,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle(_translate("MainWindow", "AirMemo"))
         for i in range(len(self.records)):
             # 根据表结构写死了两个索引值，后面再改 wrb
-            self.note_le_list[i].setText(self.records[i][2])
-            self.detail_tx_list[i].setText(self.records[i][3])
+            self.note_le_list[i].setText(self.records[i]['message'])
+            self.detail_tx_list[i].setText(self.records[i]['detail'])
         self.welt_btn.setText(_translate("MainWindow", "welt"))
         self.add_btn.setText(_translate("MainWindow", "add"))
         self.setStyleSheet('QMainWindow{background-color:rgba(196,255,255,1);}')
@@ -225,9 +227,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def setData(self, username=None):
         # 判断用户
         if username:
-            self.records = get_records(config.LDB_FILENAME, username)
+            self.records = get_notes(config.LDB_FILENAME, username)
         else:
-            self.records = get_records(config.LDB_FILENAME)
+            self.records = get_notes(config.LDB_FILENAME)
 
         # 尺寸模式
         if config.SIZEMODE == 'divide':
@@ -294,7 +296,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         self.setData(username=self.user_info['username'])
-        new_record = [-1, '', '', self.user_info['username'], 0, '']
+        new_record = {'id': -1, 'detail': '', 'message': '', 'color': ''}
         self.layoutHeight += config.COM_MICRO_BTN_HEIGHT
         self.records.append(new_record)
         self.setupLayout()
@@ -316,12 +318,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if self.x() <= width - config.MAIN_BASEWIDTH:
             for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
                 self.move(self.x() + 1, self.y())
-                sleep(0.001)
+                sleep(config.SPEED)
                 # self.sender().setSytleSheet('')
         else:
             for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
                 self.move(self.x() - 1, self.y())
-                sleep(0.001)
+                sleep(config.SPEED)
                 # self.sender().setSytleSheet('')
 
     def show_user_dlg_slot(self):
@@ -395,6 +397,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             exec_sql(config.LDB_FILENAME, sql)
         return self.user_info['username']
 
+    def update_tx_id(self, id):
+        self.detail_tx_list[-1].setObjectName('detail_tx' + str(id))
+
     def show_recycle_dlg_slot(self):
         '''
         创建回收站
@@ -435,11 +440,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if self.x() > width - config.MAIN_WELT_BTN_WIDTH:
                 for i in range(self.x() - (width - config.MAIN_WELT_BTN_WIDTH)):
                     self.move(self.x() - 1, self.y())
-                    sleep(0.001)
+                    sleep(config.SPEED)
             elif self.x() > width - config.MAIN_BASEWIDTH:
                 for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
                     self.move(self.x() + 1, self.y())
-                    sleep(0.001)  # 0.001为微调结果
+                    sleep(config.SPEED)  # 0.001为微调结果
             self._isTracking = False
             self._startPos = None
             self._endPos = None

@@ -111,6 +111,13 @@ class be_sql(object):
             return 'delete from %s where %s' % (table, s_filter)
 
 def exec_sql(filename, sql, is_update=None):
+    '''
+
+    :param filename:
+    :param sql:
+    :param is_update: 默认为空返回全部，传入其他返回影响行数。如果是行数我会直接传'count'
+    :return:
+    '''
     db = sqlite3.connect(filename)
     # sqlite 以字典格式返回查询结果
     db.row_factory = dict_factory

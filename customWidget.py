@@ -3,7 +3,7 @@
 '''
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit,QMenu, QAction,QMessageBox
-from utils import update_notes, add_notes, delete_records
+from module import update_notes, add_notes,delete_notes
 import config
 from operateSqlite import *
 import re
@@ -11,6 +11,7 @@ import re
 class AirLineEdit(QLineEdit):
     __eld_text = ''
     __lineSignal = pyqtSignal(str, int)
+    update_id_Signal = pyqtSignal(int)
 
     def __init__(self, main_win, info,parent=None):
         super().__init__(parent)
@@ -72,7 +73,7 @@ class AirLineEdit(QLineEdit):
         filter_list = [
             ['id', '=', id]
         ]
-        if delete_records(config.LDB_FILENAME, filer_list=filter_list) == 0:
+        if delete_notes(config.LDB_FILENAME, filer_list=filter_list) == 0:
             QMessageBox.information(self, '提示', {}.format('无法删除空数据'))
         else:
             # 期望不删除预设数据 未实现 wrb
@@ -97,6 +98,8 @@ class AirLineEdit(QLineEdit):
             data['username'] = self.main_win.user_info['username']
             new_id = add_notes(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
+            print(new_id)
+            self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
             update_notes(config.LDB_FILENAME, data, 'message')
@@ -110,7 +113,7 @@ class AirTextEdit(QTextEdit):
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
-        self.setEnabled(False)
+        # self.setEnabled(False)
         data = {'id': -1, 'detail': ''}
         try:
             # 使用 objName 获取id bwrb

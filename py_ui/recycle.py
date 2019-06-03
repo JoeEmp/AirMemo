@@ -61,24 +61,24 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         for i in range(len(self.del_records)):
             self.message_check = QtWidgets.QCheckBox(self.verticalLayoutWidget)
             self.message_check.setObjectName(
-                    "message_check" + str(self.del_records[i][0]))
+                    "message_check" + str(self.del_records[i]['id']))
             # 设置 msg
-            self.message_check.setText(self.del_records[i][1])
+            self.message_check.setText(self.del_records[i]['message'])
             self.message_check.setChecked(False)
             self.message_check.clicked.connect(self.set_list)
             self.verticalLayout.addWidget(self.message_check)
 
             self.detail_sub_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
             self.detail_sub_lab.setObjectName(
-                    "detail_sub_lab" + str(self.del_records[i][0]))
+                    "detail_sub_lab" + str(self.del_records[i]['id']))
             # 设置 detail
-            if not self.del_records[i][2]:
+            if not self.del_records[i]['detail']:
                 self.detail_sub_lab.setText('无详细信息')
-            elif len(self.del_records[i][2]) > config.COM_TE_WIDTH:
+            elif len(self.del_records[i]['detail']) > config.COM_TE_WIDTH:
                 self.detail_sub_lab.setText(
-                        self.del_records[i][2][:config.COM_TE_WIDTH - 3] + '...')
+                        self.del_records[i]['detail'][:config.COM_TE_WIDTH - 3] + '...')
             else:
-                self.detail_sub_lab.setText(self.del_records[i][2])
+                self.detail_sub_lab.setText(self.del_records[i]['detail'])
             self.verticalLayout.addWidget(self.detail_sub_lab)
 
         self.horizontalLayout = QtWidgets.QHBoxLayout()

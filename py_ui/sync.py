@@ -10,7 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from operateSqlite import exec_sql
 import config
-from utils import get_cloud_records, get_records
+from module import get_cloud_notes, get_notes
 
 
 class Ui_Sync_Dialog(QtWidgets.QDialog):
@@ -154,8 +154,8 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
     def set_data(self,token,username='visitor'):
-        self.local_records = get_records(config.LDB_FILENAME, username, is_del='all')
-        self.cloud_records = get_cloud_records(username,self.user_info['token'])
+        self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
+        self.cloud_records = get_cloud_notes(username,self.user_info['token'])
 
 
     # 备份按钮槽函数

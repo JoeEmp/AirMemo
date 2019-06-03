@@ -1,10 +1,8 @@
 import logging
-
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-
-from utils import check_login_state
+from module import check_login_state
 
 class AirTray(QSystemTrayIcon):
     widget = None
@@ -44,7 +42,7 @@ class AirTray(QSystemTrayIcon):
     def check(self):
         result = check_login_state()
         if result:
-            return {'username': result[0]['username'], 'token': result[0]['token']}
+            return result[0]
         else:
             return {'username': 'visitor', 'token': ''}
 
