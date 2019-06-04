@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>503</width>
+    <height>366</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Email</string>
+  </property>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>481</width>
+     <height>377</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="5" column="1">
+     <widget class="QLabel" name="context_lab">
+      <property name="text">
+       <string>内容:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="tiltle_lab">
+      <property name="text">
+       <string>主题:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="copy_lab">
+      <property name="text">
+       <string>抄送:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="3">
+     <widget class="QPushButton" name="send_btn">
+      <property name="text">
+       <string>发送</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2" colspan="2">
+     <widget class="QTextEdit" name="copy_tx">
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="recipients_lab">
+      <property name="text">
+       <string>收件人:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2" colspan="2">
+     <widget class="QTextEdit" name="title_tx"/>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QTextEdit" name="recipients_tx"/>
+    </item>
+    <item row="0" column="2" colspan="2">
+     <widget class="QComboBox" name="sender_comb">
+      <item>
+       <property name="text">
+        <string>1@qq.com</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>furnace_0xg@163.com</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="sender_lab">
+      <property name="text">
+       <string>发件人</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2" colspan="2">
+     <widget class="QTextEdit" name="context_tx"/>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="tips_lab">
+      <property name="text">
+       <string>邮箱地址使用,隔开</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
