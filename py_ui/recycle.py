@@ -8,12 +8,11 @@
 import logging
 import re
 import sip
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 import config
 import operateSqlite
-import utils
+import module
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):
@@ -28,7 +27,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.show()
 
     def set_data(self, username):
-        self.del_records = utils.get_records(config.LDB_FILENAME, username, is_del='1')
+        self.del_records = module.get_notes(config.LDB_FILENAME, username, is_del='1')
         self.records_len = len(self.del_records)
 
     def setupUi(self):
@@ -48,8 +47,8 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(
-                QtCore.QRect(10, 10, config.COM_TE_WIDTH,
-                             config.COM_BTN_HEIGHT * self.records_len * 2 + 30))
+            QtCore.QRect(10, 10, config.COM_TE_WIDTH,
+                         config.COM_BTN_HEIGHT * self.records_len * 2 + 30))
         # 打印 布局高度
         logging.warning(self.verticalLayoutWidget.height())
 
@@ -61,7 +60,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         for i in range(len(self.del_records)):
             self.message_check = QtWidgets.QCheckBox(self.verticalLayoutWidget)
             self.message_check.setObjectName(
-                    "message_check" + str(self.del_records[i]['id']))
+                "message_check" + str(self.del_records[i]['id']))
             # 设置 msg
             self.message_check.setText(self.del_records[i]['message'])
             self.message_check.setChecked(False)
@@ -70,13 +69,13 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
             self.detail_sub_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
             self.detail_sub_lab.setObjectName(
-                    "detail_sub_lab" + str(self.del_records[i]['id']))
+                "detail_sub_lab" + str(self.del_records[i]['id']))
             # 设置 detail
             if not self.del_records[i]['detail']:
                 self.detail_sub_lab.setText('无详细信息')
             elif len(self.del_records[i]['detail']) > config.COM_TE_WIDTH:
                 self.detail_sub_lab.setText(
-                        self.del_records[i]['detail'][:config.COM_TE_WIDTH - 3] + '...')
+                    self.del_records[i]['detail'][:config.COM_TE_WIDTH - 3] + '...')
             else:
                 self.detail_sub_lab.setText(self.del_records[i]['detail'])
             self.verticalLayout.addWidget(self.detail_sub_lab)

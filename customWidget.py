@@ -1,19 +1,22 @@
 '''
 为qt控件加入所需的方法
 '''
+from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit,QMenu, QAction,QMessageBox
-from module import update_notes, add_notes,delete_notes
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox
+from module import update_notes, add_notes, delete_notes
 import config
 from operateSqlite import *
 import re
+from time_thread import time_thread, remind_timer
+
 
 class AirLineEdit(QLineEdit):
     __eld_text = ''
-    __lineSignal = pyqtSignal(str, int)
+    __lineSignal = pyqtSignal(str, int)  # 绑定main_win 的 get_update_signal
     update_id_Signal = pyqtSignal(int)
 
-    def __init__(self, main_win, info,parent=None):
+    def __init__(self, main_win, info, parent=None):
         super().__init__(parent)
         self.get_reminder(info)
         self.main_win = main_win
@@ -21,13 +24,18 @@ class AirLineEdit(QLineEdit):
         self.__lineSignal.connect(main_win.get_update_Signal)
         self.createContextMenu()
 
-    def get_reminder(self,info):
-        sql = "select time from reminder where username = '%s' limit 3" % info['username']
+    def get_reminder(self, info):
+        '''
+        获取用户的前三条时间
+        :param info:
+        :return:
+        '''
+        sql = "select time from reminder where username = '%s'  order by sequence limit 3" % info['username']
         self.times = exec_sql(config.LDB_FILENAME, sql)
 
     def createContextMenu(self):
         ''' 
-        创建右键菜单 
+        创建右键菜单，菜单的数量没有办法动态控制，wrb
         '''
         #  必须将ContextMenuPolicy设置为Qt.CustomContextMenu  
         #  否则无法使用customContextMenuRequested信号  
@@ -41,10 +49,10 @@ class AirLineEdit(QLineEdit):
         self.act_paste = QAction('粘贴', triggered=self.paste)
         self.act_undo = QAction('撤销', triggered=self.undo)
         self.act_selall = QAction('全选', triggered=self.selectAll)
-        self.act_del = QAction('删除该消息', triggered=self.delete_record)
-        self.set_reminder0 = QAction(self.times[0]['time'],triggered=self.set_time)
-        self.set_reminder1 = QAction(self.times[1]['time'],triggered=self.set_time)
-        self.set_reminder2 = QAction(self.times[2]['time'],triggered=self.set_time)
+        self.act_del = QAction('删除该消息', triggered=self.delete_note)
+        self.set_reminder0 = QAction(self.times[0]['time'], triggered=self.set_time)
+        self.set_reminder1 = QAction(self.times[1]['time'], triggered=self.set_time)
+        self.set_reminder2 = QAction(self.times[2]['time'], triggered=self.set_time)
 
         self.contextMenu.addAction(self.act_copy)
         self.contextMenu.addAction(self.act_paste)
@@ -61,20 +69,22 @@ class AirLineEdit(QLineEdit):
         '''
         #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(95, 20) 20为微调结果
         self.contextMenu.move(pos + self.main_win.pos() + QPoint(95, 20))
-        # logging.warning(pos+self.main_win.pos()+QPoint(95,20))
+        # logging.info(pos+self.main_win.pos()+QPoint(95,20))
         self.contextMenu.show()
 
     def set_time(self):
-        logging.info('set time')
-        pass
+        time = datetime.strptime(self.sender().text(), '%H:%M:%S')
+        sec = (time - datetime.strptime('00:00:00', '%H:%M:%S')).seconds
+        self.thread = time_thread(parent=self, sec=sec)
+        self.thread.run()
 
-    def delete_record(self):
+    def delete_note(self):
         id = re.findall('\d+', self.objectName())[0]
         filter_list = [
             ['id', '=', id]
         ]
-        if delete_notes(config.LDB_FILENAME, filer_list=filter_list) == 0:
-            QMessageBox.information(self, '提示', {}.format('无法删除空数据'))
+        if delete_notes(config.LDB_FILENAME, filter_list=filter_list) == 0:
+            QMessageBox.information(self, '提示', {}.format('无法删除空数据'), QMessageBox.Ok)
         else:
             # 期望不删除预设数据 未实现 wrb
             self.__lineSignal.emit(self.main_win.user_info['username'], 0)

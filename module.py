@@ -76,7 +76,7 @@ def add_notes(filename, data):
         return -1
 
 
-def delete_notes(filename, filer_list):
+def delete_notes(filename, filter_list):
     '''
     软删除数据
     :param filename:
@@ -85,7 +85,7 @@ def delete_notes(filename, filer_list):
     '''
     table = 'Msg'
     sql = be_sql().update_sql(table=table, value_dict={'is_del': '1'},
-                              filter_list=filer_list)
+                              filter_list=filter_list)
     print(sql)
     return exec_sql(filename, sql, is_update=1)
 

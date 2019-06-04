@@ -1,44 +1,60 @@
 import datetime
 import logging
-
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
-
-import config
-from PyQt5.QtCore import QThread, pyqtSignal,QTimer
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 
 
-class TimeThread(QThread):
-    trigger = pyqtSignal()
-    _sec = 0
+class remind_timer(QTimer):
+    overSignal = pyqtSignal(str)
 
-    def __init__(self,time,parent=None):
-        super().__init__(parent)
-        try:
-            # self.text = parent.text()
-            time = datetime.datetime.strptime(time,'%H:%M:%S')
-            self.sec = (time-datetime.datetime.strptime('00:00:00','%H:%M:%S')).seconds
-        except Exception as e:
-            logging.warning(e)
+    def __init__(self):
+        super().__init__()
+
+    def start(self, sec=1):
+        super().start(sec * 1000)
+        self.timeout.connect(self.send_tips)
+
+    def send_tips(self):
+        '''
+        发送超时信号
+        :return:
+        '''
+        print('timeout')
+        # 自动销毁
+        self.killTimer(self.timerId())
+        self.overSignal.emit('timeout')
+
+
+class time_thread(QThread):
+    def __init__(self, parent=None, sec=1):
+        super().__init__()
+        self.parent = parent
+        self.sec = sec
 
     def run(self):
-        timer = QTimer()
-        timer.timeout.connect(time_out_tips)
-        timer.start(self.sec)
-        # # 循环完毕后发出信号
-        # self.trigger.emit()
+        self.timer = remind_timer()
+        self.timer.start(sec=self.sec)
+        self.timer.overSignal.connect(self.free_self)
 
+    def free_self(self, method):
+        '''
 
-def time_out_tips(self):
-    print('时间到了')
-    pass
+        :param method: 暂无用处，留待后用
+        :return:
+        '''
+        if method == 'timeout':
+            print('get timeout signal')
+            QMessageBox.information(self.parent, '', '请注意任务<b>%s</b>的交付时间' % self.parent.text(), QMessageBox.Ok)
+            self.deleteLater()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     top = QWidget()
     top.resize(300, 120)
     top.show()
-    s= '123'
-    th = TimeThread(time='00:00:02',parent=top)
-    th.start()
+    s = '123'
+    th = time_thread(parent=top, sec=3)
+    th.run()
     sys.exit(app.exec_())

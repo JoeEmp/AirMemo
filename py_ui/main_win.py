@@ -100,7 +100,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Sync_btn.setObjectName("homology_btn")
         self.Sync_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
         self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.SYNC_ICON)
-        self.Sync_btn.clicked.connect(self.Sync_dlg_slot)
+        self.Sync_btn.clicked.connect(self.show_sync_dlg_slot)
         self.titleLayout.addWidget(self.Sync_btn)
         # 空白
         spacerItem = QtWidgets.QSpacerItem(40, 20,
@@ -222,8 +222,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet('QMainWindow{background-color:rgba(196,255,255,1);}')
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
 
-    # 初始化数据
+
     def setData(self, username=None):
+        '''
+        根据用户初始化数据
+        :param username: 用户名
+        :return:
+        '''
         # 判断用户
         if username:
             self.records = get_notes(config.LDB_FILENAME, username)
@@ -236,15 +241,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutWidth = divide['width']
         else:
             self.layoutWidth = config.MAIN_BASEWIDTH
-        # 20为标题宽度
+        # 20为标题高度
         self.layoutHeight = (len(self.records) + 1) * config.COM_BTN_HEIGHT + 20
         self.Text_isShow = False
         logging.info('set data')
 
-    # 笔记详情的展开和收起        暂未修复bug贴图转换
     def ishide(self):
         '''
-        详情编辑框的展开和收起
+        详情编辑框的展开和收起 暂未修复bug贴图转换
         :return:
         '''
         index = self.hide_detail_btn_list.index(self.sender())
@@ -276,7 +280,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayoutWidget.resize(self.layoutWidth, self.layoutHeight)
         self.welt_btn.setMaximumSize(config.MAIN_WELT_BTN_WIDTH, self.layoutHeight)
 
-    # 发送邮件
     def send_Email_slot(self):
         '''
         获取序号对应的数据
@@ -407,7 +410,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dlg = Ui_recycle_Dialog(parent=self)
         dlg.updateSignal.connect(self.get_update_Signal)
 
-    def Sync_dlg_slot(self):
+    def show_sync_dlg_slot(self):
         result = get_login_state()
         result['state'] = 2
         if result['state'] == 2:

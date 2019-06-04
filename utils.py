@@ -9,6 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
 from operateSqlite import be_sql, exec_sql
+import logging
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
