@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QLineEdit
 import config
 import operateSqlite
 import module
-
+import utils
 
 # 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
@@ -197,7 +197,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        state = utils.logout(self.username)
+        state = module.logout(self.username)
         if state['state'] == 1:
             table = 'user'
             value_dict = {'token': 'NULL'}

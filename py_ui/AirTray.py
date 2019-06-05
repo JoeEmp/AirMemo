@@ -35,6 +35,7 @@ class AirTray(QSystemTrayIcon):
         pass
 
     def set_data(self):
+        self.setObjectName('AirTray')
         self.__user_info = self.check()
         self.set_icon()
 

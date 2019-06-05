@@ -408,7 +408,6 @@ class Ui_Settings(QtWidgets.QMainWindow):
         item.setFlags(
             QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.time_list.addItem(item)
-
         table = 'Reminder'
         value_dict = {'time': '00:00:00', 'username': self.user_info['username']}
         sql = be_sql().ins_sql(table, value_dict)
@@ -487,7 +486,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
 
     def _save_reminder_sequence(self):
         table = 'reminder'
-        value_dict = {'sequence': -1}
+        value_dict = {'sequence': -1,'time':'00:00:00'}
         filter_list = [
             ['username', '=', self.user_info['username']],
             ['id', '=', -1],
@@ -497,6 +496,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         times = [record['time'] for record in self._reminder_records]
         for i in range(len(ids)):
             value_dict['sequence'] = str(i)
+            value_dict['time'] = self.time_list.item(i).text()
             filter_list[1][2] = str(ids[i])
             filter_list[2][2] = times[i]
             sql = be_sql().update_sql(table, value_dict, filter_list)

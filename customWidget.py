@@ -3,12 +3,13 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QListWidgetItem, QListWidget
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel
 from module import update_notes, add_notes, delete_notes
 import config
 from operateSqlite import *
 import re
 from time_thread import time_thread
+import time
 
 
 class AirLineEdit(QLineEdit):
@@ -145,3 +146,20 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
+
+
+class Toast(QDialog):
+
+    def __init__(self, parent=None, text='Toast'):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
+        self.setStyleSheet('QDialog{border-top-left-radius:15px;border-top-right-radius:15px;}')  # 圆角
+        self.label = QLabel(text)
+        self
+
+    def show(self):
+        # self.move(self.x() - 20, self.y())
+        super().show()
+        self.raise_()
+        time.sleep(1)
+        self.close()

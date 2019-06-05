@@ -23,7 +23,7 @@ tips for desktop
 
 &ensp;&ensp;7.右键菜单时间个数问题
 
-&ensp;&ensp;8.提醒时间设置
+&ensp;&ensp;8.提醒时间
 
 &ensp;&ensp;9.版面滚动，固定高度
 

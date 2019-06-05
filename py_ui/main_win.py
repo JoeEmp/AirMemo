@@ -11,12 +11,10 @@
 import logging
 import re
 from time import sleep
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
-
 import config
 import customWidget
 from operateSqlite import be_sql, exec_sql
@@ -27,6 +25,7 @@ from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 from module import get_notes, get_login_state
 from utils import getSize
 import sip
+
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     _startPos = None
@@ -163,7 +162,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.note_le_list.append(self.note_le)
             self.note_le.setEnabled(False)
             self.note_le.setMaxLength(30)
-            self.note_le.setStyleSheet('background-color:#%s' % 'c4ffff')
+            self.note_le.setStyleSheet('background-color:#%s' % self.records[i]['color'])
             # self.note_le.editingFinished.connect(self.update_item_value)
             self.note_le.update_id_Signal.connect(self.update_tx_id)
 
@@ -314,6 +313,94 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 sleep(config.SPEED)
                 # self.sender().setSytleSheet('')
 
+    def addNote_slot(self):
+        '''
+        增加memo
+        :return:
+        '''
+        if self.note_le.text():
+            self.setData(username=self.user_info['username'])
+            new_record = {'id': -1, 'detail': '', 'message': '', 'color': 'ffffff'}
+            self.records.append(new_record)
+            self.changeLayout()
+            self.retranslateUi()
+            self.show()
+        else:
+            QMessageBox.information(self, 'tips', '请补充短消息框内容', QMessageBox.Ok)
+
+    def changeLayout(self):
+        '''
+        仅用于add_note_slot 先删除add_btn,再插入 AirLineEdit 和 add_btn
+        :return:
+        '''
+        record = self.records[-1]
+        length = len(self.records)
+
+        self.verticalLayout.removeWidget(self.add_btn)
+        sip.delete(self.add_btn)
+
+        self.noteLayout = QtWidgets.QGridLayout()
+        self.noteLayout.setObjectName("noteLayout" + str(-1))
+        # 短消息编辑框
+        self.note_le = customWidget.AirLineEdit(main_win=self,
+                                                parent=self.verticalLayoutWidget,
+                                                info=self.user_info)
+        self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
+        # 将id写入objName里 bwrb 必须重构
+        self.note_le.setObjectName("note_le" + str(record['id']))
+        # 加入相应列表，禁用LineEdit
+        self.note_le_list.append(self.note_le)
+        self.note_le.setEnabled(False)
+        self.note_le.setMaxLength(30)
+        self.note_le.setStyleSheet('background-color:#%s' % record['color'])
+        # self.note_le.editingFinished.connect(self.update_item_value)
+        self.note_le.update_id_Signal.connect(self.update_tx_id)
+
+        # 发送按钮
+        self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
+        self.send_btn.setObjectName("send_btn" + str(record['id']))
+        self.send_btn.setText(str(length))
+        self.send_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+        self.send_btn.setStyleSheet('border-image:url(%s);' % '')
+        self.send_btn.setStyleSheet('background-color:rgba(196,255,255,1);')
+
+        # 收起/展开按钮
+        self.hide_detail_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.hide_detail_btn.setText("")
+        self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
+        self.hide_detail_btn.setObjectName("hide_detail_btn" + str(-1))
+        self.hide_detail_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+        self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
+        self.hide_detail_btn_list.append(self.hide_detail_btn)
+
+        # 详情编辑框
+        self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
+        self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
+        self.detail_tx.setObjectName("detail_tx" + str(record['id']))
+        # 隐藏文本框 初始化文本框状态数组
+        self.detail_tx.hide()
+        self.detail_tx.setEnabled(False)
+        self.detail_tx_state_list.append(0)
+        self.detail_tx_list.append(self.detail_tx)
+        # 绑定槽
+        self.hide_detail_btn.clicked.connect(self.ishide)
+        self.send_btn.clicked.connect(self.send_Email_slot)
+        QtCore.QMetaObject.connectSlotsByName(self)
+        self.verticalLayout.addLayout(self.noteLayout)
+
+        self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.add_btn.setObjectName("add_btn")
+        self.add_btn.clicked.connect(self.addNote_slot)
+        self.verticalLayout.addWidget(self.add_btn)
+
+        # 调整窗口和布局高度
+        self.layoutHeight += config.COM_BTN_HEIGHT
+        self.resize(self.layoutWidth, self.layoutHeight)
+        self.setFixedSize(self.layoutWidth, self.layoutHeight)
+        self.verticalLayoutWidget.setGeometry(
+            QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
+
     def show_user_dlg_slot(self):
         '''
         用户窗口
@@ -412,94 +499,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super().show()
         # 添加置顶
         self.raise_()
-
-    def addNote_slot(self):
-        '''
-        增加memo
-        :return:
-        '''
-        if self.note_le.text():
-            self.setData(username=self.user_info['username'])
-            new_record = {'id': -1, 'detail': '', 'message': '', 'color': ''}
-            self.records.append(new_record)
-            self.changeLayout()
-            self.retranslateUi()
-            self.show()
-        else:
-           pass
-
-    def changeLayout(self):
-        '''
-        仅用于add_note_slot 先删除add_btn,再插入 AirLineEdit 和 add_btn
-        :return:
-        '''
-        record = self.records[-1]
-        length = len(self.records)
-
-        self.verticalLayout.removeWidget(self.add_btn)
-        sip.delete(self.add_btn)
-
-        self.noteLayout = QtWidgets.QGridLayout()
-        self.noteLayout.setObjectName("noteLayout" + str(-1))
-        # 短消息编辑框
-        self.note_le = customWidget.AirLineEdit(main_win=self,
-                                                parent=self.verticalLayoutWidget,
-                                                info=self.user_info)
-        self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
-        # 将id写入objName里 bwrb 必须重构
-        self.note_le.setObjectName("note_le" + str(record['id']))
-        # 加入相应列表，禁用LineEdit
-        self.note_le_list.append(self.note_le)
-        self.note_le.setEnabled(False)
-        self.note_le.setMaxLength(30)
-        self.note_le.setStyleSheet('background-color:#%s' % 'c4ffff')
-        # self.note_le.editingFinished.connect(self.update_item_value)
-        self.note_le.update_id_Signal.connect(self.update_tx_id)
-
-        # 发送按钮
-        self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
-        self.send_btn.setObjectName("send_btn" + str(record['id']))
-        self.send_btn.setText(str(length))
-        self.send_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
-        self.send_btn.setStyleSheet('border-image:url(%s);' % '')
-        self.send_btn.setStyleSheet('background-color:rgba(196,255,255,1);')
-
-        # 收起/展开按钮
-        self.hide_detail_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.hide_detail_btn.setText("")
-        self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
-        self.hide_detail_btn.setObjectName("hide_detail_btn" + str(-1))
-        self.hide_detail_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
-        self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
-        self.hide_detail_btn_list.append(self.hide_detail_btn)
-
-        # 详情编辑框
-        self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
-        self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
-        self.detail_tx.setObjectName("detail_tx" + str(record['id']))
-        # 隐藏文本框 初始化文本框状态数组
-        self.detail_tx.hide()
-        self.detail_tx.setEnabled(False)
-        self.detail_tx_state_list.append(0)
-        self.detail_tx_list.append(self.detail_tx)
-        # 绑定槽
-        self.hide_detail_btn.clicked.connect(self.ishide)
-        self.send_btn.clicked.connect(self.send_Email_slot)
-        QtCore.QMetaObject.connectSlotsByName(self)
-        self.verticalLayout.addLayout(self.noteLayout)
-
-        self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.add_btn.setObjectName("add_btn")
-        self.add_btn.clicked.connect(self.addNote_slot)
-        self.verticalLayout.addWidget(self.add_btn)
-
-        # 调整窗口和布局高度
-        self.layoutHeight += config.COM_BTN_HEIGHT
-        self.resize(self.layoutWidth, self.layoutHeight)
-        self.setFixedSize(self.layoutWidth, self.layoutHeight)
-        self.verticalLayoutWidget.setGeometry(
-            QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
