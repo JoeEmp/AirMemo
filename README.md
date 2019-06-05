@@ -11,7 +11,7 @@ tips for desktop
 ### to do
 &ensp;&ensp;1.多邮箱自动分割(参考foxmail)
 
-&ensp;&ensp;2.动态布局
+&ensp;&ensp;2.动态布局(已完成)
 
 &ensp;&ensp;3.云同步
 
