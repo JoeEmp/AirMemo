@@ -37,6 +37,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # 获取Reminder表数据
         sql = sql.replace(table, 'Reminder') + 'order by sequence'
         self._reminder_records = exec_sql(config.LDB_FILENAME, sql)
+        # print(self._reminder_records)
         logging.info('data init end')
 
     def setupUi(self):
@@ -164,7 +165,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         for record in self._reminder_records:
             item = QListWidgetItem(record['time'])
             item.setFlags(
-                    QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.time_list.addItem(item)
         self.time_list.setObjectName("time_list")
 
@@ -377,11 +378,8 @@ class Ui_Settings(QtWidgets.QMainWindow):
             QMessageBox.information(self, ' ', '请选择优先使用的邮箱', QMessageBox.Ok)
 
     def _reset(self):
-        '''
-        重置email_list
-        :return:
-        '''
         self.set_data()
+        # 重置email_list
         self.email_list.clear()
         for record in self._email_records:
             item = QListWidgetItem(record['addr'])
@@ -392,19 +390,23 @@ class Ui_Settings(QtWidgets.QMainWindow):
             # item.setFlags(
             #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.email_list.addItem(item)
-
+        # 重置 time_list
         self.time_list.clear()
         for record in self._reminder_records:
             item = QListWidgetItem(record['time'])
             item.setFlags(
-                    QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.time_list.addItem(item)
 
     # 提醒时间页的槽函数
     def _add_reminder_slot(self):
+        '''
+        
+        :return:
+        '''
         item = QListWidgetItem('00:00:00')
         item.setFlags(
-                QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.time_list.addItem(item)
 
         table = 'Reminder'
@@ -508,4 +510,9 @@ class Ui_Settings(QtWidgets.QMainWindow):
         sql = "delete from Email_settings where password is NULL;"
         exec_sql(config.LDB_FILENAME, sql)
         self._reset()
-        # 保存当前顺
+        # 保存当前顺序
+
+    def show(self):
+        super().show()
+        # 添加置顶
+        self.raise_()

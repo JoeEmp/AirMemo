@@ -221,7 +221,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.add_btn.setText(_translate("MainWindow", "add"))
         self.setStyleSheet('QMainWindow{background-color:rgba(196,255,255,1);}')
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
-
+        # self.setStyleSheet('QMainWindow{border-top-left-radius:15px;border-top-right-radius:15px;}')
 
     def setData(self, username=None):
         '''
@@ -421,6 +421,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 print(e)
         else:
             QMessageBox.information(self, 'tips', result['errMsg'], QMessageBox.Ok)
+
+    def show(self):
+        super().show()
+        # 添加置顶
+        self.raise_()
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):

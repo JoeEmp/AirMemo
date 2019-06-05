@@ -3,12 +3,12 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QListWidgetItem, QListWidget
 from module import update_notes, add_notes, delete_notes
 import config
 from operateSqlite import *
 import re
-from time_thread import time_thread, remind_timer
+from time_thread import time_thread
 
 
 class AirLineEdit(QLineEdit):
