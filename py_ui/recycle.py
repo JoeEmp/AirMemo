@@ -9,7 +9,9 @@ import logging
 import re
 import sip
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSize
+from PyQt5.QtWidgets import QListWidgetItem
+
 import config
 import operateSqlite
 import module
@@ -32,66 +34,49 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
 
     def setupUi(self):
         self.setObjectName("recycle_Dialog")
-        self.resize(config.COM_TE_WIDTH,
-                    config.COM_BTN_HEIGHT * self.records_len * 2 + 50)
-        # self.setFixedSize(config.TEXT_WIDTH,
-        #             config.BTN_HEIGHT * len(self.del_records) * 2 + 50)
-        # 窗口总布局
-        self.centralwidget = QtWidgets.QWidget(self)
-        self.centralwidget.setMouseTracking(True)
-        self.centralwidget.setObjectName("centralwidget")
-        # self.centralwidget.setGeometry(
-        #         QtCore.QRect(0, 0, config.TEXT_WIDTH + 20,
-        #                      config.BTN_HEIGHT * len(
-        #                              self.del_records) * 2 + 30) + 20)
-
-        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(
-            QtCore.QRect(10, 10, config.COM_TE_WIDTH,
-                         config.COM_BTN_HEIGHT * self.records_len * 2 + 30))
-        # 打印 布局高度
-        logging.warning(self.verticalLayoutWidget.height())
-
+        self.resize(300, 370)
+        self.verticalLayoutWidget = QtWidgets.QWidget(self)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 280, 350))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-
         self.verticalLayout.setObjectName("verticalLayout")
-        for i in range(len(self.del_records)):
-            self.message_check = QtWidgets.QCheckBox(self.verticalLayoutWidget)
-            self.message_check.setObjectName(
-                "message_check" + str(self.del_records[i]['id']))
-            # 设置 msg
-            self.message_check.setText(self.del_records[i]['message'])
-            self.message_check.setChecked(False)
-            self.message_check.clicked.connect(self.set_list)
-            self.verticalLayout.addWidget(self.message_check)
+        self.listWidget = QtWidgets.QListWidget(self.verticalLayoutWidget)
+        self.listWidget.setObjectName("listWidget")
+        self.verticalLayout.addWidget(self.listWidget)
+        for i in range(self.records_len):
+            item = QListWidgetItem()
+            item.setSizeHint(QSize(10, 40))
+            self.listWidget.addItem(item)
 
-            self.detail_sub_lab = QtWidgets.QLabel(self.verticalLayoutWidget)
-            self.detail_sub_lab.setObjectName(
-                "detail_sub_lab" + str(self.del_records[i]['id']))
-            # 设置 detail
-            if not self.del_records[i]['detail']:
-                self.detail_sub_lab.setText('无详细信息')
-            elif len(self.del_records[i]['detail']) > config.COM_TE_WIDTH:
-                self.detail_sub_lab.setText(
-                    self.del_records[i]['detail'][:config.COM_TE_WIDTH - 3] + '...')
+            # 设置item布局
+            itemWidget = QtWidgets.QWidget(self)
+            itemWidget.setGeometry(QtCore.QRect(40, 190, 231, 51))
+            item_verticalLayout = QtWidgets.QVBoxLayout(itemWidget)
+            item_verticalLayout.setContentsMargins(0, 0, 0, 0)
+            message_check = QtWidgets.QCheckBox(itemWidget)
+            message_check.setText(self.del_records[i]['message'])
+            item_verticalLayout.addWidget(message_check)
+            detail_sub_lab = QtWidgets.QLabel(itemWidget)
+            if self.del_records[i]['detail']:
+                if len(self.del_records[i]['detail']) > 22:
+                    detail_sub_lab.setText(self.del_records[i]['detail'][:20] + "……")
+                else:
+                    detail_sub_lab.setText(self.del_records[i]['detail'])
             else:
-                self.detail_sub_lab.setText(self.del_records[i]['detail'])
-            self.verticalLayout.addWidget(self.detail_sub_lab)
+                detail_sub_lab.setText('无具体任务细节')
+            item_verticalLayout.addWidget(detail_sub_lab)
+
+            self.listWidget.setItemWidget(item, itemWidget)
 
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        spacerItem = QtWidgets.QSpacerItem(40, 20,
-                                           QtWidgets.QSizePolicy.Expanding,
-                                           QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.restore_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.restore_btn.setObjectName("restore_btn")
         self.horizontalLayout.addWidget(self.restore_btn)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20,
-                                            QtWidgets.QSizePolicy.Expanding,
-                                            QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
         self.verticalLayout.addLayout(self.horizontalLayout)
 

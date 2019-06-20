@@ -8,9 +8,11 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QMessageBox
+
 from operateSqlite import exec_sql
 import config
-from module import get_cloud_notes, get_notes
+from module import get_cloud_notes, get_notes, server_error_msg
 
 
 class Ui_Sync_Dialog(QtWidgets.QDialog):
@@ -20,7 +22,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         super().__init__(parent=parent)
         self.parent = parent
         self.user_info = parent.user_info
-        self.set_data(username=self.user_info['username'],token=self.user_info['token'])
+        self.set_data(username=self.user_info['username'], token=self.user_info['token'])
         self.setupUi()
         # self.show()
 
@@ -153,10 +155,12 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.label.setText(_translate("Dialog", "绿色为云端已有消息"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def set_data(self,token,username='visitor'):
+    def set_data(self, token, username='visitor'):
         self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
-        self.cloud_records = get_cloud_notes(username,self.user_info['token'])
-
+        try:
+            self.cloud_records = get_cloud_notes(username, self.user_info['token'])
+        except Exception as e:
+            QMessageBox.information(self, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)
 
     # 备份按钮槽函数
     def sync_upload_slot(self):
@@ -169,7 +173,6 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
 
     def del_local_record(self):
         pass
-
 
 # if __name__ == "__main__":
 #     cloud_records = get_cloud_records('coco')

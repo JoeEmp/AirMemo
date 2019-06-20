@@ -46,7 +46,7 @@ def update_notes(filename, data, ele):
             ]
             sql = be_sql().update_sql('Msg', {ele: data[ele]}, filter_list)
             cur = exec_sql(filename, sql)
-            logging.info('%s update No.%s record successfully!!!' % (ele,data['id']))
+            logging.info('%s update No.%s record successfully!!!' % (ele, data['id']))
             return cur
     except Exception as e:
         print('update error')
@@ -213,6 +213,7 @@ def register(username, password):
         logging.warning(e)
         return server_error_msg()
 
+
 # 到达时间时触发槽
 def time_out_slot():
     tips = QWidget()
@@ -236,7 +237,12 @@ def get_cloud_notes(username, token):
     }
     data = {'username': username, 'token': token, 'page_id': '1', 'page_size': '5000'}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
-    return r.json()
+    try:
+        return r.json()
+    except Exception as e:
+        logging.warning(e)
+        return server_error_msg()
+
 
 def server_error_msg():
-    return {"state":-1,"errMsg":"服务端异常"}
+    return {"state": -1, "errMsg": "服务端异常"}
