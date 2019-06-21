@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
 from operateSqlite import be_sql, exec_sql
 import logging
-from customWidget import Toast
+# from customWidget import Toast
 from time_thread import time_thread
 
 protocol = 'http://'
@@ -117,7 +117,7 @@ def create_reminder(parent, time):
 
 
 def showToast(parent,text):
-
+    pass
 
 if __name__ == '__main__':
     pass

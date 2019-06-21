@@ -491,7 +491,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 dlg = Ui_Sync_Dialog(parent=self)
                 dlg.updateSignal.connect(self.get_update_Signal)
             except Exception as e:
-                print(e)
+                logging.warnings(e)
+                QMessageBox.information(self, 'tips', "无法连接服务器", QMessageBox.Ok)
         else:
             QMessageBox.information(self, 'tips', result['errMsg'], QMessageBox.Ok)
 

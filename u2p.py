@@ -39,7 +39,7 @@ if __name__ == "__main__":
     findUI(ulist)
     # print(ulist)
     # 只转化指定文件
-    sub_ulist = ['ui/sync.ui']
+    sub_ulist = ['ui/new_recycle.ui']
     if sub_ulist:
         translation(sub_ulist)
     else:
