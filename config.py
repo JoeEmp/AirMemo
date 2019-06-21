@@ -44,11 +44,11 @@ MAIN_WELT_BTN_WIDTH = 60
 MAIN_BASEWIDTH = MAIN_WELT_BTN_WIDTH + COM_TE_WIDTH
 
 # icon
-LOGIN_ICON = './icon/user.ico'
+LOGIN_ICON = './icon/user1.png'
 
 SYNC_ICON = './icon/Sync.ico'
 
-HOMO_ICON = './icon/recycle.svg'
+HOMO_ICON = './icon/recycle1.png'
 
 TITLE_ICON = './icon/title.svg'
 
@@ -57,6 +57,8 @@ HIDE_ICON = './icon/hide.ico'
 SHOW_ICON = './icon/show.ico'
 
 CLOSE_ICON = './icon/close_btn.png'
+
+ADD_ICON =''
 
 # 邮箱窗口设置 email.py
 RECIPIENT_TX_HEIGHT = 25
