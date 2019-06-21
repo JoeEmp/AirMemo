@@ -307,7 +307,7 @@ class Ui_register_Dialog(QtWidgets.QDialog):
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
                     self.password_le.text() == self.again_le.text()):
-            result = utils.register(username=self.username_le.text(), password=self.again_le.text())
+            result = module.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['state'] == 1:
                     self.close()

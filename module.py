@@ -207,8 +207,11 @@ def register(username, password):
     }
     data = {'username': username, 'password': password}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
-    return r.json()
-
+    try:
+        return r.json()
+    except Exception as e:
+        logging.warning(e)
+        return server_error_msg()
 
 # 到达时间时触发槽
 def time_out_slot():
@@ -234,3 +237,6 @@ def get_cloud_notes(username, token):
     data = {'username': username, 'token': token, 'page_id': '1', 'page_size': '5000'}
     r = requests.post(protocol + user_host + url, headers=headers, data=data)
     return r.json()
+
+def server_error_msg():
+    return {"state":-1,"errMsg":"服务端异常"}
