@@ -8,6 +8,8 @@ tips for desktop
 
 &ensp;&ensp;3.配置提醒时间和邮箱
 
+&ensp;&ensp;4.完成回收站功能
+
 ### to do
 &ensp;&ensp;1.多邮箱自动分割(参考foxmail)
 
@@ -23,9 +25,7 @@ tips for desktop
 
 &ensp;&ensp;7.右键菜单时间个数问题
 
-&ensp;&ensp;8.提醒时间
-
-&ensp;&ensp;9.版面滚动，固定高度
+&ensp;&ensp;8.版面滚动，固定高度
 
 ### question
 

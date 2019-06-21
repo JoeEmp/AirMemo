@@ -10,7 +10,7 @@ import re
 import sip
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QSize
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 import config
 import operateSqlite
@@ -57,6 +57,8 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
             message_check = QtWidgets.QCheckBox(itemWidget)
             message_check.setText(self.del_records[i]['message'])
             item_verticalLayout.addWidget(message_check)
+            message_check.setObjectName('message_check%s' % i)
+            message_check.clicked.connect(self.set_list)
             detail_sub_lab = QtWidgets.QLabel(itemWidget)
             if self.del_records[i]['detail']:
                 if len(self.del_records[i]['detail']) > 22:
@@ -75,6 +77,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.horizontalLayout.addItem(spacerItem)
         self.restore_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.restore_btn.setObjectName("restore_btn")
+        self.restore_btn.clicked.connect(self.restore_records)
         self.horizontalLayout.addWidget(self.restore_btn)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
@@ -83,32 +86,26 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
-    def restore_records(self):
-        self.restore_btn.clicked.connect(self.restore_records)
-
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Dialog", "回收站"))
         self.restore_btn.setText(_translate("Dialog", "还原"))
 
-    def reset(self):
-        self.verticalLayout.removeWidget(self.detail_sub_lab)
-        sip.delete(self.detail_sub_lab)
-        self.repaint()
-        self.set_data(self.parent.user_info['username'])
-        self.setupUi()
-        self.show()
-        table = 'Msg'
-        value_dict = {'is_del': '0'}
-        for i in self.item_set:
-            filter_list = [
-                ['id', '=', str(i)]
-            ]
-            sql = operateSqlite.be_sql().update_sql(table=table,
-                                                    value_dict=value_dict,
-                                                    filter_list=filter_list)
-            operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+    def restore_records(self):
+        if not self.listWidget.selectedItems():
+            QMessageBox.information(self, 'tips', '请选择回收任务', QMessageBox.Ok)
+        else:
+            # print(self.item_set)
+            for i in self.item_set:
+                filter_list = [
+                    ['id', '=', str(self.del_records[i]['id'])]
+                ]
+                module.restore_note(config.LDB_FILENAME, filter_list)
+                self.listWidget.takeItem(i)
         self.reset()
+
+    def reset(self):
+        self.set_data(self.parent.user_info['username'])
         self.item_set.clear()
 
     def set_list(self):
@@ -119,9 +116,9 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
             logging.info(e)
         if self.sender().isChecked():
             self.item_set.add(id)
+            self.listWidget.setCurrentRow(id)
         else:
             self.item_set.remove(id)
-            # print(self.item_set)
 
     def closeEvent(self, QCloseEvent):
         self.updateSignal.emit(self.parent.user_info['username'])

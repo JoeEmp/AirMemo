@@ -202,6 +202,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.add_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.add_btn.setObjectName("add_btn")
+        self.add_btn.setStyleSheet('border-image:url(%s);' % config.ADD_ICON)
         self.add_btn.clicked.connect(self.addNote_slot)
         self.verticalLayout.addWidget(self.add_btn)
 

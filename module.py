@@ -77,6 +77,14 @@ def add_notes(filename, data):
 
 
 def delete_notes(filename, filter_list):
+    return change_del_flag(filename, filter_list)
+
+
+def restore_note(filename, filter_list):
+    return change_del_flag(filename, filter_list, is_del=0)
+
+
+def change_del_flag(filename, filter_list, is_del=1):
     '''
     软删除数据
     :param filename:
@@ -84,15 +92,15 @@ def delete_notes(filename, filter_list):
     :return:
     '''
     table = 'Msg'
-    sql = be_sql().update_sql(table=table, value_dict={'is_del': '1'},
+    sql = be_sql().update_sql(table=table, value_dict={'is_del': str(is_del)},
                               filter_list=filter_list)
-    print(sql)
+    # print(sql)
     return exec_sql(filename, sql, is_update=1)
 
 
 def clear_notes(filename, sever_date):
     '''
-    根据系统返回天数删除记录
+    根据系统返回天数物理删除记录
     :param filename:
     :param sever_date:
     :return:
