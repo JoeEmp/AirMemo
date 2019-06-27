@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 import logging
 import re
-import sip
+# import sip
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
