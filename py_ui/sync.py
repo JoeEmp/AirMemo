@@ -160,7 +160,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         try:
             self.cloud_records = get_cloud_notes(username, self.user_info['token'])
         except Exception as e:
-            QMessageBox.information(self, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)
+            QMessageBox.information(self.parent, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)
 
     # 备份按钮槽函数
     def sync_upload_slot(self):
