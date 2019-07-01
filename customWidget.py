@@ -3,7 +3,9 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel
+from PyQt5.QtGui import QLinearGradient, QColor
+from PyQt5.QtPrintSupport import QPrinter
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel, QSlider
 from module import update_notes, add_notes, delete_notes
 import config
 from operateSqlite import *
@@ -45,6 +47,7 @@ class AirLineEdit(QLineEdit):
 
         #  创建QMenu  
         self.contextMenu = QMenu(self)
+        self.contextMenu.setStyleSheet("selection-background-color: blue;")
 
         self.act_copy = QAction('复制', triggered=self.copy)
         self.act_paste = QAction('粘贴', triggered=self.paste)
@@ -147,6 +150,20 @@ class hideButton(QPushButton):
         except Exception as e:
             logging.error(e)
 
+'''
+class color_sider(QSlider):
+    def printEvent(self):
+        painter=QPrinter(self)
+        painter.setRenderHint(QPainter.a, true)
+        Linear=QLinearGradient(100, 100, 100, 200) # 垂直渐变
+
+        Linear.setColorAt(0, QColor=QColor.red())
+        Linear.setColorAt(1, QColor.blue())
+
+        painter.setBrush(Linear)
+        painter.setPen(Qt::transparent)
+        painter.drawRect(100, 100, 100, 100)
+'''
 
 class Toast(QDialog):
 
