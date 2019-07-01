@@ -486,7 +486,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def show_sync_dlg_slot(self):
         result = get_login_state()
-        result['state'] = 2
+        # result['state'] = 2
         if result['state'] == 2:
             try:
                 dlg = Ui_Sync_Dialog(parent=self)

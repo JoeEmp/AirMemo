@@ -102,6 +102,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         if self.username_le.text() and self.password_le.text():
             result = module.login(username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
+            print(result)
             try:
                 if result['token']:
                     table = 'user'
