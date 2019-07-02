@@ -183,8 +183,8 @@ def check_login_state():
 def logout(username):
     '''
     注销
-    :param username:
-    :return:
+    :param username: 用户名 str
+    :return: 响应
     '''
     result = check_login_state()
     logging.debug(result)
@@ -207,8 +207,8 @@ def register(username, password):
     '''
     注册用户
     :param username: 用户名
-    :param password: 明文密码
-    :return:
+    :param password: 密码
+    :return: 响应
     '''
     url = '/api/register'
     headers = {
@@ -225,9 +225,12 @@ def register(username, password):
 
 # 到达时间时触发槽
 def time_out_slot():
+    '''
+    计时器超时槽函数
+    :return:
+    '''
     tips = QWidget()
     tips.resize(300, 120)
-
     # tips.setGeometry(1366-300,768-140,300, 120)
     tips.show()
 
@@ -235,10 +238,10 @@ def time_out_slot():
 # 获取用户云端的数据
 def get_cloud_notes(username, token):
     '''
-
-    :param username:
-    :param token:
-    :return:
+    获取用户云端的数据
+    :param username: 用户名 str
+    :param token:   token str
+    :return: 响应
     '''
     url = '/api/cloud_page'
     headers = {

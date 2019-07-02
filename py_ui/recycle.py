@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 import logging
 import re
-# import sip
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
@@ -29,6 +28,11 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.show()
 
     def set_data(self, username):
+        '''
+        根据用户名，获取已删除note
+        :param username:
+        :return:
+        '''
         self.del_records = module.get_notes(config.LDB_FILENAME, username, is_del='1')
         self.records_len = len(self.del_records)
 
@@ -92,6 +96,10 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.restore_btn.setText(_translate("Dialog", "还原"))
 
     def restore_records(self):
+        '''
+        根据item_set还原note,重置数据
+        :return:
+        '''
         if not self.listWidget.selectedItems():
             QMessageBox.information(self, 'tips', '请选择回收任务', QMessageBox.Ok)
         else:
@@ -105,10 +113,18 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         self.reset()
 
     def reset(self):
+        '''
+        重设全部变量
+        :return:
+        '''
         self.set_data(self.parent.user_info['username'])
         self.item_set.clear()
 
     def set_list(self):
+        '''
+        添加选中项到 item_set
+        :return:
+        '''
         # print(self.sender().objectName())
         try:
             id = int(re.findall('\d+', self.sender().objectName())[0])

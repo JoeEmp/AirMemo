@@ -11,7 +11,6 @@ import config
 from operateSqlite import be_sql, exec_sql
 import logging
 # from customWidget import Toast
-from time_thread import time_thread
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -118,6 +117,7 @@ def create_reminder(parent, time):
 
 def showToast(parent,text):
     pass
+
 
 if __name__ == '__main__':
     pass

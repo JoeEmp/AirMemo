@@ -3,6 +3,13 @@ import os
 import subprocess
 
 def findUI(ulist, dir="./ui", need_suffix='.ui'):
+    '''
+    查找 .ui 文件
+    :param ulist: 存储文件
+    :param dir: 查找目录
+    :param need_suffix: 查找文件后缀
+    :return:
+    '''
     # 是否存在目录
     if not os.path.exists(dir):
         print("ui director inexistence ")
@@ -27,6 +34,12 @@ def dirAlter(clist):
 
 # 执行命令行将 .ui 转换成 .py
 def translation(clist, tag_dir='./py_'):
+    '''
+    调用uic，转ui变为py
+    :param clist: 需要转化的.ui文件
+    :param tag_dir: .py文件的目标路径
+    :return:
+    '''
     for file in clist:
         try:
             # window

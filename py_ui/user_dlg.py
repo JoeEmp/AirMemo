@@ -128,7 +128,6 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                                             QMessageBox.Yes)
             except Exception as e:
                 logging.error(e)
-
         elif not self.username_le.text():
             QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
         elif not self.password_le.text():
@@ -139,7 +138,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         ui.show()
 
 
-# 注销渲染
+# 注销窗口
 class Ui_logout_Dialog(QtWidgets.QDialog):
     logout_signal = pyqtSignal(str)
 
@@ -214,7 +213,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             QMessageBox.information(self, '提示', "{}".format('请检查数据库文件和网络状态'), QMessageBox.Yes)
 
 
-# 注册渲染
+# 注册窗口
 class Ui_register_Dialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -14,6 +14,11 @@ class AirTray(QSystemTrayIcon):
         self.show()
 
     def set_menu(self, widget_dict):
+        '''
+        设置菜单
+        :param widget_dict: {'widget_name':widget_object}
+        :return:
+        '''
         self.widget_dict = widget_dict
         self.main_menu = QMenu()
         self.show_action = QAction('&show',
@@ -30,17 +35,29 @@ class AirTray(QSystemTrayIcon):
         self.setContextMenu(self.main_menu)
 
     def set_icon(self):
+        '''
+        设置图标
+        :return:
+        '''
         # 这里的路径从main.py 算起
         self.setIcon(QIcon('./ui/app_icon.png'))
         pass
 
     def set_data(self):
+        '''
+        设置data
+        :return:
+        '''
         self.setObjectName('AirTray')
         self.__user_info = self.check()
         self.set_icon()
 
     # 获取 username 以及 token ，默认为 'visitor'
     def check(self):
+        '''
+        检测登录用户的信息
+        :return:
+        '''
         result = check_login_state()
         if result:
             return result[0]
@@ -58,9 +75,17 @@ class AirTray(QSystemTrayIcon):
         print(reason)
 
     def get_info(self):
+        '''
+        提供用户信息
+        :return:
+        '''
         return self.__user_info
 
     def update_info(self):
+        '''
+        重新更新用户信息
+        :return:
+        '''
         self.__user_info = self.check()
 
     def quitapp(self):

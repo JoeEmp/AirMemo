@@ -282,7 +282,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def send_Email_slot(self):
         '''
-        获取序号对应的数据
+        获取序号对应的数据，打开窗口
         :return:
         '''
         id = re.findall('\d+', self.sender().objectName())[0]
@@ -292,6 +292,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         email_dlg.show()
 
     def switchEdit_state(self):
+        '''
+        textEdit的状态切换
+        :return:
+        '''
         index = self.note_le_list.index(self.sender())
         # if(self.note_le_list[index].isEnabled()):
         self.note_le_list[index].setEnable(True)
@@ -447,7 +451,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def reset(self, username):
         '''
-        根据username名，更新整个窗口的内存
+        根据username名，更新整个窗口的data
         :param username:
         :return:
         '''

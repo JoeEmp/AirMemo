@@ -1,4 +1,3 @@
-import datetime
 import logging
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
@@ -39,7 +38,7 @@ class time_thread(QThread):
 
     def free_self(self, method):
         '''
-
+        释放线程
         :param method: 暂无用处，留待后用
         :return:
         '''
@@ -55,6 +54,7 @@ if __name__ == '__main__':
     top.resize(300, 120)
     top.show()
     s = '123'
+    # 3秒后窗口自动关闭
     th = time_thread(parent=top, sec=3)
     th.run()
     sys.exit(app.exec_())

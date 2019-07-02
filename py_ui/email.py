@@ -23,6 +23,10 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         self.setupUi()
 
     def set_data(self):
+        '''
+        获取用户的邮箱配置
+        :return:
+        '''
         sql = "select * from email_settings where username = '%s' and password is not null ORDER by is_default desc" % \
               self.user_info['username']
         # test sql
@@ -135,6 +139,10 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
             self.content_tx.setText(info['detail'])
 
     def send_email(self):
+        '''
+        发送按钮的槽
+        :return:
+        '''
         self.send_btn.setDisabled(True)
         if not self.sender_comb.currentText():
             QMessageBox.information(self, '', '{}'.format('请在系统托盘->settings->email里配置邮箱'), QMessageBox.Ok)

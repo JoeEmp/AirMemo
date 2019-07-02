@@ -6,15 +6,14 @@ import sqlite3
 # 构建字符串 提供 简单查询、更新，插入。
 class be_sql(object):
     '''
-    doc
+    构建字符串 提供 简单查询、更新，插入
     '''
 
     def update_sql(self, table, value_dict, filter_list=None):
         '''
-
-        :param table:
-        :param value_dict:
-        :param filter_list:
+        :param table:  表名 str
+        :param value_dict:  {'col':'value'} dict
+        :param filter_list: [['col','Operator','value']] case [['username','=','joe']] list of list
         :return: str
         '''
         try:
@@ -46,8 +45,8 @@ class be_sql(object):
 
     def ins_sql(self, table, dict):
         '''
-        :param table:
-        :param dict:
+        :param table: 表名
+        :param dict:  {'col':'value'}
         :return: str
         '''
         s_col = ''
@@ -94,7 +93,12 @@ class be_sql(object):
             sql = 'select %s from %s where %s' % (s_need[:-1], table, s_filter)
         return sql
 
-    def del_sql(self,table,filter_list=None):
+    def del_sql(self, table, filter_list=None):
+        '''
+        :param table: 表名 str
+        :param filter_list: 过滤条件 list of list
+        :return: str
+        '''
         if not filter_list:
             return 'delete from %s ;' % (table)
         else:
@@ -110,13 +114,14 @@ class be_sql(object):
             s_filter = s_filter[:-4] + ';'
             return 'delete from %s where %s' % (table, s_filter)
 
+
 def exec_sql(filename, sql, is_update=None):
     '''
-
-    :param filename:
-    :param sql:
+    :param filename: 文件名(含路径) str
+    :param sql: 需要执行的sql str
     :param is_update: 默认为空返回全部，传入其他返回影响行数。如果是行数我会直接传'count'
-    :return:
+    :except:  返回 None
+    :return:  fetchall
     '''
     db = sqlite3.connect(filename)
     # sqlite 以字典格式返回查询结果
@@ -132,6 +137,7 @@ def exec_sql(filename, sql, is_update=None):
         return cur.fetchall()
     else:
         return cur.rowcount
+
 
 # 官方api提供，使返回的数据结构为 list of dict
 def dict_factory(cursor, row):

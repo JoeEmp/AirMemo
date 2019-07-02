@@ -30,11 +30,12 @@ class AirLineEdit(QLineEdit):
     def get_reminder(self, info):
         '''
         获取用户的前三条时间
-        :param info:
-        :return:
+        :param info: 用户信息 {'username':'','token':''}
+        :return: None
         '''
         sql = "select time from reminder where username = '%s'  order by sequence limit 3" % info['username']
         self.times = exec_sql(config.LDB_FILENAME, sql)
+        return None
 
     def createContextMenu(self):
         ''' 
@@ -77,12 +78,20 @@ class AirLineEdit(QLineEdit):
         self.contextMenu.show()
 
     def set_time(self):
+        '''
+        设置提醒时间
+        :return:
+        '''
         time = datetime.strptime(self.sender().text(), '%H:%M:%S')
         sec = (time - datetime.strptime('00:00:00', '%H:%M:%S')).seconds
         self.thread = time_thread(parent=self, sec=sec)
         self.thread.run()
 
     def delete_note(self):
+        '''
+        删除note
+        :return:
+        '''
         id = re.findall('\d+', self.objectName())[0]
         filter_list = [
             ['id', '=', id]
@@ -99,6 +108,12 @@ class AirLineEdit(QLineEdit):
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
+        '''
+        更新note
+        :param args:
+        :param kwargs:
+        :return:
+        '''
         data = {'id': -1, 'message': '', 'username': ''}
         try:
             # 使用 objName 获取id bwrb
@@ -126,6 +141,12 @@ class AirTextEdit(QTextEdit):
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
+        '''
+        更新detail
+        :param args:
+        :param kwargs:
+        :return:
+        '''
         # self.setEnabled(False)
         data = {'id': -1, 'detail': ''}
         try:
@@ -172,7 +193,6 @@ class Toast(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
         self.setStyleSheet('QDialog{border-top-left-radius:15px;border-top-right-radius:15px;}')  # 圆角
         self.label = QLabel(text)
-        self
 
     def show(self):
         # self.move(self.x() - 20, self.y())
