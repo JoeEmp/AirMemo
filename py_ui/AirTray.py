@@ -8,7 +8,7 @@ class AirTray(QSystemTrayIcon):
     widget = None
     __user_info = {}
 
-    def __init__(self, widget_dict=None):
+    def __init__(self):
         super().__init__()
         self.set_data()
         self.show()

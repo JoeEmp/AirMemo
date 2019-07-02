@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
 from operateSqlite import be_sql, exec_sql
 import logging
-# from customWidget import Toast
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
@@ -24,7 +23,6 @@ def getSize(divide):
     sizeDict = {}
     screenSize = QApplication.desktop().screenGeometry()
     sizeDict['width'] = (screenSize.width() / divide['width'])
-    # sizeDict['height']=(screenSize.heigth()/divide['height'])
     return sizeDict
 
 
@@ -120,16 +118,8 @@ def showToast(parent,text):
 
 
 if __name__ == '__main__':
-    pass
     app = QApplication(sys.argv)
     tips = QWidget()
-    # tips.resize(300,120)
-
     tips.setGeometry(1366 - 310, 768 - 170, 300, 120)
     tips.show()
     sys.exit(app.exec_())
-    # dbName = r'AirMemo.db'
-    # # add_records(dbName)
-    # print(get_records(dbName))
-    # # clear_records(filename=dbName,Severdate='2019-01-05')
-    # print(get_records(dbName))

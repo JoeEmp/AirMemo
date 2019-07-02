@@ -1,4 +1,3 @@
-import logging
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer

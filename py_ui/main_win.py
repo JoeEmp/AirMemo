@@ -287,7 +287,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         id = re.findall('\d+', self.sender().objectName())[0]
         info = exec_sql(config.LDB_FILENAME, 'select message,detail from Msg where id = %s' % id)[0]
-        # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
 
@@ -297,7 +296,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         index = self.note_le_list.index(self.sender())
-        # if(self.note_le_list[index].isEnabled()):
         self.note_le_list[index].setEnable(True)
 
     def welt_slot(self):
@@ -311,12 +309,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
                 self.move(self.x() + 1, self.y())
                 sleep(config.SPEED)
-                # self.sender().setSytleSheet('')
         else:
             for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
                 self.move(self.x() - 1, self.y())
                 sleep(config.SPEED)
-                # self.sender().setSytleSheet('')
 
     def addNote_slot(self):
         '''
@@ -413,10 +409,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     未登录状态下创建登录窗口
         :return:
         '''
-        # login_dlg = QtWidgets.QDialog(self)
-        # 检测登录状态
         result = get_login_state()
-        # result['state'] = 1
         ui = None
         if result['state'] == 1:
             ui = Ui_login_Dialog(self)
@@ -490,7 +483,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def show_sync_dlg_slot(self):
         result = get_login_state()
-        # result['state'] = 2
         if result['state'] == 2:
             try:
                 dlg = Ui_Sync_Dialog(parent=self)
@@ -508,7 +500,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
-        # if not self.geometry().contains(self.pos()):
         self._endPos = e.pos() - self._startPos
         self.move(self.pos() + self._endPos)
 

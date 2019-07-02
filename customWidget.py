@@ -74,7 +74,6 @@ class AirLineEdit(QLineEdit):
         '''
         #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(95, 20) 20为微调结果
         self.contextMenu.move(pos + self.main_win.pos() + QPoint(95, 20))
-        # logging.info(pos+self.main_win.pos()+QPoint(95,20))
         self.contextMenu.show()
 
     def set_time(self):
@@ -107,7 +106,6 @@ class AirLineEdit(QLineEdit):
         self.setEnabled(True)
 
     def leaveEvent(self, *args, **kwargs):
-        # self.setEnabled(False)
         '''
         更新note
         :param args:
@@ -123,7 +121,6 @@ class AirLineEdit(QLineEdit):
         data['message'] = self.text()
         # 插入新的数据
         if data['id'] == -1 and data['message']:
-            # logging.warning(data)
             data['username'] = self.main_win.user_info['username']
             new_id = add_notes(config.LDB_FILENAME, data)
             self.setObjectName('note_le' + str(new_id))
@@ -170,33 +167,3 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
-
-'''
-class color_sider(QSlider):
-    def printEvent(self):
-        painter=QPrinter(self)
-        painter.setRenderHint(QPainter.a, true)
-        Linear=QLinearGradient(100, 100, 100, 200) # 垂直渐变
-
-        Linear.setColorAt(0, QColor=QColor.red())
-        Linear.setColorAt(1, QColor.blue())
-
-        painter.setBrush(Linear)
-        painter.setPen(Qt::transparent)
-        painter.drawRect(100, 100, 100, 100)
-'''
-
-class Toast(QDialog):
-
-    def __init__(self, parent=None, text='Toast'):
-        super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
-        self.setStyleSheet('QDialog{border-top-left-radius:15px;border-top-right-radius:15px;}')  # 圆角
-        self.label = QLabel(text)
-
-    def show(self):
-        # self.move(self.x() - 20, self.y())
-        super().show()
-        self.raise_()
-        time.sleep(1)
-        self.close()

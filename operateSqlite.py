@@ -37,7 +37,6 @@ class be_sql(object):
                     s_filter += ' and '
                 s_filter = s_filter[:-4]
                 sql = 'update %s set %s where %s' % (table, s_value[:-1], s_filter)
-            # print(sql)
         except Exception as e:
             logging.warning(e)
             return ''

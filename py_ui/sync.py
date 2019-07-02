@@ -24,7 +24,6 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.user_info = parent.user_info
         self.set_data(username=self.user_info['username'], token=self.user_info['token'])
         self.setupUi()
-        # self.show()
 
     def setupUi(self):
         self.setObjectName("Dialog")
@@ -155,7 +154,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.label.setText(_translate("Dialog", "绿色为云端已有消息"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def set_data(self, token, username='visitor'):
+    def set_data(self, username='visitor'):
         self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
         try:
             self.cloud_records = get_cloud_notes(username, self.user_info['token'])

@@ -1,6 +1,5 @@
 # 将UI目录下的所有.ui文件转化换为.py文件
 import os
-import subprocess
 
 def findUI(ulist, dir="./ui", need_suffix='.ui'):
     '''
@@ -53,7 +52,6 @@ def translation(clist, tag_dir='./py_'):
 if __name__ == "__main__":
     ulist = []
     findUI(ulist)
-    # print(ulist)
     # 只转化指定文件
     sub_ulist = ['UI/settings.ui']
     if sub_ulist:

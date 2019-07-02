@@ -205,7 +205,6 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
                 ['username', '=', self.username]
             ]
             sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
-            # print(sql)
             operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
             self.close()
             self.logout_signal.emit('visitor')

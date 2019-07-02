@@ -10,9 +10,7 @@ import re
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
-
 import config
-import operateSqlite
 import module
 
 
@@ -103,7 +101,6 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         if not self.listWidget.selectedItems():
             QMessageBox.information(self, 'tips', '请选择回收任务', QMessageBox.Ok)
         else:
-            # print(self.item_set)
             for i in self.item_set:
                 filter_list = [
                     ['id', '=', str(self.del_records[i]['id'])]
@@ -125,7 +122,6 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         添加选中项到 item_set
         :return:
         '''
-        # print(self.sender().objectName())
         try:
             id = int(re.findall('\d+', self.sender().objectName())[0])
         except Exception as e:

@@ -29,8 +29,6 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         '''
         sql = "select * from email_settings where username = '%s' and password is not null ORDER by is_default desc" % \
               self.user_info['username']
-        # test sql
-        # sql = "select * from email_settings where username = '%s'" % 'joe'
         self.settings = exec_sql(LDB_FILENAME, sql)
 
     def setupUi(self):

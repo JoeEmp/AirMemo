@@ -37,7 +37,6 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # 获取Reminder表数据
         sql = sql.replace(table, 'Reminder') + 'order by sequence'
         self._reminder_records = exec_sql(config.LDB_FILENAME, sql)
-        # print(self._reminder_records)
         logging.info('data init end')
 
     def setupUi(self):
@@ -340,8 +339,6 @@ class Ui_Settings(QtWidgets.QMainWindow):
                                     'addr': 'new addr', 'ssl_port': None, 'user_ssl': 0,
                                     'is_default': 0})
         new_item = QListWidgetItem('new addr(请编辑Email地址后退出)')
-        # new_item.setFlags(
-        #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.email_list.insertItem(len(self._email_records), new_item)
         table = 'Email_settings'
         dict = {'username': self.user_info['username'], 'addr': 'new addr'}
@@ -470,8 +467,6 @@ class Ui_Settings(QtWidgets.QMainWindow):
                 brush = QtGui.QBrush(QtGui.QColor(1, 203, 31))
                 brush.setStyle(QtCore.Qt.NoBrush)
                 item.setForeground(brush)
-            # item.setFlags(
-            #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.email_list.addItem(item)
         # 重置 time_list
         self.time_list.clear()
@@ -593,8 +588,6 @@ class Ui_Settings(QtWidgets.QMainWindow):
 
     # 窗口函数
     def closeEvent(self, *args, **kwargs):
-        # tab_name = self.tabWidget.currentWidget().objectName()
-        # if tab_name == 'email_tab':
         # 去除无效email配置
         sql = "delete from Email_settings where password is NULL;"
         exec_sql(config.LDB_FILENAME, sql)

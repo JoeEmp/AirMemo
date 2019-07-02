@@ -23,7 +23,6 @@ def get_notes(filename, username='visitor', is_del='0'):
         if is_del == 'all':
             filter_list.pop()
         sql = be_sql().sel_sql(table, filter_list=filter_list)
-        # print(sql)
         cur = exec_sql(filename, sql)
     except Exception as e:
         logging.error(e)
@@ -94,7 +93,6 @@ def change_del_flag(filename, filter_list, is_del=1):
     table = 'Msg'
     sql = be_sql().update_sql(table=table, value_dict={'is_del': str(is_del)},
                               filter_list=filter_list)
-    # print(sql)
     return exec_sql(filename, sql, is_update=1)
 
 
@@ -124,7 +122,6 @@ def login(username, password):
     headers = {
         'User-Agent': 'AirMemo'
     }
-    # cryptograph_password()
     data = {'username': username, 'password': cryptograph_password(password)}
     try:
         r = requests.post(protocol + user_host + url, headers=headers, data=data)
@@ -163,7 +160,6 @@ def get_login_state():
         except Exception as e:
             logging.error(e)
             return {'state': -1,'errMsg': '接口返回数据出错-%s'%r.status_code}
-    # print(state)
     return state
 
 
@@ -231,7 +227,6 @@ def time_out_slot():
     '''
     tips = QWidget()
     tips.resize(300, 120)
-    # tips.setGeometry(1366-300,768-140,300, 120)
     tips.show()
 
 
