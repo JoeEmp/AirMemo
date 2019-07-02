@@ -1,14 +1,15 @@
 # 此文件为用户对话框的窗口
 # 包括 login_dlg register_dlg logout_dlg
-from PyQt5 import QtCore, QtGui, QtWidgets
+import logging
+
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
-import utils
-import operateSqlite
 import config
-import logging
-
+import operateSqlite
+import module
+import utils
 
 # 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
@@ -25,6 +26,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.setObjectName("login_Dialog")
         self.resize(293, 192)
         self.setSizeGripEnabled(False)
+        # 非模模式
         self.setModal(False)
 
         self.gridLayoutWidget = QtWidgets.QWidget(self)
@@ -37,6 +39,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         self.password_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.password_le.setObjectName("password_le")
+        self.password_le.setPlaceholderText('密码')
         self.gridLayout.addWidget(self.password_le, 3, 2, 1, 1)
 
         self.password_lab = QtWidgets.QLabel(self.gridLayoutWidget)
@@ -55,6 +58,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         self.username_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.username_le.setObjectName("username_le")
+        self.username_le.setPlaceholderText('邮箱')
         self.gridLayout.addWidget(self.username_le, 1, 2, 1, 1)
 
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -96,8 +100,9 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_login(self):
         if self.username_le.text() and self.password_le.text():
-            result = utils.login(username=self.username_le.text(), password=self.password_le.text())
+            result = module.login(username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
+            print(result)
             try:
                 if result['token']:
                     table = 'user'
@@ -123,7 +128,6 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                                             QMessageBox.Yes)
             except Exception as e:
                 logging.error(e)
-
         elif not self.username_le.text():
             QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
         elif not self.password_le.text():
@@ -134,7 +138,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         ui.show()
 
 
-# 注销渲染
+# 注销窗口
 class Ui_logout_Dialog(QtWidgets.QDialog):
     logout_signal = pyqtSignal(str)
 
@@ -193,7 +197,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        state = utils.logout(self.username)
+        state = module.logout(self.username)
         if state['state'] == 1:
             table = 'user'
             value_dict = {'token': 'NULL'}
@@ -209,7 +213,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             QMessageBox.information(self, '提示', "{}".format('请检查数据库文件和网络状态'), QMessageBox.Yes)
 
 
-# 注册渲染
+# 注册窗口
 class Ui_register_Dialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -303,7 +307,7 @@ class Ui_register_Dialog(QtWidgets.QDialog):
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
                     self.password_le.text() == self.again_le.text()):
-            result = utils.register(username=self.username_le.text(), password=self.again_le.text())
+            result = module.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['state'] == 1:
                     self.close()

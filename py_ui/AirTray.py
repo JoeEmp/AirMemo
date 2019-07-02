@@ -1,11 +1,8 @@
 import logging
-
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QDialog, \
-    QMessageBox
-
-from utils import check_login_state, get_records
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
+from module import check_login_state
 
 class AirTray(QSystemTrayIcon):
     widget = None
@@ -17,11 +14,16 @@ class AirTray(QSystemTrayIcon):
         self.show()
 
     def set_menu(self, widget_dict):
+        '''
+        设置菜单
+        :param widget_dict: {'widget_name':widget_object}
+        :return:
+        '''
         self.widget_dict = widget_dict
         self.main_menu = QMenu()
         self.show_action = QAction('&show',
                                    triggered=self.widget_dict['main_win'].show)
-        self.settings_action = QAction('&settings', triggered=QDialog.show)
+        self.settings_action = QAction('&settings', triggered=self.widget_dict['setting_win'].show)
         self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
@@ -33,19 +35,32 @@ class AirTray(QSystemTrayIcon):
         self.setContextMenu(self.main_menu)
 
     def set_icon(self):
+        '''
+        设置图标
+        :return:
+        '''
         # 这里的路径从main.py 算起
-        self.setIcon(QIcon('./UI/app_icon.png'))
+        self.setIcon(QIcon('./ui/app_icon.png'))
         pass
 
     def set_data(self):
+        '''
+        设置data
+        :return:
+        '''
+        self.setObjectName('AirTray')
         self.__user_info = self.check()
         self.set_icon()
 
     # 获取 username 以及 token ，默认为 'visitor'
     def check(self):
+        '''
+        检测登录用户的信息
+        :return:
+        '''
         result = check_login_state()
         if result:
-            return {'username': result[0][0], 'token': result[0][1]}
+            return result[0]
         else:
             return {'username': 'visitor', 'token': ''}
 
@@ -60,19 +75,30 @@ class AirTray(QSystemTrayIcon):
         print(reason)
 
     def get_info(self):
+        '''
+        提供用户信息
+        :return:
+        '''
         return self.__user_info
 
     def update_info(self):
+        '''
+        重新更新用户信息
+        :return:
+        '''
         self.__user_info = self.check()
 
     def quitapp(self):
         try:
             self.widget_dict['main_win'].show()
+            self.widget_dict['setting_win'].hide()
             sel = QMessageBox.question(self.widget_dict['main_win'], "提示", "确定要退出Airmemo",
                                        QMessageBox.Yes | QMessageBox.No,
                                        QMessageBox.No)
             if sel == QMessageBox.Yes:
+                # quitapp这个内建函数不可迭代，所以只能一个一个窗口写
                 self.widget_dict['main_win'].close()
+                self.widget_dict['setting_win'].close()
                 QCoreApplication.instance().quit()
                 # 在应用程序全部关闭后，TrayIcon其实还不会自动消失，
                 # 直到你的鼠标移动到上面去后，才会消失，
