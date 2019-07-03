@@ -22,7 +22,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         super().__init__(parent=parent)
         self.parent = parent
         self.user_info = parent.user_info
-        self.set_data(username=self.user_info['username'], token=self.user_info['token'])
+        self.set_data(username=self.user_info['username'])
         self.setupUi()
 
     def setupUi(self):
