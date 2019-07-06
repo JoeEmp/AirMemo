@@ -35,6 +35,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     layoutHeight = 0
     _records = None
     user_info = {}
+    
 
     def __init__(self, parent=None):
         super().__init__()
@@ -243,6 +244,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
         self.layoutHeight = (len(self.records) + 1) * config.COM_BTN_HEIGHT + 20
+        try:
+            if 1 in self.detail_tx_state_list:
+                self.layoutHeight += config.COM_TE_HEIGHT
+        except Exception as e:
+            logging.warning(e)
         self.Text_isShow = False
         logging.info('set data')
 
@@ -323,6 +329,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         增加memo
         :return:
         '''
+        if QApplication.desktop().screenGeometry().height() < self.layoutHeight+config.COM_BTN_HEIGHT:
+            QMessageBox.information(self,'tips','请清除一些任务后再添加',QMessageBox.Ok)
+            return None
         if self.note_le.text():
             self.setData(username=self.user_info['username'])
             new_record = {'id': -1, 'detail': '', 'message': '', 'color': 'ffffff'}
@@ -401,8 +410,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # 调整窗口和布局高度
         self.layoutHeight += config.COM_BTN_HEIGHT
-        self.resize(self.layoutWidth, self.layoutHeight)
+        
         self.setFixedSize(self.layoutWidth, self.layoutHeight)
+        self.resize(self.layoutWidth, self.layoutHeight)
+        self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
         self.verticalLayoutWidget.setGeometry(
             QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
 
@@ -501,6 +512,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             QMessageBox.information(self, 'tips', result['errMsg'], QMessageBox.Ok)
 
+#重写类方法
     def show(self):
         super().show()
         # 添加置顶

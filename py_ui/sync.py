@@ -24,7 +24,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.user_info = parent.user_info
         self.set_data(username=self.user_info['username'], token=self.user_info['token'])
         self.setupUi()
-        # self.show()
+        self.show()
 
     def setupUi(self):
         self.setObjectName("Dialog")
