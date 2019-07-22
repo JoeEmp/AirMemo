@@ -10,11 +10,13 @@ from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
 from operateSqlite import be_sql, exec_sql
 import logging
+import rsa
+
 # from customWidget import Toast
 
 protocol = 'http://'
 local_host = '127.0.0.1:5000'
-pro_host = '149.129.125.8:5000'
+pro_host = 'todo.winn.online:5000'
 # 服务器切换
 user_host = local_host
 
@@ -115,7 +117,7 @@ def create_reminder(parent, time):
     sec = (time - datetime.datetime.strptime('00:00:00', '%H:%M:%S')).seconds
 
 
-def showToast(parent,text):
+def showToast(parent, text):
     pass
 
 
