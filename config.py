@@ -9,9 +9,8 @@ logging.basicConfig(level=logging.WARNING, filename='log.txt', filemode='a',
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
 
-#隐藏速度
+# 隐藏速度
 SPEED = 0.001
-
 
 # 公共长宽标准
 # 详情编辑框大小
@@ -23,8 +22,8 @@ COM_BTN_WIDTH = 25
 COM_BTN_HEIGHT = 25
 
 # 小按钮长宽
-COM_MICRO_BTN_WIDTH = 20
-COM_MICRO_BTN_HEIGHT = 20
+COM_MICRO_BTN_WIDTH = 23
+COM_MICRO_BTN_HEIGHT = 23
 
 # 本地数据库位置
 LDB_FILENAME = 'AirMemo.db'
@@ -37,28 +36,36 @@ SIZEMODE = 'pixel'
 
 WIDGET_FLAG = False
 
-# 主窗口设置 main.py
+# 主窗口设置 main_win.py
 
 MAIN_WELT_BTN_WIDTH = 60
 
 MAIN_BASEWIDTH = MAIN_WELT_BTN_WIDTH + COM_TE_WIDTH
 
 # icon
-LOGIN_ICON = './icon/user1.png'
+LOGIN_ICON = './icon/user.svg'
 
-SYNC_ICON = './icon/Sync.ico'
+SYNC_ICON = './icon/cloud-sync.svg'
 
-HOMO_ICON = './icon/recycle1.png'
+HOMO_ICON = './icon/delete.svg'
 
 TITLE_ICON = './icon/title.svg'
 
-HIDE_ICON = './icon/hide.ico'
+WELT_ICON = './icon/double-right.svg'
 
-SHOW_ICON = './icon/show.ico'
+SHOW_ICON = './icon/double-left.svg'
 
-CLOSE_ICON = './icon/close_btn.png'
+CLOSE_ICON = './icon/close.svg'
 
-ADD_ICON =''
+ADD_ICON = ''
+
+UP_ICOM = './icon/up.svg'
+
+DOWN_ICON = './icon/down.svg'
+
+LEFT_ICON = './icon/left.svg'
+
+RIGHT_ICON = './icon/right.svg'
 
 # 邮箱窗口设置 email.py
 RECIPIENT_TX_HEIGHT = 25

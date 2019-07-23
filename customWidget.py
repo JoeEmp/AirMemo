@@ -19,13 +19,14 @@ class AirLineEdit(QLineEdit):
     __lineSignal = pyqtSignal(str, int)  # 绑定main_win 的 get_update_signal
     update_id_Signal = pyqtSignal(int)
 
-    def __init__(self, main_win, info, parent=None):
+    def __init__(self, main_win, info, parent=None,color='ffffff'):
         super().__init__(parent)
         self.get_reminder(info)
         self.main_win = main_win
         # 绑定槽
         self.__lineSignal.connect(main_win.get_update_Signal)
         self.createContextMenu()
+        self.color=color
 
     def get_reminder(self, info):
         '''
@@ -104,7 +105,7 @@ class AirLineEdit(QLineEdit):
 
     def enterEvent(self, *args, **kwargs):
         self.__eld_text = self.text()
-        self.setEnabled(True)
+        self.setStyleSheet("background:#ffffff")
 
     def leaveEvent(self, *args, **kwargs):
         # self.setEnabled(False)
@@ -131,14 +132,19 @@ class AirLineEdit(QLineEdit):
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
             update_notes(config.LDB_FILENAME, data, 'message')
-
+        self.setStyleSheet("background:#%s"%self.color)
 
 class AirTextEdit(QTextEdit):
     __eld_text = ''
 
+    def __init__(self,parent=None,color='ffffff'):
+        super().__init__(parent)
+        self.color = color
+
     def enterEvent(self, *args, **kwargs):
         self.__eld_text = self.toPlainText()
-        self.setEnabled(True)
+        # self.setEnabled(True)
+        self.setStyleSheet('background:#ffffff')
 
     def leaveEvent(self, *args, **kwargs):
         '''
@@ -158,7 +164,7 @@ class AirTextEdit(QTextEdit):
         # 更新数据库
         if data['detail'] != self.__eld_text:
             update_notes(config.LDB_FILENAME, data, 'detail')
-
+        self.setStyleSheet('background:#%s'% self.color)
 
 class hideButton(QPushButton):
     # flag 为Ture时为展开
