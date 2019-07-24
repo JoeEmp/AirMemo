@@ -4,7 +4,7 @@ import sys
 # from PyQt5.QtWidgets import QApplication
 from py_ui.AirTray import AirTray
 from py_ui.main_win import *
-from py_ui.demo import *
+from py_ui.settings import *
 from utils import setApp
 from PyQt5.QtCore import QSharedMemory
 from PyQt5.QtNetwork import QLocalServer,QLocalSocket

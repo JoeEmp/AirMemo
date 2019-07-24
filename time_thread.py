@@ -2,6 +2,7 @@ import logging
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
+from py_ui.demo import *
 
 
 class remind_timer(QTimer):
@@ -44,7 +45,8 @@ class time_thread(QThread):
         '''
         if method == 'timeout':
             print('get timeout signal')
-            QMessageBox.information(self.parent, '', '请注意任务<b>%s</b>的交付时间' % self.parent.text(), QMessageBox.Ok)
+            Ui_timeout_Dialog(self.parent).show()
+            # QMessageBox.information(self.parent, '', '请注意任务<b>%s</b>的交付时间' % self.parent.text(), QMessageBox.Ok)
             self.deleteLater()
 
 
