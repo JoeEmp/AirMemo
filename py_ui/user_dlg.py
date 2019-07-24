@@ -11,6 +11,7 @@ import operateSqlite
 import module
 import utils
 
+
 # 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
     login_signal = pyqtSignal(str)
@@ -111,6 +112,11 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         dict = {'username': self.username_le.text(), 'token': result['token']}
                         sql = operateSqlite.be_sql().ins_sql(table, dict)
                         operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+                        times = ['00:15:00', '00:30:00', '01:00:00']
+                        for time in times:
+                            operateSqlite.exec_sql(config.LDB_FILENAME,
+                                                   "insert into Reminder(username,time) values ('%s','%s');" % (dict[
+                                                       'username'], time))
                     # 已有用户更新数据
                     else:
                         value_dict = {'token': result['token']}
@@ -119,7 +125,8 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                                                                 filter_list=filter_list)
                         operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
                     try:
-                        self.login_signal.emit(self.username_le.text())  # 发射信号
+                        # 发射信号
+                        self.login_signal.emit(self.username_le.text())
                     except Exception as e:
                         logging.error(e)
                     self.close()
@@ -306,7 +313,7 @@ class Ui_register_Dialog(QtWidgets.QDialog):
 
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
-                    self.password_le.text() == self.again_le.text()):
+                self.password_le.text() == self.again_le.text()):
             result = module.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['state'] == 1:

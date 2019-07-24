@@ -18,7 +18,7 @@ protocol = 'http://'
 local_host = '127.0.0.1:5000'
 pro_host = 'todo.winn.online:5000'
 # 服务器切换
-user_host = local_host
+user_host = pro_host
 
 
 # 返回等分字典
