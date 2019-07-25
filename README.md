@@ -34,14 +34,3 @@ tips for desktop
 &ensp;&ensp;1.目前最大的问题是id的获取在对象名字中获取的
 
 &ensp;&ensp;2.缺一个美工[捂脸]
-
-未登录的账号是没有token在服务端（登出时token置null）
-1、A 登录 账号Joe
-账号joe 有token
-2、B 登录 账号Joe(无效登录)
-    Ser主动发送验证码到用户邮箱
-    前端出现验证码输入框登录
-    带正确验证码登录，成功登录，更新token
-    
-    
-验证码有效期30分钟
