@@ -3,8 +3,6 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtGui import QLinearGradient, QColor
-from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel, QSlider
 from module import update_notes, add_notes, delete_notes
 import config

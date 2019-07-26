@@ -57,7 +57,7 @@ if __name__ == "__main__":
     findUI(ulist)
     # print(ulist)
     # 只转化指定文件
-    sub_ulist = ['UI/timeout_tip.ui']
+    sub_ulist = ['UI/sync.ui']
     if sub_ulist:
         translation(sub_ulist)
     else:

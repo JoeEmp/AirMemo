@@ -20,11 +20,12 @@ import customWidget
 from operateSqlite import be_sql, exec_sql
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
-from py_ui.sync import Ui_Sync_Dialog
+from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 from module import get_notes, get_login_state
 from utils import getSize
 import sip
+import platform
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -258,7 +259,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
         self.layoutHeight = (len(self.records) + 1) * \
-            config.COM_BTN_HEIGHT + 20
+                            config.COM_BTN_HEIGHT + 20
         try:
             if 1 in self.detail_tx_state_list:
                 self.layoutHeight += config.COM_TE_HEIGHT
@@ -330,15 +331,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         width = QApplication.desktop().screenGeometry().width()
+        platform_name = platform.system()
+
         if self.x() <= width - config.MAIN_BASEWIDTH:
-            for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
-                self.move(self.x() + 1, self.y())
-                sleep(config.SPEED)
+            if 'Windows' == platform_name:
+                for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                    self.move(self.x() + 1, self.y())
+                    sleep(config.SPEED)
+                    print(self.x(), self.y())
+
+            elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                self.move(width - config.MAIN_WELT_BTN_WIDTH, self.y())
+            # 变更贴图
             # self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
         else:
-            for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
-                self.move(self.x() - 1, self.y())
-                sleep(config.SPEED)
+            if 'Windows' == platform_name:
+                for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
+                    self.move(self.x() - 1, self.y())
+                    sleep(config.SPEED)
+            elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                self.move(width - config.MAIN_BASEWIDTH, self.y())
+            # 变更贴图
             # self.sender().setStyleSheet('border-image:url(%s);' % config.WELT_ICON)
 
     def addNote_slot(self):
@@ -346,7 +359,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         增加memo
         :return:
         '''
-        if QApplication.desktop().screenGeometry().height() < self.layoutHeight+config.COM_BTN_HEIGHT:
+        if QApplication.desktop().screenGeometry().height() < self.layoutHeight + config.COM_BTN_HEIGHT:
             QMessageBox.information(
                 self, 'tips', '请清除一些任务后再添加', QMessageBox.Ok)
             return None
@@ -537,7 +550,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             QMessageBox.information(
                 self, 'tips', result['errMsg'], QMessageBox.Ok)
 
-# 重写类方法
+    # 重写类方法
     def show(self):
         super().show()
         # 添加置顶
@@ -558,16 +571,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def mouseReleaseEvent(self, e: QMouseEvent):
         if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
             width = QApplication.desktop().screenGeometry().width()
-
+            platform_name = platform.system()
             # x轴判断
             if self.x() > width - config.MAIN_WELT_BTN_WIDTH:
-                for i in range(self.x() - (width - config.MAIN_WELT_BTN_WIDTH)):
-                    self.move(self.x() - 1, self.y())
-                    sleep(config.SPEED)
+                if 'Windows' == platform_name:
+                    for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                        self.move(self.x() + 1, self.y())
+                        sleep(config.SPEED)
+                        print(self.x(), self.y())
+
+                elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                    self.move(width - config.MAIN_WELT_BTN_WIDTH, self.y())
+                # 变更贴图
+                # self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
             elif self.x() > width - config.MAIN_BASEWIDTH:
-                for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
-                    self.move(self.x() + 1, self.y())
-                    sleep(config.SPEED)  # 0.001为微调结果
+                if 'Windows' == platform_name:
+                    for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                        self.move(self.x() + 1, self.y())
+                        sleep(config.SPEED)  # 0.001为微调结果
+                elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                    self.move(width - config.MAIN_BASEWIDTH, self.y())
+                # 变更贴图
+                # self.sender().setStyleSheet('border-image:url(%s);' % config.WELT_ICON)
             self._isTracking = False
             self._startPos = None
             self._endPos = None
+        # print(self.x(), self.y())

@@ -115,6 +115,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         self.password_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.password_le.setObjectName("password_le")
         self.gridLayout.addWidget(self.password_le, 2, 5, 1, 2)
+        self.password_le.setEchoMode(QtWidgets.QLineEdit.Password)
 
         # 发信名称编辑框
         self.sender_le = QtWidgets.QLineEdit(self.gridLayoutWidget)
@@ -418,11 +419,20 @@ class Ui_Settings(QtWidgets.QMainWindow):
                                   'user_ssl': user_ssl, 'ssl_port': ssl_port,
                                   'sender_name': sender_name}
                     filter_list = [
-                        ['id', '=', str(self.email_list.currentRow() + 1)]
+                        ['id', '=', str(self.email_list.currentRow() + 1)],
+                        ['username', '=',self.user_info['username']]
                     ]
                     sql = be_sql().update_sql(table, value_dict=value_dict, filter_list=filter_list)
-                    exec_sql(config.LDB_FILENAME, sql)
+                    ret = exec_sql(config.LDB_FILENAME, sql,is_update=1)
+                    # 更新失败，直接插入数据
+                    if ret <= 0:
+                        value_dict['username']=self.user_info['username']
+                        sql = be_sql().ins_sql(table,value_dict)
+                        exec_sql(config.LDB_FILENAME, sql)
                     self.email_list.currentItem().setText(self.email_le.text())
+                    #清除无效配置数据
+                    sql = "delete from Email_settings where password is NULL;"
+                    exec_sql(config.LDB_FILENAME, sql)
                     self.set_data()
                 else:
                     QMessageBox.warning(self, ' ', '请输入密码', QMessageBox.Ok)

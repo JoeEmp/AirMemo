@@ -158,7 +158,7 @@ def get_login_state():
             logging.error(e)
             return {'state': -1, 'errMsg': '无法连接服务器'}
         try:
-            print(r)
+            # print(r)
             state = r.json()
         except Exception as e:
             logging.error(e)

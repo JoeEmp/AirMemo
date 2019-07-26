@@ -1,105 +1,191 @@
 # -*- coding: utf-8 -*-
 
-# self implementation generated from reading ui file 'UI/timeout_tip.ui'
+# Form implementation generated from reading ui file 'UI/sync.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-import sys
-import platform
-from PyQt5 import QtCore, QtWidgets, Qt
-from PyQt5.QtWidgets import QApplication, QWidget
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal, QModelIndex
+from PyQt5.QtWidgets import QMessageBox
+
+from operateSqlite import exec_sql
+import config
+from module import get_cloud_notes, get_notes, server_error_msg
 
 
-class Ui_timeout_Dialog(QtWidgets.QDialog):
+class Ui_Sync_Dialog(QtWidgets.QDialog):
+    updateSignal = pyqtSignal(str)
+
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(parent=parent)
+        self.parent = parent
+        self.user_info = parent.user_info
+        self.set_data(username=self.user_info['username'], token=self.user_info['token'])
         self.setupUi()
+        self.show()
 
     def setupUi(self):
-        self.setWindowFlag(Qt.Qt.FramelessWindowHint)
-        self.setStyleSheet("background-color:#ffffff")
+        self.setObjectName("Dialog")
+        self.resize(258, 402)
 
-        self.setObjectName('timeout')
-        self.resize(280, 110)
-        self.setMaximumSize(QtCore.QSize(280, 110))
-        self.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.tabWidget = QtWidgets.QTabWidget(self)
+        self.tabWidget.setGeometry(QtCore.QRect(10, 10, 241, 391))
+        self.tabWidget.setObjectName("tabWidget")
+        # 云端tab
+        self.cloud_tab = QtWidgets.QWidget()
+        self.cloud_tab.setObjectName("cloud_tab")
 
-        self.late_btn = QtWidgets.QPushButton(self)
-        self.late_btn.setGeometry(QtCore.QRect(184, 72, 88, 26))
-        self.late_btn.setStyleSheet("alternate-background-color: rgb(65, 70, 255);")
-        self.late_btn.setObjectName("late_btn")
+        self.gridLayoutWidget_2 = QtWidgets.QWidget(self.cloud_tab)
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 231, 361))
+        self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
 
-        self.confirm_btn = QtWidgets.QPushButton(self)
-        self.confirm_btn.setGeometry(QtCore.QRect(114, 72, 62, 26))
-        self.confirm_btn.setObjectName("confirm_btn")
+        self.cloud_gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
+        self.cloud_gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.cloud_gridLayout.setObjectName("cloud_gridLayout")
 
-        self.textEdit = QtWidgets.QTextEdit(self)
-        self.textEdit.setEnabled(False)
-        self.textEdit.setGeometry(QtCore.QRect(10, 20, 261, 51))
-        self.textEdit.setStyleSheet("")
-        self.textEdit.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.textEdit.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.textEdit.setObjectName("textEdit")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.cloud_gridLayout.addItem(spacerItem, 3, 0, 1, 1)
+        # 云端tab的提示语
+        self.cloud_lab = QtWidgets.QLabel(self.gridLayoutWidget_2)
+        self.cloud_lab.setStyleSheet("color:rgb(0, 68, 221)")
+        self.cloud_lab.setObjectName("cloud_lab")
+        self.cloud_gridLayout.addWidget(self.cloud_lab, 2, 0, 1, 3)
+        # 云端tab的列表
+        self.cloud_list = QtWidgets.QListWidget(self.gridLayoutWidget_2)
+        self.cloud_list.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.cloud_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.cloud_list.setObjectName("cloud_list")
 
-        self.title_lab = QtWidgets.QLabel(self)
-        self.title_lab.setGeometry(QtCore.QRect(0, 0, 280, 21))
-        self.title_lab.setMaximumSize(QtCore.QSize(280, 30))
-        self.title_lab.setStyleSheet(
-            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(192, 255, 255, 255), stop:1 rgba(255, 255, 255, 255));")
-        self.title_lab.setObjectName("title_lab")
+        brush = QtGui.QBrush(QtGui.QColor(0, 68, 221))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        local_ids = [r['cloud_id'] for r in self.local_records]
+        for cloud_record in self.cloud_records:
+            item = QtWidgets.QListWidgetItem()
+            item.setText(cloud_record['msg'])
+            if cloud_record['cloud_id'] in local_ids:
+                item.setForeground(brush)
+            self.cloud_list.addItem(item)
 
-        self.confirm_btn.clicked.connect(self.close)
-        self.late_btn.clicked.connect(self.late)
+        # 云端tab的删除按钮
+        self.cloud_gridLayout.addWidget(self.cloud_list, 1, 0, 1, 4)
+        self.cloud_del_btn = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.cloud_del_btn.setObjectName("cloud_del_btn")
+        self.cloud_gridLayout.addWidget(self.cloud_del_btn, 3, 2, 1, 1)
+        # 云端tab的同步按钮
+        self.cloud_sync_btn = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.cloud_sync_btn.setObjectName("cloud_sync_btn")
+        self.cloud_gridLayout.addWidget(self.cloud_sync_btn, 3, 1, 1, 1)
+
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.cloud_gridLayout.addItem(spacerItem1, 3, 3, 1, 1)
+
+        self.tabWidget.addTab(self.cloud_tab, "")
+
+        # 本地页面
+        self.local_tab = QtWidgets.QWidget()
+        self.local_tab.setObjectName("local_tab")
+
+        self.gridLayoutWidget_3 = QtWidgets.QWidget(self.local_tab)
+        self.gridLayoutWidget_3.setGeometry(QtCore.QRect(0, 0, 231, 361))
+        self.gridLayoutWidget_3.setObjectName("gridLayoutWidget_3")
+
+        self.local_gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget_3)
+        self.local_gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.local_gridLayout.setObjectName("local_gridLayout")
+
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.local_gridLayout.addItem(spacerItem2, 3, 0, 1, 1)
+        # 本地tab的提示语
+        self.local_lab = QtWidgets.QLabel(self.gridLayoutWidget_3)
+        self.local_lab.setStyleSheet("color:rgb(0, 204, 34)")
+        self.local_lab.setObjectName("local_lab")
+        self.local_gridLayout.addWidget(self.local_lab, 2, 0, 1, 3)
+        # 本地tab的列表
+        self.local_list = QtWidgets.QListWidget(self.gridLayoutWidget_3)
+        self.local_list.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.local_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.local_list.setObjectName("local_list")
+
+        # record插入
+        brush = QtGui.QBrush(QtGui.QColor(0, 204, 34))
+        brush.setStyle(QtCore.Qt.NoBrush)
+        cloud_ids = [r['cloud_id'] for r in self.cloud_records]
+        for local_record in self.local_records:
+            item = QtWidgets.QListWidgetItem()
+            item.setText(local_record['message'])
+            if 1 == local_record['is_del']:
+                item.setText(item.text() + '(已删除)')
+            if local_record['cloud_id'] in cloud_ids:
+                item.setForeground(brush)
+            self.local_list.addItem(item)
+
+        self.local_gridLayout.addWidget(self.local_list, 1, 0, 1, 4)
+        # 本地tab的删除按钮
+        self.local_del_btn = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.local_del_btn.setObjectName("local_del_btn")
+        self.local_gridLayout.addWidget(self.local_del_btn, 3, 2, 1, 1)
+        # 本地tab的同步按钮
+        self.local_sync_btn = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.local_sync_btn.setObjectName("local_sync_btn")
+        self.local_gridLayout.addWidget(self.local_sync_btn, 3, 1, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.local_gridLayout.addItem(spacerItem3, 3, 3, 1, 1)
+
+        self.tabWidget.addTab(self.local_tab, "")
+
+        # 绑定槽
+        self.local_del_btn.clicked.connect(self.del_local_record)
 
         self.retranslateUi()
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("Form", "timeout tips"))
-        self.late_btn.setText(_translate("Form", "稍后提醒"))
-        self.confirm_btn.setText(_translate("Form", "确认"))
-        self.title_lab.setText(_translate("Form",
-                                          "<html><head/><body><p><span style=\" font-size:18pt; color:#505050;\">A</span><span style=\" color:#505050;\">irmemo</span></p></body></html>"))
-        self.textEdit.setHtml(_translate("Form",
-                                         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-                                         "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-                                         "p, li { white-space: pre-wrap; }\n"
-                                         "</style></head><body style=\" font-family:\'.SF NS Text\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-                                         "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-color:#000000 \">       %s</p></body></html>") % self.parent().text())
+        self.setWindowTitle(_translate("Dialog", "云"))
+        self.cloud_lab.setText(_translate("Dialog", "蓝色为云端有更新的版本"))
+        __sortingEnabled = self.cloud_list.isSortingEnabled()
+        self.cloud_list.setSortingEnabled(False)
+        self.cloud_list.setSortingEnabled(__sortingEnabled)
+        self.cloud_del_btn.setText(_translate("Dialog", "删除"))
+        self.cloud_sync_btn.setText(_translate("Dialog", "同步"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.cloud_tab), _translate("Dialog", "云端"))
+        self.local_lab.setText(_translate("Dialog", "绿色为已在云端，但未必一致"))
+        __sortingEnabled = self.local_list.isSortingEnabled()
+        self.local_list.setSortingEnabled(False)
+        self.local_list.setSortingEnabled(__sortingEnabled)
+        self.local_del_btn.setText(_translate("Dialog", "删除"))
+        self.local_sync_btn.setText(_translate("Dialog", "备份"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def late(self):
-        self.hide()
-        # 调试使用 5秒
-        self.late_btn.setText('00:00:05')
-        self.parent().set_time()
-        self.close()
+    def set_data(self, token, username='visitor'):
+        self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
+        try:
+            self.cloud_records = get_cloud_notes(username, self.user_info['token'])['list']
+            print(self.cloud_records)
+        except Exception as e:
+            QMessageBox.information(self.parent, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)
 
-    def show(self):
-        screenSize = QApplication.desktop().screenGeometry()
-        x = screenSize.width() - 280 - 15
-        y = 30
-        super().show()
-        platform_name = platform.system()
-        if platform_name == 'Darwin':
-            self.move(x, y)
-        elif platform_name == 'Linux':
-            # 暂时没有在linux上开发，不知道可不可以做动画效果
-            self.move(x, y)
-        elif platform_name == 'Window':
-            self.move(screenSize.width())
-            for i in range(280 + 15 + 1):
-                self.move(screenSize.width() - i, y)
-        else:
-            self.move(x, y)
+    # 备份按钮槽函数
+    def sync_upload_slot(self):
+        self.local_list.selectedIndexes()
+        pass
 
+    # 同步按钮槽函数
+    def sync_download_slot(self, type=1):
+        pass
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    # top = QWidget()
-    # top.resize(300, 120)
-    # top.show()
-    dlg = Ui_timeout_Dialog()
-    dlg.show()
-    sys.exit(app.exec_())
+    def del_local_record(self):
+        ids = self.local_list.selectedIndexes()
+        for id in ids:
+            sql = "delete from msg where username = '%s' and id = %d" % (
+                self.user_info['username'], self.local_records[id.row()]['id'])
+            exec_sql(config.LDB_FILENAME, sql)
+            self.local_list.takeItem(id.row())
+
+# if __name__ == "__main__":
+#     cloud_records = get_cloud_records('coco')
+#     for cloud in cloud_records:
+#         print()
