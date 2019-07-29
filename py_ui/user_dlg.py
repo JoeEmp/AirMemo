@@ -7,9 +7,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
 
 import config
-import operateSqlite
-import module
-import utils
+from comm import operateSqlite, module, utils
 
 
 # 登录窗口

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget
-from operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql, exec_sql
 import config
-from utils import cryptograph_password, protocol, user_host
+from comm.utils import cryptograph_text, protocol, user_host
 import requests
 import logging
 
@@ -125,7 +125,7 @@ def login(username, password):
         'User-Agent': 'AirMemo'
     }
     # cryptograph_password()
-    data = {'username': username, 'password': cryptograph_password(password)}
+    data = {'username': username, 'password': cryptograph_text(password, 'password')}
     try:
         r = requests.post(protocol + user_host + url, headers=headers, data=data)
         return r.json()
@@ -162,7 +162,7 @@ def get_login_state():
             state = r.json()
         except Exception as e:
             logging.error(e)
-            return {'state': -1,'errMsg': '接口返回数据出错-%s'%r.status_code}
+            return {'state': -1, 'errMsg': '接口返回数据出错-%s' % r.status_code}
     # print(state)
     return state
 

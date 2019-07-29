@@ -8,8 +8,8 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-from utils import mail
-from operateSqlite import *
+from comm.utils import mail
+from comm.operateSqlite import *
 from config import *
 
 

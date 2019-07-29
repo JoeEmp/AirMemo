@@ -7,12 +7,12 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal, QModelIndex
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
 
-from operateSqlite import exec_sql
+from comm.operateSqlite import exec_sql
 import config
-from module import get_cloud_notes, get_notes, server_error_msg
+from comm.module import get_cloud_notes, get_notes, server_error_msg
 
 
 class Ui_Sync_Dialog(QtWidgets.QDialog):
@@ -160,7 +160,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.local_sync_btn.setText(_translate("Dialog", "备份"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def set_data(self, token, username='visitor'):
+    def set_data(self, username='visitor'):
         self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
         try:
             self.cloud_records = get_cloud_notes(username, self.user_info['token'])['list']

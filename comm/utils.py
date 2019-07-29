@@ -8,9 +8,8 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
-from operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql, exec_sql
 import logging
-import rsa
 
 # from customWidget import Toast
 
@@ -97,15 +96,36 @@ def mail(info, title, recipients, content):
     return ret
 
 
-# 产生密文密码
-def cryptograph_password(password):
-    if password:
-        m = hashlib.md5()
-        m.update(password.encode('utf-8'))
-        cryptograph = m.hexdigest()
-    else:
-        cryptograph = None
-    return cryptograph
+def cryptograph_password(paswor):
+    pass
+
+def cryptograph_text(text, text_type):
+    '''
+    :param text: 需要加密的文本
+    :param text_type: 文本类型目前有 'password','msg','detail'
+    :return: 加密文本或者空
+    '''
+    try:
+        # 密码加密
+        if 'password' == text_type:
+            m = hashlib.md5()
+            m.update(text.encode('utf-8'))
+            return m.hexdigest()
+        # msg加密
+        elif 'msg' == text_type:
+            m = hashlib.md5()
+            m.update(text.encode('utf-8'))
+            return m.hexdigest()
+        # detail加密
+        elif 'detail' == text_type:
+            m = hashlib.md5()
+            m.update(text.encode('utf-8'))
+            return m.hexdigest()
+        else:
+            return None
+    except Exception as e:
+        logging.warning(e)
+        return None
 
 
 # 创建提醒时间线程

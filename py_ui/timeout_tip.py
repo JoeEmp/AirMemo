@@ -8,6 +8,8 @@
 import platform
 from PyQt5 import QtCore, QtWidgets, Qt
 from PyQt5.QtWidgets import QApplication, QWidget
+from time import sleep
+import config
 
 
 class Ui_timeout_Dialog(QtWidgets.QDialog):
@@ -80,15 +82,18 @@ class Ui_timeout_Dialog(QtWidgets.QDialog):
         x = screenSize.width() - 280 - 15
         y = 30
         super().show()
-        platform_name = platform.system()
+        platform_name = "Window"
         if platform_name == 'Darwin':
             self.move(x, y)
+            print(self.x())
         elif platform_name == 'Linux':
             # 暂时没有在linux上开发，不知道可不可以做动画效果
             self.move(x, y)
         elif platform_name == 'Window':
-            self.move(screenSize.width())
+            self.move(screenSize.width(),y)
             for i in range(280 + 15 + 1):
-                self.move(screenSize.width() - i, y)
+                self.move(self.x() - 1, y)
+                sleep(config.SPEED)
+                # print(self.x())
         else:
             self.move(x, y)

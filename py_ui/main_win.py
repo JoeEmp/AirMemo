@@ -16,14 +16,14 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import config
-import customWidget
-from operateSqlite import be_sql, exec_sql
+from comm import customWidget
+from comm.operateSqlite import be_sql, exec_sql
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-from module import get_notes, get_login_state
-from utils import getSize
+from comm.module import get_notes, get_login_state
+from comm.utils import getSize
 import sip
 import platform
 

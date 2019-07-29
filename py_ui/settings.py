@@ -7,9 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import logging
-from PyQt5.QtWidgets import QAbstractItemView, QListWidgetItem, QMessageBox
-from operateSqlite import *
+from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
+from comm.operateSqlite import *
 import config
 
 

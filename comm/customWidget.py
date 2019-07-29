@@ -3,12 +3,12 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel, QSlider
-from module import update_notes, add_notes, delete_notes
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel
+from comm.module import update_notes, add_notes, delete_notes
 import config
-from operateSqlite import *
+from comm.operateSqlite import *
 import re
-from time_thread import time_thread
+from comm.time_thread import time_thread
 import time
 
 
