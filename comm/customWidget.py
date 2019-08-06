@@ -129,7 +129,7 @@ class AirLineEdit(QLineEdit):
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
-            update_notes(config.LDB_FILENAME, data, 'msg', user_name=self.main_win.user_info['username'])
+            update_notes(config.LDB_FILENAME, data, 'message', user_name=self.main_win.user_info['username'])
         self.setStyleSheet("background:#%s" % self.color)
 
 

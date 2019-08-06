@@ -101,8 +101,9 @@ def cryptograph_text(text, text_type, **kwargs):
     '''
     :param text: 需要加密的文本
     :param text_type: 文本类型目前有 'password','msg','detail'
-    :return: 加密文本或者空
+    :return: 文或者空
     '''
+    text = '\ '.join(text.split())
     try:
         # 密码加密
         if 'password' == text_type:
