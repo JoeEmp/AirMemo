@@ -23,7 +23,7 @@ from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
 from comm.module import get_notes, get_login_state
-from comm.utils import getSize
+from comm.utils import getSize, cryptograph_text
 import sip
 import platform
 
@@ -200,8 +200,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
-            self.detail_tx = customWidget.AirTextEdit(
-                self.verticalLayoutWidget, color=self.records[i]['color'])
+            self.detail_tx = customWidget.AirTextEdit(main_win=self,
+                                                      parent=self.verticalLayoutWidget, color=self.records[i]['color'])
             self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
             self.detail_tx.setObjectName(
                 "detail_tx" + str(self.records[i]['id']))
@@ -424,7 +424,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.hide_detail_btn_list.append(self.hide_detail_btn)
 
         # 详情编辑框
-        self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
+        self.detail_tx = customWidget.AirTextEdit(main_win=self, parent=self.verticalLayoutWidget)
         self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
         self.detail_tx.setObjectName("detail_tx" + str(record['id']))
         # 隐藏文本框 初始化文本框状态数组
@@ -518,8 +518,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         records = get_notes(config.LDB_FILENAME, self.user_info['username'])
         if not records:
             table = 'Msg'
-            dict = {'message': 'Welcome', 'detail': 'Thanks you support',
+            dict = {'message': 'Welcome',
+                    'detail': 'Thanks you support',
                     'username': self.user_info['username']}
+            dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
+            dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
             exec_sql(config.LDB_FILENAME, sql)
         return self.user_info['username']
