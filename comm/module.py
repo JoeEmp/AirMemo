@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget
 from comm.operateSqlite import be_sql, exec_sql
 import config
-from comm.utils import cryptograph_text, protocol, user_host
+from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
 
@@ -25,18 +25,21 @@ def get_notes(filename, username='visitor', is_del='0'):
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
         cur = exec_sql(filename, sql)
+        for c in cur:
+            c['message'] = decrypt_text(c['message'], 'message', user_name=username)
+            c['detail'] = decrypt_text(c['detail'], 'detail', user_name=username)
     except Exception as e:
         logging.error(e)
         return []
     return cur
 
 
-def update_notes(filename, data, ele):
+def update_notes(filename, data, ele,**kwargs):
     '''
     更新内容
     :param filename:
     :param data:
-    :param ele: 元素(如 note_le,detail_tx)
+    :param ele: 元素(如 'msg','detail')
     :return:
     '''
     try:
@@ -44,6 +47,8 @@ def update_notes(filename, data, ele):
             filter_list = [
                 ['id', '=', str(data['id'])]
             ]
+            # 加密
+            data[ele] = cryptograph_text(data[ele], ele, user_name=kwargs['user_name'])
             sql = be_sql().update_sql('Msg', {ele: data[ele]}, filter_list)
             cur = exec_sql(filename, sql)
             logging.info('%s update No.%s record successfully!!!' % (ele, data['id']))
@@ -65,6 +70,10 @@ def add_notes(filename, data):
     try:
         if data['id'] == -1:
             del data['id']
+            #
+            for k, v in data.items():
+                if 'username' != k:
+                    data[k] = cryptograph_text(v, k, user_name=data['username'])
             sql = be_sql().ins_sql('Msg', data)
             exec_sql(filename, sql)
             logging.info('add records done')

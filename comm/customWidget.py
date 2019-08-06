@@ -17,14 +17,14 @@ class AirLineEdit(QLineEdit):
     __lineSignal = pyqtSignal(str, int)  # 绑定main_win 的 get_update_signal
     update_id_Signal = pyqtSignal(int)
 
-    def __init__(self, main_win, info, parent=None,color='ffffff'):
+    def __init__(self, main_win, info, parent=None, color='ffffff'):
         super().__init__(parent)
         self.get_reminder(info)
         self.main_win = main_win
         # 绑定槽
         self.__lineSignal.connect(main_win.get_update_Signal)
         self.createContextMenu()
-        self.color=color
+        self.color = color
 
     def get_reminder(self, info):
         '''
@@ -129,13 +129,15 @@ class AirLineEdit(QLineEdit):
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
-            update_notes(config.LDB_FILENAME, data, 'message')
-        self.setStyleSheet("background:#%s"%self.color)
+            update_notes(config.LDB_FILENAME, data, 'msg', user_name=self.main_win.user_info['username'])
+        self.setStyleSheet("background:#%s" % self.color)
+
 
 class AirTextEdit(QTextEdit):
     __eld_text = ''
 
-    def __init__(self,parent=None,color='ffffff'):
+    def __init__(self, main_win, parent=None, color='ffffff'):
+        self.main_win = main_win
         super().__init__(parent)
         self.color = color
 
@@ -161,8 +163,9 @@ class AirTextEdit(QTextEdit):
         data['detail'] = self.toPlainText()
         # 更新数据库
         if data['detail'] != self.__eld_text:
-            update_notes(config.LDB_FILENAME, data, 'detail')
-        self.setStyleSheet('background:#%s'% self.color)
+            update_notes(config.LDB_FILENAME, data, 'detail', user_name=self.main_win.user_info['username'])
+        self.setStyleSheet('background:#%s' % self.color)
+
 
 class hideButton(QPushButton):
     # flag 为Ture时为展开
@@ -174,6 +177,7 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
+
 
 '''
 class color_sider(QSlider):
@@ -189,6 +193,7 @@ class color_sider(QSlider):
         painter.setPen(Qt::transparent)
         painter.drawRect(100, 100, 100, 100)
 '''
+
 
 class Toast(QDialog):
 

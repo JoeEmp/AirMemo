@@ -14,6 +14,8 @@ tips for desktop
 
 &ensp;&ensp;6.单端避免重复打开
 
+&ensp;&ensp;7.db文件加密(更改为密文存储，渲染速度更慢后期调整)
+
 ### to do
 &ensp;&ensp;1.多邮箱自动分割(参考foxmail)
 
@@ -23,11 +25,9 @@ tips for desktop
 
 &ensp;&ensp;4.异地登录问题，仅允许单端登录
 
-&ensp;&ensp;5.db文件加密
+&ensp;&ensp;5.右键菜单时间个数问题
 
-&ensp;&ensp;6.右键菜单时间个数问题
-
-&ensp;&ensp;7.优先级增加
+&ensp;&ensp;6.优先级增加
 
 ### question
 

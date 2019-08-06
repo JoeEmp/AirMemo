@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QApplication, QStyleFactory, QMessageBox, QWidget
 import config
 from comm.operateSqlite import be_sql, exec_sql
 import logging
+import os
 
 # from customWidget import Toast
 
@@ -96,10 +97,7 @@ def mail(info, title, recipients, content):
     return ret
 
 
-def cryptograph_password(paswor):
-    pass
-
-def cryptograph_text(text, text_type):
+def cryptograph_text(text, text_type, **kwargs):
     '''
     :param text: 需要加密的文本
     :param text_type: 文本类型目前有 'password','msg','detail'
@@ -112,15 +110,26 @@ def cryptograph_text(text, text_type):
             m.update(text.encode('utf-8'))
             return m.hexdigest()
         # msg加密
-        elif 'msg' == text_type:
-            m = hashlib.md5()
-            m.update(text.encode('utf-8'))
-            return m.hexdigest()
+        elif 'msg' == text_type or 'message' == text_type:
+            return get_aes_cryText(kwargs['user_name'], text)
         # detail加密
         elif 'detail' == text_type:
-            m = hashlib.md5()
-            m.update(text.encode('utf-8'))
-            return m.hexdigest()
+            return get_aes_cryText(kwargs['user_name'], text)
+        else:
+            return None
+    except Exception as e:
+        logging.warning(e)
+        return None
+
+
+def decrypt_text(text, text_type, **kwargs):
+    try:
+        # msg解密
+        if 'msg' == text_type or 'message' == text_type:
+            return get_aes_decryText(kwargs['user_name'], text)
+        # detail解密
+        elif 'detail' == text_type:
+            return get_aes_decryText(kwargs['user_name'], text)
         else:
             return None
     except Exception as e:
@@ -139,6 +148,30 @@ def create_reminder(parent, time):
 
 def showToast(parent, text):
     pass
+
+
+def get_aes_cryText(user_name, text):
+    '''
+    返回加密字符串
+    :param user_name:
+    :param text:
+    :return: 密文
+    '''
+    r = os.popen('./be-aes %s -c %s' % (user_name, text))
+    text = r.read()
+    return text[:-1]
+
+
+def get_aes_decryText(user_name, text):
+    '''
+    返回明文字符串
+    :param user_name: 用户名
+    :param text: 密文
+    :return: 明文
+    '''
+    r = os.popen('./be-aes %s -d %s' % (user_name, text))
+    text = r.read()
+    return text[:-1]
 
 
 if __name__ == '__main__':
