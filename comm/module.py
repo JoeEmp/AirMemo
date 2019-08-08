@@ -34,7 +34,7 @@ def get_notes(filename, username='visitor', is_del='0'):
     return cur
 
 
-def update_notes(filename, data, ele,**kwargs):
+def update_notes(filename, data, ele, **kwargs):
     '''
     更新内容
     :param filename:
@@ -49,7 +49,8 @@ def update_notes(filename, data, ele,**kwargs):
             ]
             # 加密
             data[ele] = cryptograph_text(data[ele], ele, user_name=kwargs['user_name'])
-            sql = be_sql().update_sql('Msg', {ele: data[ele]}, filter_list)
+            sql = be_sql().update_sql('Msg', {ele: data[ele], 'update_time': data['update_time']}, filter_list)
+            print(sql)
             cur = exec_sql(filename, sql)
             logging.info('%s update No.%s record successfully!!!' % (ele, data['id']))
             return cur

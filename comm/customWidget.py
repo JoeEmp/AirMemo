@@ -129,6 +129,7 @@ class AirLineEdit(QLineEdit):
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
+            data['update_time']="(datetime(CURRENT_TIMESTAMP, 'localtime') )"
             update_notes(config.LDB_FILENAME, data, 'message', user_name=self.main_win.user_info['username'])
         self.setStyleSheet("background:#%s" % self.color)
 
@@ -163,6 +164,7 @@ class AirTextEdit(QTextEdit):
         data['detail'] = self.toPlainText()
         # 更新数据库
         if data['detail'] != self.__eld_text:
+            data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
             update_notes(config.LDB_FILENAME, data, 'detail', user_name=self.main_win.user_info['username'])
         self.setStyleSheet('background:#%s' % self.color)
 

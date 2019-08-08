@@ -19,12 +19,16 @@ class be_sql(object):
         try:
             s_value = ''
             for k, v in value_dict.items():
-                if v == 'NULL':
+                # 对关键词特殊处理
+                if v == 'NULL' or "(datetime(CURRENT_TIMESTAMP, 'localtime') )" == v:
                     s_value += k + ' = ' + v + ","
                 else:
                     s_value += k + ' = ' + "'" + v + "',"
+            s_value = s_value[:-1]
+            # 无过滤条件，直接返回
             if not filter_list:
-                return 'update %s set %s' % (table, s_value[:-1])
+                return 'update %s set %s' % (table, s_value)
+            # 组合过滤条件
             else:
                 s_filter = ''
                 for item in filter_list:
@@ -36,7 +40,7 @@ class be_sql(object):
                             s_filter += i + ' '
                     s_filter += ' and '
                 s_filter = s_filter[:-4]
-                sql = 'update %s set %s where %s' % (table, s_value[:-1], s_filter)
+                sql = 'update %s set %s where %s' % (table, s_value, s_filter)
             # print(sql)
         except Exception as e:
             logging.warning(e)

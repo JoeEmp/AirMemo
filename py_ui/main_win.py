@@ -519,7 +519,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if not records:
             table = 'Msg'
             dict = {'message': 'Welcome',
-                    'detail': 'Thanks you support',
+                    'detail': 'Thanks\ you\ support',
                     'username': self.user_info['username']}
             dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
             dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
