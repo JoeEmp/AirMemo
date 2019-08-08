@@ -2,7 +2,7 @@ import logging
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-from module import check_login_state
+from comm.module import check_login_state
 
 class AirTray(QSystemTrayIcon):
     widget = None

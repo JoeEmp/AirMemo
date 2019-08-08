@@ -16,15 +16,16 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import config
-import customWidget
-from operateSqlite import be_sql, exec_sql
+from comm import customWidget
+from comm.operateSqlite import be_sql, exec_sql
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
-from py_ui.sync import Ui_Sync_Dialog
+from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-from module import get_notes, get_login_state
-from utils import getSize
+from comm.module import get_notes, get_login_state
+from comm.utils import getSize, cryptograph_text
 import sip
+import platform
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -88,8 +89,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.login_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.login_btn.setText("")
         self.login_btn.setObjectName("login_btn")
-        self.login_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
-        self.login_btn.setStyleSheet('border-image:url(%s);' % config.LOGIN_ICON)
+        self.login_btn.setMaximumSize(
+            config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
+        self.login_btn.setStyleSheet(
+            'border-image:url(%s);' % config.LOGIN_ICON)
         # 请求登录
         self.login_btn.clicked.connect(self.show_user_dlg_slot)
         self.titleLayout.addWidget(self.login_btn)
@@ -97,7 +100,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Sync_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Sync_btn.setText("")
         self.Sync_btn.setObjectName("homology_btn")
-        self.Sync_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
+        self.Sync_btn.setMaximumSize(
+            config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
         self.Sync_btn.setStyleSheet('border-image:url(%s);' % config.SYNC_ICON)
         self.Sync_btn.clicked.connect(self.show_sync_dlg_slot)
         self.titleLayout.addWidget(self.Sync_btn)
@@ -112,7 +116,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.recycle_bin_btn.setObjectName("recycle_bin_btn")
         self.recycle_bin_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH,
                                             config.COM_MICRO_BTN_HEIGHT)
-        self.recycle_bin_btn.setStyleSheet('border-image:url(%s);' % config.HOMO_ICON)
+        self.recycle_bin_btn.setStyleSheet(
+            'border-image:url(%s);' % config.HOMO_ICON)
         self.recycle_bin_btn.clicked.connect(self.show_recycle_dlg_slot)
 
         self.titleLayout.addWidget(self.recycle_bin_btn)
@@ -121,8 +126,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.close_btn.setText("")
         self.close_btn.setObjectName("closeButton")
         self.titleLayout.addWidget(self.close_btn)
-        self.close_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
-        self.close_btn.setStyleSheet('border-image:url(%s);' % config.CLOSE_ICON)
+        self.close_btn.setMaximumSize(
+            config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT)
+        self.close_btn.setStyleSheet(
+            'border-image:url(%s);' % config.CLOSE_ICON)
         self.close_btn.clicked.connect(self.close)
 
         self.rootLayout.addLayout(self.titleLayout)
@@ -135,7 +142,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.welt_btn.setObjectName("welt_btn")
         self.winLayout.addWidget(self.welt_btn)
         # 使用 self.layoutHeight 直接占满
-        self.welt_btn.setMaximumSize(config.MAIN_WELT_BTN_WIDTH, self.layoutHeight)
+        self.welt_btn.setMaximumSize(
+            config.MAIN_WELT_BTN_WIDTH, self.layoutHeight)
         self.welt_btn.clicked.connect(self.welt_slot)
 
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -154,26 +162,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # 短消息编辑框
             self.note_le = customWidget.AirLineEdit(main_win=self,
                                                     parent=self.verticalLayoutWidget,
-                                                    info=self.user_info)
+                                                    info=self.user_info,
+                                                    color=self.records[i]['color'])
             self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
             # 将id写入objName里 bwrb 必须重构
             self.note_le.setObjectName("note_le" + str(self.records[i]['id']))
             # 加入相应列表，禁用LineEdit
             self.note_le_list.append(self.note_le)
-            self.note_le.setEnabled(False)
             self.note_le.setMaxLength(30)
-            self.note_le.setStyleSheet('background-color:#%s' % self.records[i]['color'])
+            self.note_le.setStyleSheet(
+                'background-color:#%s' % self.records[i]['color'])
             # self.note_le.editingFinished.connect(self.update_item_value)
             self.note_le.update_id_Signal.connect(self.update_tx_id)
 
             # 发送按钮
             self.send_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
             self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
-            self.send_btn.setObjectName("send_btn" + str(self.records[i]['id']))
+            self.send_btn.setObjectName(
+                "send_btn" + str(self.records[i]['id']))
             self.send_btn.setText(str(i + 1))
-            self.send_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+            self.send_btn.setMaximumSize(
+                config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
             self.send_btn.setStyleSheet('border-image:url(%s);' % '')
-            self.send_btn.setStyleSheet('background-color:rgba(196,255,255,1);')
+            self.send_btn.setStyleSheet(
+                'background-color:rgba(196,255,255,1);')
 
             # 收起/展开按钮
             self.hide_detail_btn = QtWidgets.QPushButton(
@@ -181,17 +193,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))
-            self.hide_detail_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
-            self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
+            self.hide_detail_btn.setMaximumSize(
+                config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+            self.hide_detail_btn.setStyleSheet(
+                'border-image:url(%s);' % config.LEFT_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
-            self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
+            self.detail_tx = customWidget.AirTextEdit(main_win=self,
+                                                      parent=self.verticalLayoutWidget, color=self.records[i]['color'])
             self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
-            self.detail_tx.setObjectName("detail_tx" + str(self.records[i]['id']))
+            self.detail_tx.setObjectName(
+                "detail_tx" + str(self.records[i]['id']))
             # 隐藏文本框 初始化文本框状态数组
             self.detail_tx.hide()
-            self.detail_tx.setEnabled(False)
             self.detail_tx_state_list.append(0)
             self.detail_tx_list.append(self.detail_tx)
             # 绑定槽
@@ -219,7 +234,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.detail_tx_list[i].setText(self.records[i]['detail'])
         self.welt_btn.setText(_translate("MainWindow", "welt"))
         self.add_btn.setText(_translate("MainWindow", "add"))
-        self.setStyleSheet('QMainWindow{background-color:rgba(196,255,255,1);}')
+        self.setStyleSheet(
+            'QMainWindow{background-color:rgba(196,255,255,1);}')
         self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
         # self.setStyleSheet('QMainWindow{border-top-left-radius:15px;border-top-right-radius:15px;}')
 
@@ -242,7 +258,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
-        self.layoutHeight = (len(self.records) + 1) * config.COM_BTN_HEIGHT + 20
+        self.layoutHeight = (len(self.records) + 1) * \
+                            config.COM_BTN_HEIGHT + 20
+        try:
+            if 1 in self.detail_tx_state_list:
+                self.layoutHeight += config.COM_TE_HEIGHT
+        except Exception as e:
+            logging.warning(e)
         self.Text_isShow = False
         logging.info('set data')
 
@@ -256,6 +278,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if 1 in self.detail_tx_state_list and self.detail_tx_state_list.index(
                 1) != index:
             self.detail_tx_list[self.detail_tx_state_list.index(1)].hide()
+            self.sender()
             self.layoutHeight = self.layoutHeight - config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[self.detail_tx_state_list.index(1)] = 0
@@ -266,19 +289,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutHeight = self.layoutHeight + config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 1
-            self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
+            self.sender().setStyleSheet('border-image:url(%s);' % config.DOWN_ICON)
         else:
             self.detail_tx_list[index].hide()
             self.layoutHeight = self.layoutHeight - config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 0
-            self.sender().setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
-
+            self.sender().setStyleSheet('border-image:url(%s);' % config.LEFT_ICON)
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)
         self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
         self.verticalLayoutWidget.resize(self.layoutWidth, self.layoutHeight)
-        self.welt_btn.setMaximumSize(config.MAIN_WELT_BTN_WIDTH, self.layoutHeight)
+        self.welt_btn.setMaximumSize(
+            config.MAIN_WELT_BTN_WIDTH, self.layoutHeight)
 
     def send_Email_slot(self):
         '''
@@ -305,23 +328,42 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         width = QApplication.desktop().screenGeometry().width()
+        platform_name = platform.system()
+
         if self.x() <= width - config.MAIN_BASEWIDTH:
-            for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
-                self.move(self.x() + 1, self.y())
-                sleep(config.SPEED)
+            if 'Windows' == platform_name:
+                for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                    self.move(self.x() + 1, self.y())
+                    sleep(config.SPEED)
+                    print(self.x(), self.y())
+
+            elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                self.move(width - config.MAIN_WELT_BTN_WIDTH, self.y())
+            # 变更贴图
+            # self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
         else:
-            for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
-                self.move(self.x() - 1, self.y())
-                sleep(config.SPEED)
+            if 'Windows' == platform_name:
+                for i in range(config.MAIN_BASEWIDTH - config.MAIN_WELT_BTN_WIDTH):
+                    self.move(self.x() - 1, self.y())
+                    sleep(config.SPEED)
+            elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                self.move(width - config.MAIN_BASEWIDTH, self.y())
+            # 变更贴图
+            # self.sender().setStyleSheet('border-image:url(%s);' % config.WELT_ICON)
 
     def addNote_slot(self):
         '''
         增加memo
         :return:
         '''
+        if QApplication.desktop().screenGeometry().height() < self.layoutHeight + config.COM_BTN_HEIGHT:
+            QMessageBox.information(
+                self, 'tips', '请清除一些任务后再添加', QMessageBox.Ok)
+            return None
         if self.note_le.text():
             self.setData(username=self.user_info['username'])
-            new_record = {'id': -1, 'detail': '', 'message': '', 'color': 'ffffff'}
+            new_record = {'id': -1, 'detail': '',
+                          'message': '', 'color': 'c4ffff'}
             self.records.append(new_record)
             self.changeLayout()
             self.retranslateUi()
@@ -345,13 +387,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # 短消息编辑框
         self.note_le = customWidget.AirLineEdit(main_win=self,
                                                 parent=self.verticalLayoutWidget,
-                                                info=self.user_info)
+                                                info=self.user_info,
+                                                color=record['color'])
         self.noteLayout.addWidget(self.note_le, 0, 1, 1, 1)
         # 将id写入objName里 bwrb 必须重构
         self.note_le.setObjectName("note_le" + str(record['id']))
         # 加入相应列表，禁用LineEdit
         self.note_le_list.append(self.note_le)
-        self.note_le.setEnabled(False)
         self.note_le.setMaxLength(30)
         self.note_le.setStyleSheet('background-color:#%s' % record['color'])
         # self.note_le.editingFinished.connect(self.update_item_value)
@@ -362,7 +404,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.noteLayout.addWidget(self.send_btn, 0, 0, 1, 1)
         self.send_btn.setObjectName("send_btn" + str(record['id']))
         self.send_btn.setText(str(length))
-        self.send_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+        self.send_btn.setMaximumSize(
+            config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
         self.send_btn.setStyleSheet('border-image:url(%s);' % '')
         self.send_btn.setStyleSheet('background-color:rgba(196,255,255,1);')
 
@@ -371,17 +414,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.hide_detail_btn.setText("")
         self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
         self.hide_detail_btn.setObjectName("hide_detail_btn" + str(-1))
-        self.hide_detail_btn.setMaximumSize(config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
-        self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.HIDE_ICON)
+        self.hide_detail_btn.setMaximumSize(
+            config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+        self.hide_detail_btn.setStyleSheet(
+            'border-image:url(%s);' % config.LEFT_ICON)
         self.hide_detail_btn_list.append(self.hide_detail_btn)
 
         # 详情编辑框
-        self.detail_tx = customWidget.AirTextEdit(self.verticalLayoutWidget)
+        self.detail_tx = customWidget.AirTextEdit(main_win=self, parent=self.verticalLayoutWidget)
         self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
         self.detail_tx.setObjectName("detail_tx" + str(record['id']))
         # 隐藏文本框 初始化文本框状态数组
         self.detail_tx.hide()
-        self.detail_tx.setEnabled(False)
         self.detail_tx_state_list.append(0)
         self.detail_tx_list.append(self.detail_tx)
         # 绑定槽
@@ -397,8 +441,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # 调整窗口和布局高度
         self.layoutHeight += config.COM_BTN_HEIGHT
-        self.resize(self.layoutWidth, self.layoutHeight)
+
         self.setFixedSize(self.layoutWidth, self.layoutHeight)
+        self.resize(self.layoutWidth, self.layoutHeight)
+        self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
         self.verticalLayoutWidget.setGeometry(
             QtCore.QRect(0, 0, self.layoutWidth, self.layoutHeight))
 
@@ -421,7 +467,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 logging.error(e)
         else:
-            QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+            QMessageBox.information(self, '提示', "{}".format(
+                result['errMsg']), QMessageBox.Yes)
             return -1
         if ui:
             ui.show()
@@ -439,7 +486,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.reset(username)
             return True
         else:
-            QMessageBox.information(self, '提示', "{}".format('登录信息错误'), QMessageBox.Yes)
+            QMessageBox.information(
+                self, '提示', "{}".format('登录信息错误'), QMessageBox.Yes)
             return False
 
     def reset(self, username):
@@ -464,8 +512,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         records = get_notes(config.LDB_FILENAME, self.user_info['username'])
         if not records:
             table = 'Msg'
-            dict = {'message': 'Welcome', 'detail': 'Thanks you support',
+            dict = {'message': 'Welcome',
+                    'detail': 'Thanks\ you\ support',
                     'username': self.user_info['username']}
+            dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
+            dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
             exec_sql(config.LDB_FILENAME, sql)
         return self.user_info['username']
@@ -489,10 +540,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 dlg.updateSignal.connect(self.get_update_Signal)
             except Exception as e:
                 logging.warnings(e)
-                QMessageBox.information(self, 'tips', "无法连接服务器", QMessageBox.Ok)
+                QMessageBox.information(
+                    self, 'tips', "无法连接服务器", QMessageBox.Ok)
         else:
-            QMessageBox.information(self, 'tips', result['errMsg'], QMessageBox.Ok)
+            QMessageBox.information(
+                self, 'tips', result['errMsg'], QMessageBox.Ok)
 
+    # 重写类方法
     def show(self):
         super().show()
         # 添加置顶
@@ -512,16 +566,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def mouseReleaseEvent(self, e: QMouseEvent):
         if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):
             width = QApplication.desktop().screenGeometry().width()
-
+            platform_name = platform.system()
             # x轴判断
             if self.x() > width - config.MAIN_WELT_BTN_WIDTH:
-                for i in range(self.x() - (width - config.MAIN_WELT_BTN_WIDTH)):
-                    self.move(self.x() - 1, self.y())
-                    sleep(config.SPEED)
+                if 'Windows' == platform_name:
+                    for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                        self.move(self.x() + 1, self.y())
+                        sleep(config.SPEED)
+                        print(self.x(), self.y())
+
+                elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                    self.move(width - config.MAIN_WELT_BTN_WIDTH, self.y())
+                # 变更贴图
+                # self.sender().setStyleSheet('border-image:url(%s);' % config.SHOW_ICON)
             elif self.x() > width - config.MAIN_BASEWIDTH:
-                for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
-                    self.move(self.x() + 1, self.y())
-                    sleep(config.SPEED)  # 0.001为微调结果
+                if 'Windows' == platform_name:
+                    for i in range(width - self.x() - config.MAIN_WELT_BTN_WIDTH):
+                        self.move(self.x() + 1, self.y())
+                        sleep(config.SPEED)  # 0.001为微调结果
+                elif 'Darwin' == platform_name or 'Linux' == platform_name:
+                    self.move(width - config.MAIN_BASEWIDTH, self.y())
+                # 变更贴图
+                # self.sender().setStyleSheet('border-image:url(%s);' % config.WELT_ICON)
             self._isTracking = False
             self._startPos = None
             self._endPos = None
+        # print(self.x(), self.y())

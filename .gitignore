@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ##ignore dir file##
 __pycache__
 .idea
@@ -7,13 +6,6 @@ venv
 
 ##ignore file ##
 *.db
-=======
-##ignore dir file##
-__pycache__
-.idea
-.vscode
-venv
-
-##ignore file ##
-*.db
->>>>>>> 239dd3be0e97b303d4b7732c0c1f02f930cdda3a
+be-aes.py
+ttt.py
+test.py

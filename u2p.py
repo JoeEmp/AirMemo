@@ -1,6 +1,7 @@
 # 将UI目录下的所有.ui文件转化换为.py文件
 import os
 
+
 def findUI(ulist, dir="./ui", need_suffix='.ui'):
     '''
     查找 .ui 文件
@@ -44,16 +45,17 @@ def translation(clist, tag_dir='./py_'):
             # window
             # os.system("python -m PyQt5.uic.pyuic " + file + " -o " + tag_dir + file[0:-3] + ".py  ")
             # mac
-            os.system(os.popen('which pyuic5').read()[:-1] +' '+ file + " -o " + tag_dir + file[0:-3] + ".py  ")
+            os.system(os.popen('which pyuic5').read()[:-1] + ' ' + file + " -o " + tag_dir + file[0:-3] + ".py  ")
         except Exception as e:
             print(str(file) + "translation failed")
             print(e)
+
 
 if __name__ == "__main__":
     ulist = []
     findUI(ulist)
     # 只转化指定文件
-    sub_ulist = ['UI/settings.ui']
+    sub_ulist = ['UI/sync.ui']
     if sub_ulist:
         translation(sub_ulist)
     else:

@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 import config
-import module
+from comm import module
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):

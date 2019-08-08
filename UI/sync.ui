@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>258</width>
-    <height>403</height>
+    <height>402</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,11 +19,11 @@
      <x>10</x>
      <y>10</y>
      <width>241</width>
-     <height>381</height>
+     <height>391</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="cloud_tab">
     <attribute name="title">
@@ -33,12 +33,64 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>10</y>
+       <y>0</y>
        <width>231</width>
-       <height>331</height>
+       <height>361</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="cloud_gridLayout">
+      <item row="3" column="0">
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="cloud_lab">
+        <property name="styleSheet">
+         <string notr="true">color:rgb(0, 68, 221)</string>
+        </property>
+        <property name="text">
+         <string>蓝色为云端有更新的版本</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="4">
+       <widget class="QListWidget" name="cloud_list">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::MultiSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>cloud have new</string>
+         </property>
+         <property name="foreground">
+          <brush brushstyle="NoBrush">
+           <color alpha="255">
+            <red>0</red>
+            <green>68</green>
+            <blue>221</blue>
+           </color>
+          </brush>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>与本地一致</string>
+         </property>
+        </item>
+       </widget>
+      </item>
       <item row="3" column="2">
        <widget class="QPushButton" name="cloud_del_btn">
         <property name="text">
@@ -66,8 +118,25 @@
         </property>
        </spacer>
       </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="local_tab">
+    <attribute name="title">
+     <string>本地</string>
+    </attribute>
+    <widget class="QWidget" name="gridLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>231</width>
+       <height>361</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="local_gridLayout">
       <item row="3" column="0">
-       <spacer name="horizontalSpacer_4">
+       <spacer name="horizontalSpacer_11">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -79,8 +148,18 @@
         </property>
        </spacer>
       </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="local_lab">
+        <property name="styleSheet">
+         <string notr="true">color:rgb(0, 204, 34)</string>
+        </property>
+        <property name="text">
+         <string>绿色为已在云端</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" colspan="4">
-       <widget class="QListWidget" name="cloud_list">
+       <widget class="QListWidget" name="local_list">
         <property name="selectionMode">
          <enum>QAbstractItemView::MultiSelection</enum>
         </property>
@@ -89,61 +168,34 @@
         </property>
         <item>
          <property name="text">
-          <string>cloud have new</string>
-         </property>
-         <property name="foreground">
-          <brush brushstyle="NoBrush">
-           <color alpha="255">
-            <red>85</red>
-            <green>85</green>
-            <blue>255</blue>
-           </color>
-          </brush>
+          <string>123</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>与本地一致</string>
+          <string>sss已删除</string>
+         </property>
+         <property name="background">
+          <brush brushstyle="NoBrush">
+           <color alpha="255">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </property>
+         <property name="foreground">
+          <brush brushstyle="NoBrush">
+           <color alpha="255">
+            <red>0</red>
+            <green>204</green>
+            <blue>34</blue>
+           </color>
+          </brush>
          </property>
         </item>
        </widget>
       </item>
-      <item row="2" column="0" colspan="3">
-       <widget class="QLabel" name="label_2">
-        <property name="styleSheet">
-         <string notr="true">color:rgb(85, 85, 255)</string>
-        </property>
-        <property name="text">
-         <string>蓝色为云端有更新的版本</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="local_tab">
-    <attribute name="title">
-     <string>本地</string>
-    </attribute>
-    <widget class="QWidget" name="gridLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>231</width>
-       <height>351</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="local_gridLayout">
-      <property name="leftMargin">
-       <number>1</number>
-      </property>
-      <property name="topMargin">
-       <number>1</number>
-      </property>
-      <property name="rightMargin">
-       <number>2</number>
-      </property>
       <item row="3" column="2">
        <widget class="QPushButton" name="local_del_btn">
         <property name="text">
@@ -159,7 +211,7 @@
        </widget>
       </item>
       <item row="3" column="3">
-       <spacer name="horizontalSpacer_2">
+       <spacer name="horizontalSpacer_12">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -170,63 +222,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="3" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="0" colspan="4">
-       <widget class="QListWidget" name="local_list">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::MultiSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>1</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>sss(已删除)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2(已删除)</string>
-         </property>
-         <property name="foreground">
-          <brush brushstyle="NoBrush">
-           <color alpha="255">
-            <red>1</red>
-            <green>203</green>
-            <blue>31</blue>
-           </color>
-          </brush>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QLabel" name="label">
-        <property name="styleSheet">
-         <string notr="true">color:rgb(1, 203, 31)</string>
-        </property>
-        <property name="text">
-         <string>绿色为云端已有消息</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

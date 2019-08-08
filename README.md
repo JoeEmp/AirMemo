@@ -10,22 +10,26 @@ tips for desktop
 
 &ensp;&ensp;4.完成回收站功能
 
+&ensp;&ensp;5.版面滚动，固定高度(根据实际场景,限制高度,没有滚动)
+
+&ensp;&ensp;6.单端避免重复打开
+
+&ensp;&ensp;7.db文件加密(更改为密文存储，渲染速度更慢后期调整)
+
+&ensp;&ensp;8.动态布局(已完成)
+
 ### to do
 &ensp;&ensp;1.多邮箱自动分割(参考foxmail)
 
-&ensp;&ensp;2.动态布局(已完成)
+&ensp;&ensp;2.云同步
 
-&ensp;&ensp;3.云同步
+&ensp;&ensp;3.异地登录问题，仅允许单端登录
 
-&ensp;&ensp;4.异地登录问题，仅允许单端登录
+&ensp;&ensp;4.右键菜单时间个数问题
 
-&ensp;&ensp;5.单端避免重复打开
+&ensp;&ensp;5.颜色选择
 
-&ensp;&ensp;6.db文件加密
-
-&ensp;&ensp;7.右键菜单时间个数问题
-
-&ensp;&ensp;8.版面滚动，固定高度
+&ensp;&ensp;6.优先级增加
 
 ### question
 
