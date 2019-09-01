@@ -1,11 +1,11 @@
 import sys
-
-# from PyQt5.QtWidgets import QApplication
 from py_ui.AirTray import AirTray
 from py_ui.main_win import *
 from py_ui.settings import *
 from comm.utils import setApp
 from PyQt5.QtNetwork import QLocalServer,QLocalSocket
+from comm.operateSqlite import link_db
+import config
 
 
 def main():
@@ -35,6 +35,8 @@ def main():
         sys.exit(app.exec_())
     finally:
         localServer.close() 
+
+    link_db(config.LDB_FILENAME)
 
 if __name__ == '__main__':
     main()

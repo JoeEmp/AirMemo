@@ -157,7 +157,7 @@ def get_login_state():
     # 本地有token的用户去服务器校验
     else:
         try:
-            url = '/api/check_login'
+            url = '/api/pc/check_login'
             headers = {
                 'User-Agent': 'AirMemo'
             }

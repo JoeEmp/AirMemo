@@ -2,6 +2,36 @@
 import logging
 import sqlite3
 
+sqlit_db = None
+
+
+def dict_factory(cursor, row):
+    '''
+    # 官方api提供，使返回的数据结构为 list of dict
+    :param cursor:
+    :param row:
+    :return:
+    '''
+    dict = {}
+    for idx, col in enumerate(cursor.description):
+        dict[col[0]] = row[idx]
+    return dict
+
+
+def link_db(filename):
+    '''
+    链接数据库修改本文件的db变量
+    :param filename:
+    :return:
+    '''
+    while True:
+        try:
+            sqlit_db = sqlite3.connect(filename)
+            sqlit_db.row_factory = dict_factory
+            break
+        except Exception as e:
+            logging.warning(e)
+
 
 # 构建字符串 提供 简单查询、更新，插入。
 class be_sql(object):
@@ -119,7 +149,7 @@ class be_sql(object):
             return 'delete from %s where %s' % (table, s_filter)
 
 
-def exec_sql(filename, sql, is_update=None):
+def exec_sql(sql, is_update=None):
     '''
     :param filename: 文件名(含路径) str
     :param sql: 需要执行的sql str
@@ -127,13 +157,10 @@ def exec_sql(filename, sql, is_update=None):
     :except:  返回 None
     :return:  fetchall
     '''
-    db = sqlite3.connect(filename)
-    # sqlite 以字典格式返回查询结果
-    db.row_factory = dict_factory
-    c = db.cursor()
+    c = sqlit_db.cursor()
     try:
         cur = c.execute(sql)
-        db.commit()
+        sqlit_db.commit()
     except Exception as e:
         logging.error(e)
         return None
@@ -141,14 +168,6 @@ def exec_sql(filename, sql, is_update=None):
         return cur.fetchall()
     else:
         return cur.rowcount
-
-
-# 官方api提供，使返回的数据结构为 list of dict
-def dict_factory(cursor, row):
-    dict = {}
-    for idx, col in enumerate(cursor.description):
-        dict[col[0]] = row[idx]
-    return dict
 
 
 if __name__ == '__main__':
