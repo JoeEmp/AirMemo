@@ -112,7 +112,7 @@ def get_cloud_notes(username, token):
     :param token:   token str
     :return: 响应
     '''
-    url = '/api/cloud_page'
+    url = '/api/AirMemo/pc/cloud_page'
     headers = {
         'User-Agent': 'AirMemo'
     }

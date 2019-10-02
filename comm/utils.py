@@ -74,7 +74,7 @@ def mail(info, title, recipients, content):
     if record['user_ssl'] == 1:
         port = record['ssl_port']
 
-    ret = {'state': 1, 'errMsg': ''}
+    ret = {'status': 1, 'errMsg': ''}
     try:
         msg = MIMEText(content, 'plain', 'utf-8')
         msg['From'] = formataddr([record['sender_name'], info['addr']])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
@@ -93,7 +93,7 @@ def mail(info, title, recipients, content):
         server.quit()
     except Exception as e:
         logging.warning(str(e.smtp_error, encoding='gbk'))
-        ret = {'state': -1, 'errMsg': '账号%s %s' % (info['addr'], str(e.smtp_error, encoding='gbk'))}
+        ret = {'status': -1, 'errMsg': '账号%s %s' % (info['addr'], str(e.smtp_error, encoding='gbk'))}
     return ret
 
 

@@ -18,6 +18,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.setupUi()
         self.retranslateUi()
         logging.info('end init')
+        self.login_signal.connect(parent.get_update_Signal)
 
     def setupUi(self):
         self.setObjectName("login_Dialog")
@@ -99,9 +100,9 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         if self.username_le.text() and self.password_le.text():
             result = login.login(username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
-            print(result)
+            logging.debug(result)
             try:
-                if result['token']:
+                if result['result']['token']:
                     table = 'user'
                     if not utils.get_user_info(table, self.username_le.text()):
                         # 没有用户直接插入
@@ -114,7 +115,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                                 "insert into Reminder(username,time) values ('%s','%s');" % (dict['username'], time))
                     # 已有用户更新数据
                     else:
-                        value_dict = {'token': result['token']}
+                        value_dict = {'token': result['result']['token']}
                         filter_list = [['username', '=', self.username_le.text()]]
                         sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
                                                                 filter_list=filter_list)
@@ -149,6 +150,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         self.username = username
         self.setupUi()
         self.retranslateUi()
+        self.logout_signal.connect(parent.get_update_Signal)
 
     def setupUi(self):
         self.setObjectName("logout_Dialog")
@@ -199,8 +201,8 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        state = pubilc.logout(self.username)
-        if state['state'] == 1:
+        status = pubilc.logout(self.username)
+        if status['status'] == 1:
             table = 'user'
             value_dict = {'token': 'NULL'}
             filter_list = [
@@ -311,7 +313,7 @@ class Ui_register_Dialog(QtWidgets.QDialog):
                 self.password_le.text() == self.again_le.text()):
             result = pubilc.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
-                if result['state'] == 1:
+                if result['status'] == 1:
                     self.close()
                 else:
                     QMessageBox.information(self, '提示', "{}".format(result['errMsg']),

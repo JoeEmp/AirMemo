@@ -2,7 +2,7 @@ import config
 import requests
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import logging
-from comm.pubilc import check_login_state
+from comm.pubilc import check_login_status
 
 
 def login(username, password):
@@ -12,7 +12,7 @@ def login(username, password):
     :param password:
     :return:
     '''
-    url = '/api/app/pc/login'
+    url = '/api/AirMemo/pc/login'
     headers = {
         'User-Agent': 'AirMemo'
     }
@@ -26,20 +26,20 @@ def login(username, password):
         return {}
 
 
-def get_login_state():
+def get_login_status():
     '''
     查询用户在 服务器 的登录状态
     :return:
     '''
     # 检查本地token
-    result = check_login_state()
+    result = check_login_status()
     # 本地无用户登录
     if not result:
-        return {'state': 1}
+        return {'status': 1}
     # 本地有token的用户去服务器校验
     else:
         try:
-            url = '/api/pc/check_login'
+            url = '/api/AirMemo/pc/check_login'
             headers = {
                 'User-Agent': 'AirMemo'
             }
@@ -48,12 +48,12 @@ def get_login_state():
                               data=data)
         except Exception as e:
             logging.error(e)
-            return {'state': -1, 'errMsg': '无法连接服务器'}
+            return {'status': -1, 'errMsg': '无法连接服务器'}
         try:
             # print(r)
-            state = r.json()
+            status = r.json()
         except Exception as e:
             logging.error(e)
-            return {'state': -1, 'errMsg': '接口返回数据出错-%s' % r.status_code}
-    # print(state)
-    return state
+            return {'status': -1, 'errMsg': '接口返回数据出错-%s' % r.status_code}
+    # print(status)
+    return status

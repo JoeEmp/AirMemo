@@ -151,10 +151,10 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         info = {'username': self.user_info['username'], 'addr': self.sender_comb.currentText()}
         result = mail(info, self.Msg_tx.toPlainText(),
                       self.recipients_tx.toPlainText(), self.content_tx.toPlainText())
-        if result['state'] == 1:
+        if result['status'] == 1:
             self.close()
             return True
-        elif result['state'] == -1:
+        elif result['status'] == -1:
             self.send_btn.setEnabled(True)
             QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Ok)
             return True

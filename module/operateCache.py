@@ -1,4 +1,4 @@
-from comm.pubilc import check_login_state
+from comm.pubilc import check_login_status
 from comm.user_cache import mine
 from module.note import get_notes
 import config
@@ -12,7 +12,7 @@ def update_user_info():
     检测登录用户的信息
     :return:
     '''
-    result = check_login_state()
+    result = check_login_status()
     if result:
         result = result[0]
     else:

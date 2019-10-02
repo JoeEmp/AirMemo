@@ -161,10 +161,10 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.local_sync_btn.setText(_translate("Dialog", "备份"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.local_tab), _translate("Dialog", "本地"))
 
-    def set_data(self, username='visitor'):
+    def set_data(self, username='visitor', token=None):
         self.local_records = get_notes(config.LDB_FILENAME, username, is_del='all')
         try:
-            self.cloud_records = get_cloud_notes(username, self.user_info['token'])['list']
+            self.cloud_records = get_cloud_notes(username, token)['list']
             print(self.cloud_records)
         except Exception as e:
             QMessageBox.information(self.parent, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)

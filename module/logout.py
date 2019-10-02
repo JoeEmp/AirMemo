@@ -2,7 +2,7 @@ import config
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
-from  comm.pubilc import check_login_state
+from  comm.pubilc import check_login_status
 
 def logout(username):
     '''
@@ -10,7 +10,7 @@ def logout(username):
     :param username: 用户名 str
     :return: 响应
     '''
-    result = check_login_state()
+    result = check_login_status()
     logging.debug(result)
     try:
         if result:
@@ -24,4 +24,4 @@ def logout(username):
             return r.json()
     except Exception as e:
         logging.error(e)
-        return {'state': '-1'}
+        return {'status': '-1'}

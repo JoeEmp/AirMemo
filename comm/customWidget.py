@@ -3,6 +3,7 @@
 '''
 from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
+from PyQt5.QtGui import QPainter, QPixmap
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel
 from module.note import update_notes, add_notes, delete_notes
 import config
@@ -129,7 +130,7 @@ class AirLineEdit(QLineEdit):
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
-            data['update_time']="(datetime(CURRENT_TIMESTAMP, 'localtime') )"
+            data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
             update_notes(data, 'message', user_name=self.main_win.user_info['username'])
         self.setStyleSheet("background:#%s" % self.color)
 
@@ -170,6 +171,10 @@ class AirTextEdit(QTextEdit):
 
 
 class hideButton(QPushButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.flag = 0
+
     # flag 为Ture时为展开
     def switch(self, ele, flag):
         try:
@@ -179,6 +184,16 @@ class hideButton(QPushButton):
                 ele.show()
         except Exception as e:
             logging.error(e)
+
+    def paintEvent(self, QPaintEvent):
+        super().paintEvent(QPaintEvent)
+        painter = QPainter(self)
+        pix = QPixmap()
+        pix.load(config.LEFT_ICON)
+        painter.translate(50, 50)  # 让图片的中心作为旋转的中心
+        painter.rotate(90)  # 顺时针旋转90度
+        painter.translate(-50, -50)  # 使原点复原
+        painter.drawPixmap(0, 0, 100, 100, pix)
 
 
 '''
