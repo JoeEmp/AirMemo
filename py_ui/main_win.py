@@ -22,10 +22,12 @@ from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-from comm.module import get_notes, get_login_state
+from module.login import get_login_state
+from comm.pubilc import get_notes
 from comm.utils import getSize, cryptograph_text
 import sip
 import platform
+from comm.user_cache import mine
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -41,7 +43,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         logging.info("mainwindow init")
         self.parent = parent
-        self.user_info = parent.get_info()
+        self.user_info = mine.get_value('user_info')
         self.setData(username=self.user_info['username'])
         self.setupLayout()
         self.retranslateUi()
@@ -258,8 +260,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
-        self.layoutHeight = (len(self.records) + 1) * \
-                            config.COM_BTN_HEIGHT + 20
+        self.layoutHeight = (len(self.records) + 1) * config.COM_BTN_HEIGHT + 20
         try:
             if 1 in self.detail_tx_state_list:
                 self.layoutHeight += config.COM_TE_HEIGHT
@@ -309,7 +310,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         id = re.findall('\d+', self.sender().objectName())[0]
-        info = exec_sql(config.LDB_FILENAME,
+        info = exec_sql(
                         'select message,detail from Msg where id = %s' % id)[0]
         # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
@@ -359,6 +360,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         增加memo
         :return:
         '''
+        # 限高设置
         if QApplication.desktop().screenGeometry().height() < self.layoutHeight + config.COM_BTN_HEIGHT:
             QMessageBox.information(
                 self, 'tips', '请清除一些任务后再添加', QMessageBox.Ok)
@@ -513,8 +515,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         用于检测用户的登录状态
         :return:
         '''
-        self.parent.update_info()
-        self.user_info = self.parent.get_info()
+        self.user_info = mine.get_value('user_info')
         records = get_notes(config.LDB_FILENAME, self.user_info['username'])
         if not records:
             table = 'Msg'
@@ -524,7 +525,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
             dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
-            exec_sql(config.LDB_FILENAME, sql)
+            exec_sql( sql)
         return self.user_info['username']
 
     def update_tx_id(self, id):

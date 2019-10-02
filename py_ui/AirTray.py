@@ -2,11 +2,13 @@ import logging
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-from comm.module import check_login_state
+from comm.pubilc import check_login_state
+from comm.user_cache import mine
+
 
 class AirTray(QSystemTrayIcon):
     widget = None
-    __user_info = {}
+    __user_info = dict()
 
     def __init__(self, widget_dict=None):
         super().__init__()
@@ -49,7 +51,8 @@ class AirTray(QSystemTrayIcon):
         :return:
         '''
         self.setObjectName('AirTray')
-        self.__user_info = self.check()
+        mine.add_item('user_info', self.check())
+        self.__user_info = mine.get_value('user_info')
         self.set_icon()
 
     # 获取 username 以及 token ，默认为 'visitor'
@@ -86,7 +89,7 @@ class AirTray(QSystemTrayIcon):
         重新更新用户信息
         :return:
         '''
-        self.__user_info = self.check()
+        self.__user_info = mine.update_item('user_info', self.check())
 
     def quitapp(self):
         try:

@@ -24,6 +24,7 @@ def link_db(filename):
     :param filename:
     :return:
     '''
+    global sqlit_db
     while True:
         try:
             sqlit_db = sqlite3.connect(filename)

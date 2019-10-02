@@ -9,15 +9,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 from comm.operateSqlite import *
-import config
+from comm.user_cache import mine
 
 
 class Ui_Settings(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         logging.info('init begin')
-        self.parent = parent
-        self.user_info = parent.get_info()
+        self.parent = parent        # 冗余
+        self.user_info = mine.get_value('user_info')
         self.set_data()
         self.setupUi()
 
@@ -32,10 +32,10 @@ class Ui_Settings(QtWidgets.QMainWindow):
             ['username', '=', self.user_info['username']]
         ]
         sql = be_sql().sel_sql(table=table, filter_list=filter_list)
-        self._email_records = exec_sql(config.LDB_FILENAME, sql)
+        self._email_records = exec_sql(sql)
         # 获取Reminder表数据
         sql = sql.replace(table, 'Reminder') + 'order by sequence'
-        self._reminder_records = exec_sql(config.LDB_FILENAME, sql)
+        self._reminder_records = exec_sql(sql)
         # print(self._reminder_records)
         logging.info('data init end')
 
@@ -346,7 +346,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         table = 'Email_settings'
         dict = {'username': self.user_info['username'], 'addr': 'new addr'}
         sql = be_sql().ins_sql(table, dict)
-        exec_sql(config.LDB_FILENAME, sql)
+        exec_sql( sql)
         self.set_data()
         pass
 
@@ -364,7 +364,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
                         ['id', '=', str(self._email_records[index]['id'])]
                     ]
                     sql = be_sql().del_sql(table, filter_list=filter_list)
-                    exec_sql(config.LDB_FILENAME, sql)
+                    exec_sql( sql)
                 elif ret == QMessageBox.Cancel:
                     pass
             except Exception as e:
@@ -422,16 +422,16 @@ class Ui_Settings(QtWidgets.QMainWindow):
                         ['username', '=',self.user_info['username']]
                     ]
                     sql = be_sql().update_sql(table, value_dict=value_dict, filter_list=filter_list)
-                    ret = exec_sql(config.LDB_FILENAME, sql,is_update=1)
+                    ret = exec_sql( sql,is_update=1)
                     # 更新失败，直接插入数据
                     if ret <= 0:
                         value_dict['username']=self.user_info['username']
                         sql = be_sql().ins_sql(table,value_dict)
-                        exec_sql(config.LDB_FILENAME, sql)
+                        exec_sql( sql)
                     self.email_list.currentItem().setText(self.email_le.text())
                     #清除无效配置数据
                     sql = "delete from Email_settings where password is NULL;"
-                    exec_sql(config.LDB_FILENAME, sql)
+                    exec_sql( sql)
                     self.set_data()
                 else:
                     QMessageBox.warning(self, ' ', '请输入密码', QMessageBox.Ok)
@@ -460,12 +460,12 @@ class Ui_Settings(QtWidgets.QMainWindow):
                 ['id', '=', str(self._email_records[self.email_list.currentRow()]['id'])]
             ]
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql(config.LDB_FILENAME, sql)
+            exec_sql( sql)
 
             value_dict['is_default'] = '0'
             filter_list[0][1] = '!='
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql(config.LDB_FILENAME, sql)
+            exec_sql( sql)
         else:
             QMessageBox.information(self, ' ', '请选择优先使用的邮箱', QMessageBox.Ok)
 
@@ -503,7 +503,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         table = 'Reminder'
         value_dict = {'time': '00:00:00', 'username': self.user_info['username']}
         sql = be_sql().ins_sql(table, value_dict)
-        exec_sql(config.LDB_FILENAME, sql)
+        exec_sql( sql)
         self.set_data()
 
     def _del_reminder_slot(self):
@@ -519,7 +519,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
                         ['id', '=', str(self._reminder_records[index]['id'])]
                     ]
                     sql = be_sql().del_sql(table, filter_list=filter_list)
-                    exec_sql(config.LDB_FILENAME, sql)
+                    exec_sql( sql)
                 elif ret == QMessageBox.Cancel:
                     pass
             except Exception as e:
@@ -592,7 +592,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
             filter_list[1][2] = str(ids[i])
             filter_list[2][2] = times[i]
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql(config.LDB_FILENAME, sql)
+            exec_sql( sql)
         pass
 
     # 优先级页的函数
@@ -606,7 +606,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # if tab_name == 'email_tab':
         # 去除无效email配置
         sql = "delete from Email_settings where password is NULL;"
-        exec_sql(config.LDB_FILENAME, sql)
+        exec_sql( sql)
         self._reset()
         # 保存当前顺序
 

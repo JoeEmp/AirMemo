@@ -21,9 +21,9 @@ def add_msg(filename, data):
                 if 'username' != k:
                     data[k] = cryptograph_text(v, k, user_name=data['username'])
             sql = be_sql().ins_sql('Msg', data)
-            exec_sql(filename, sql)
+            exec_sql(sql)
             logging.info('add records done')
-            return len(exec_sql(filename, 'select * from Msg')) - 1
+            return len(exec_sql('select * from Msg')) - 1
     except Exception as e:
         logging.error('add error ', ending='\t')
         logging.error(sql)

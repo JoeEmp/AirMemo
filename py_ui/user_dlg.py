@@ -5,10 +5,8 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
-
-import config
-from comm import operateSqlite, module, utils
-
+from comm import operateSqlite, utils, pubilc
+from module import login
 
 # 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
@@ -87,7 +85,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         QtCore.QMetaObject.connectSlotsByName(self)
         self.login_btn.clicked.connect(self.do_login)
-        self.register_btn.clicked.connect(self.do_register)
+        self.register_btn.clicked.connect(self.show_register_dlg)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -99,7 +97,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_login(self):
         if self.username_le.text() and self.password_le.text():
-            result = module.login(username=self.username_le.text(), password=self.password_le.text())
+            result = login.login(username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
             print(result)
             try:
@@ -108,20 +106,19 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                     if not utils.get_user_info(table, self.username_le.text()):
                         # 没有用户直接插入
                         dict = {'username': self.username_le.text(), 'token': result['token']}
-                        sql = operateSqlite.be_sql().ins_sql(table, dict)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+                        sql = "insert into user(username,token) values ('%s','%s');"
+                        operateSqlite.exec_sql( sql)
                         times = ['00:15:00', '00:30:00', '01:00:00']
                         for time in times:
-                            operateSqlite.exec_sql(config.LDB_FILENAME,
-                                                   "insert into Reminder(username,time) values ('%s','%s');" % (dict[
-                                                       'username'], time))
+                            operateSqlite.exec_sql(
+                                "insert into Reminder(username,time) values ('%s','%s');" % (dict['username'], time))
                     # 已有用户更新数据
                     else:
                         value_dict = {'token': result['token']}
                         filter_list = [['username', '=', self.username_le.text()]]
                         sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
                                                                 filter_list=filter_list)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
+                        operateSqlite.exec_sql( sql, is_update=1)
                     try:
                         # 发射信号
                         self.login_signal.emit(self.username_le.text())
@@ -138,7 +135,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         elif not self.password_le.text():
             QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
 
-    def do_register(self):
+    def show_register_dlg(self):
         ui = Ui_register_Dialog(self)
         ui.show()
 
@@ -202,7 +199,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        state = module.logout(self.username)
+        state = pubilc.logout(self.username)
         if state['state'] == 1:
             table = 'user'
             value_dict = {'token': 'NULL'}
@@ -211,7 +208,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             ]
             sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
             # print(sql)
-            operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
+            operateSqlite.exec_sql( sql, is_update=1)
             self.close()
             self.logout_signal.emit('visitor')
         else:
@@ -312,7 +309,7 @@ class Ui_register_Dialog(QtWidgets.QDialog):
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
                 self.password_le.text() == self.again_le.text()):
-            result = module.register(username=self.username_le.text(), password=self.again_le.text())
+            result = pubilc.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['state'] == 1:
                     self.close()

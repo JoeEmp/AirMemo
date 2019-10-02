@@ -46,7 +46,7 @@ def setApp(app):
 def get_user_info(table, username):
     filter_list = [['username', '=', username]]
     sql = be_sql().sel_sql(table, filter_list=filter_list)
-    return exec_sql(config.LDB_FILENAME, sql)
+    return exec_sql(sql)
 
 
 # 获取索引
@@ -65,7 +65,7 @@ def get_index(dict, keys):
 # 发送邮件
 def mail(info, title, recipients, content):
     # 获取授权密码
-    record = exec_sql(config.LDB_FILENAME,
+    record = exec_sql(
                       "select * from email_settings where username ='%s'" % info['username'])[0]
     password = record['password']
 

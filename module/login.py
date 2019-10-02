@@ -2,7 +2,8 @@ import config
 import requests
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import logging
-from comm .pubilc import check_login_state
+from comm.pubilc import check_login_state
+
 
 def login(username, password):
     '''
@@ -11,7 +12,7 @@ def login(username, password):
     :param password:
     :return:
     '''
-    url = '/api/login'
+    url = '/api/app/pc/login'
     headers = {
         'User-Agent': 'AirMemo'
     }
@@ -23,6 +24,7 @@ def login(username, password):
     except Exception as e:
         logging.warning(e)
         return {}
+
 
 def get_login_state():
     '''

@@ -24,7 +24,7 @@ def get_notes(filename, username='visitor', is_del='0'):
             filter_list.pop()
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
-        cur = exec_sql(filename, sql)
+        cur = exec_sql(sql)
         for c in cur:
             c['message'] = decrypt_text(c['message'], 'message', user_name=username)
             c['detail'] = decrypt_text(c['detail'], 'detail', user_name=username)
@@ -51,7 +51,7 @@ def update_notes(filename, data, ele, **kwargs):
             data[ele] = cryptograph_text(data[ele], ele, user_name=kwargs['user_name'])
             sql = be_sql().update_sql('Msg', {ele: data[ele], 'update_time': data['update_time']}, filter_list)
             print(sql)
-            cur = exec_sql(filename, sql)
+            cur = exec_sql(sql)
             logging.info('%s update No.%s record successfully!!!' % (ele, data['id']))
             return cur
     except Exception as e:
@@ -76,9 +76,9 @@ def add_notes(filename, data):
                 if 'username' != k:
                     data[k] = cryptograph_text(v, k, user_name=data['username'])
             sql = be_sql().ins_sql('Msg', data)
-            exec_sql(filename, sql)
+            exec_sql(sql)
             logging.info('add records done')
-            return len(exec_sql(filename, 'select * from Msg')) - 1
+            return len(exec_sql('select * from Msg')) - 1
     except Exception as e:
         logging.error('add error ', ending='\t')
         logging.error(sql)
@@ -105,7 +105,7 @@ def change_del_flag(filename, filter_list, is_del=1):
     sql = be_sql().update_sql(table=table, value_dict={'is_del': str(is_del)},
                               filter_list=filter_list)
     # print(sql)
-    return exec_sql(filename, sql, is_update=1)
+    return exec_sql(sql, is_update=1)
 
 
 def clear_notes(filename, sever_date):
@@ -116,7 +116,7 @@ def clear_notes(filename, sever_date):
     :return:
     '''
     try:
-        exec_sql(filename, ("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date))
+        exec_sql(("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date))
         logging.info('clear done')
     except Exception as e:
         print("clear error")
@@ -180,14 +180,14 @@ def get_login_state():
 def check_login_state():
     '''
     查找 本地 token非空的人
-    :return: 查询结果 结构[{'username':'','token':''}]
+    :return: 查询结果 结构[[{'username':'','token':''}],]
              无查询结果时 结构为[]
     '''
     table = 'user'
     need_col_list = ['username', 'token']
     filter_list = [['token', 'is not', 'NULL']]
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
-    return exec_sql(config.LDB_FILENAME, sql)
+    return exec_sql( sql)
 
 
 def logout(username):

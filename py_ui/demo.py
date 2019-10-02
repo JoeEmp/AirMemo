@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import QMessageBox
 
 from comm.operateSqlite import exec_sql
 import config
-from comm.module import get_cloud_notes, get_notes, server_error_msg
+from comm.pubilc import server_error_msg
+from module.note import get_cloud_notes, get_notes
 
 
 class Ui_Sync_Dialog(QtWidgets.QDialog):
@@ -182,7 +183,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         for id in ids:
             sql = "delete from msg where username = '%s' and id = %d" % (
                 self.user_info['username'], self.local_records[id.row()]['id'])
-            exec_sql(config.LDB_FILENAME, sql)
+            exec_sql( sql)
             self.local_list.takeItem(id.row())
 
 # if __name__ == "__main__":
