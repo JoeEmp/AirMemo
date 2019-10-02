@@ -151,10 +151,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
 
-        self.note_le_list = []
-        self.hide_detail_btn_list = []
-        self.detail_tx_list = []
-        self.detail_tx_state_list = []
+        self.note_le_list = list()
+        self.detail_tx_list = list()
+        self.detail_tx_state_list = list()
+        self.hide_detail_btn_list = list()
 
         for i in range(len(self.records)):
             self.noteLayout = QtWidgets.QGridLayout()
@@ -271,7 +271,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def ishide(self):
         '''
-        详情编辑框的展开和收起 暂未修复bug贴图转换
+        详情编辑框的展开和收起
         :return:
         '''
         index = self.hide_detail_btn_list.index(self.sender())
@@ -279,7 +279,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if 1 in self.detail_tx_state_list and self.detail_tx_state_list.index(
                 1) != index:
             self.detail_tx_list[self.detail_tx_state_list.index(1)].hide()
-            self.sender()
+            self.hide_detail_btn_list[self.detail_tx_state_list.index(1)].setStyleSheet(
+                'border-image:url(%s);' % config.LEFT_ICON)
             self.layoutHeight = self.layoutHeight - config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[self.detail_tx_state_list.index(1)] = 0
@@ -297,6 +298,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
             self.detail_tx_state_list[index] = 0
             self.sender().setStyleSheet('border-image:url(%s);' % config.LEFT_ICON)
+
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)
         self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
@@ -311,7 +313,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         id = re.findall('\d+', self.sender().objectName())[0]
         info = exec_sql(
-                        'select message,detail from Msg where id = %s' % id)[0]
+            'select message,detail from Msg where id = %s' % id)[0]
         # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
@@ -460,7 +462,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     未登录状态下创建登录窗口
         :return:
         '''
-        # login_dlg = QtWidgets.QDialog(self)
         # 检测登录状态
         result = get_login_state()
         # result['state'] = 1
@@ -525,7 +526,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
             dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
-            exec_sql( sql)
+            exec_sql(sql)
         return self.user_info['username']
 
     def update_tx_id(self, id):
