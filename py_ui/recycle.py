@@ -12,7 +12,7 @@ from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 import config
-# from comm import module
+from module import note
 
 
 class Ui_recycle_Dialog(QtWidgets.QDialog):
@@ -32,7 +32,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
         :param username:
         :return:
         '''
-        self.del_records = module.get_notes(config.LDB_FILENAME, username, is_del='1')
+        self.del_records = note.get_notes(config.LDB_FILENAME, username, is_del='1')
         self.records_len = len(self.del_records)
 
     def setupUi(self):
@@ -136,5 +136,6 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
             self.item_set.remove(id)
 
     def closeEvent(self, QCloseEvent):
-        self.updateSignal.emit(self.parent.user_info['username'])
+        if self.item_set:
+            self.updateSignal.emit(self.parent.user_info['username'])
         self.item_set.clear()

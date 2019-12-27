@@ -467,14 +467,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if result['status'] == 1:
             ui = Ui_login_Dialog(self)
             # ui.login_signal.connect(self.get_update_Signal)
-        elif result['status'] == 2:
+        elif result['status'] == 0:
             try:
-                ui = Ui_logout_Dialog(self, result['username'])
+                ui = Ui_logout_Dialog(self, self.user_info['username'])
             except Exception as e:
                 logging.error(e)
         else:
             QMessageBox.information(self, '提示', "{}".format(
-                result['errMsg']), QMessageBox.Yes)
+                result['msg']), QMessageBox.Yes)
             return -1
         if ui:
             ui.show()
@@ -543,9 +543,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if result['status'] == 0:
             try:
                 dlg = Ui_Sync_Dialog(parent=self)
-                dlg.updateSignal.connect(self.get_update_Signal)
             except Exception as e:
-                logging.warnings(e)
+                logging.warning(e)
                 QMessageBox.information(self, 'tips', "无法连接服务器", QMessageBox.Ok)
         else:
             QMessageBox.information(self, 'tips', result['msg'], QMessageBox.Ok)

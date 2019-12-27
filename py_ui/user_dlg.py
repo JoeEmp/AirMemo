@@ -6,7 +6,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
 from comm import operateSqlite, utils, pubilc
-from module import login
+from module import login,logout,register
+
 
 # 登录窗口
 class Ui_login_Dialog(QtWidgets.QDialog):
@@ -108,7 +109,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         # 没有用户直接插入
                         dict = {'username': self.username_le.text(), 'token': result['token']}
                         sql = "insert into user(username,token) values ('%s','%s');"
-                        operateSqlite.exec_sql( sql)
+                        operateSqlite.exec_sql(sql)
                         times = ['00:15:00', '00:30:00', '01:00:00']
                         for time in times:
                             operateSqlite.exec_sql(
@@ -119,7 +120,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         filter_list = [['username', '=', self.username_le.text()]]
                         sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
                                                                 filter_list=filter_list)
-                        operateSqlite.exec_sql( sql, is_update=1)
+                        operateSqlite.exec_sql(sql, is_update=1)
                     try:
                         # 发射信号
                         self.login_signal.emit(self.username_le.text())
@@ -127,7 +128,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         logging.error(e)
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
+                    QMessageBox.information(self, '提示', "{}".format(result['msg']),
                                             QMessageBox.Yes)
             except Exception as e:
                 logging.error(e)
@@ -201,8 +202,9 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
 
     def do_logout(self):
         # 请求登出
-        status = pubilc.logout(self.username)
-        if status['status'] == 1:
+        status = logout.logout(self.username)
+        print(status)
+        if status['status'] == 0:
             table = 'user'
             value_dict = {'token': 'NULL'}
             filter_list = [
@@ -210,7 +212,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             ]
             sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
             # print(sql)
-            operateSqlite.exec_sql( sql, is_update=1)
+            operateSqlite.exec_sql(sql, is_update=1)
             self.close()
             self.logout_signal.emit('visitor')
         else:
@@ -311,15 +313,15 @@ class Ui_register_Dialog(QtWidgets.QDialog):
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
                 self.password_le.text() == self.again_le.text()):
-            result = pubilc.register(username=self.username_le.text(), password=self.again_le.text())
+            result = register.register(username=self.username_le.text(), password=self.again_le.text())
             if result:
                 if result['status'] == 1:
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
+                    QMessageBox.information(self, '提示', "{}".format(result['msg']),
                                             QMessageBox.Yes)
             else:
-                QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+                QMessageBox.information(self, '提示', "{}".format(result['msg']), QMessageBox.Yes)
         elif not self.username_le.text():
             QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
         elif not self.password_le.text():

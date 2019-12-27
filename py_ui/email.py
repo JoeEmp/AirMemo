@@ -156,5 +156,5 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
             return True
         elif result['status'] == -1:
             self.send_btn.setEnabled(True)
-            QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Ok)
+            QMessageBox.information(self, '提示', "{}".format(result['msg']), QMessageBox.Ok)
             return True

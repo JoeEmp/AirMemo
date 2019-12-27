@@ -25,6 +25,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
         self.user_info = parent.user_info
         self.set_data(username=self.user_info['username'], token=self.user_info['token'])
         self.setupUi()
+        self.updateSignal.connect(parent.get_update_Signal)
         self.show()
 
     def setupUi(self):
@@ -167,7 +168,7 @@ class Ui_Sync_Dialog(QtWidgets.QDialog):
             self.cloud_records = get_cloud_notes(username, token)['list']
             print(self.cloud_records)
         except Exception as e:
-            QMessageBox.information(self.parent, 'tip', "{}".format(server_error_msg()['errMsg']), QMessageBox.Ok)
+            QMessageBox.information(self.parent, 'tip', "{}".format(server_error_msg(-1)['msg']), QMessageBox.Ok)
 
     # 备份按钮槽函数
     def sync_upload_slot(self):
