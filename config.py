@@ -9,6 +9,11 @@ logging.basicConfig(level=logging.WARNING, filename='log.txt', filemode='a',
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
 
+proxies = {
+    'http': 'http://0.0.0.0:8888/',
+    'https': 'https://0.0.0.0:8888/'
+}
+
 # 隐藏速度
 SPEED = 0.001
 
