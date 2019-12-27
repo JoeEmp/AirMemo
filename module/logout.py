@@ -2,7 +2,8 @@ import config
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
-from  comm.pubilc import check_login_status
+from comm.pubilc import check_login_status
+
 
 def logout(username):
     '''
@@ -14,14 +15,16 @@ def logout(username):
     logging.debug(result)
     try:
         if result:
-            url = '/api/logout'
+            url = '/api/AirMemo/pc/logout'
             headers = {
                 'User-Agent': 'AirMemo'
             }
             data = {'username': username, 'token': result[0]['token']}
             r = requests.post(protocol + user_host + url, headers=headers,
-                              data=data)
+                              data=data,
+                              proxies=config.proxies
+                              )
             return r.json()
     except Exception as e:
         logging.error(e)
-        return {'status': '-1'}
+        return {'status': '-2'}

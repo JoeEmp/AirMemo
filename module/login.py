@@ -1,8 +1,10 @@
 import config
 import requests
+
+from comm.operateSqlite import exec_sql, be_sql
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import logging
-from comm.pubilc import check_login_status
+import comm.pubilc as pubilc
 
 
 def login(username, password):
@@ -12,24 +14,16 @@ def login(username, password):
     :param password:
     :return:
     '''
-    url = '/api/AirMemo/pc/login'
-    headers = {
-        'User-Agent': 'AirMemo'
-    }
+    path = '/api/AirMemo/pc/login'
     # cryptograph_password()
     data = {'username': username, 'password': cryptograph_text(password, 'password')}
-    try:
-        r = requests.post(protocol + user_host + url, headers=headers, data=data)
-        return r.json()
-    except Exception as e:
-        logging.warning(e)
-        return {}
+    return pubilc.req_ser(path, data)
 
 
 def get_login_status():
     '''
     查询用户在 服务器 的登录状态
-    :return:
+    :return: {"status":,"msg":,"token":}
     '''
     # 检查本地token
     result = check_login_status()
@@ -39,21 +33,23 @@ def get_login_status():
     # 本地有token的用户去服务器校验
     else:
         try:
-            url = '/api/AirMemo/pc/check_login'
-            headers = {
-                'User-Agent': 'AirMemo'
-            }
+            path = '/api/AirMemo/pc/check_login'
             data = result[0]
-            r = requests.post(protocol + user_host + url, headers=headers,
-                              data=data)
+            r = pubilc.req_ser(path, data)
         except Exception as e:
             logging.error(e)
-            return {'status': -1, 'errMsg': '无法连接服务器'}
-        try:
-            # print(r)
-            status = r.json()
-        except Exception as e:
-            logging.error(e)
-            return {'status': -1, 'errMsg': '接口返回数据出错-%s' % r.status_code}
-    # print(status)
-    return status
+            return {'status': -1, 'msg': '未知错误'}
+    return r
+
+
+def check_login_status():
+    '''
+    查找 本地 token非空的人
+    :return: 查询结果 结构[[{'username':'','token':''}],]
+             无查询结果时 结构为[]
+    '''
+    table = 'user'
+    need_col_list = ['username', 'token']
+    filter_list = [['token', 'is not', 'NULL']]
+    sql = be_sql().sel_sql(table, need_col_list, filter_list)
+    return exec_sql(sql)

@@ -3,7 +3,7 @@ import config
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
-from comm.pubilc import server_error_msg
+import comm.pubilc as pubilc
 
 
 def get_notes(filename, username='visitor', is_del='0'):
@@ -112,14 +112,6 @@ def get_cloud_notes(username, token):
     :param token:   token str
     :return: 响应
     '''
-    url = '/api/AirMemo/pc/cloud_page'
-    headers = {
-        'User-Agent': 'AirMemo'
-    }
+    path = '/api/AirMemo/pc/cloud_page'
     data = {'username': username, 'token': token, 'page_id': '1', 'page_size': '5000'}
-    r = requests.post(protocol + user_host + url, headers=headers, data=data)
-    try:
-        return r.json()
-    except Exception as e:
-        logging.warning(e)
-        return server_error_msg()
+    pubilc.req_ser(path, data)

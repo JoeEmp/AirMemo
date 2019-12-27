@@ -33,63 +33,6 @@ def get_notes(filename, username='visitor', is_del='0'):
         return []
     return cur
 
-
-def update_notes(filename, data, ele, **kwargs):
-    '''
-    更新内容
-    :param filename:
-    :param data:
-    :param ele: 元素(如 'msg','detail')
-    :return:
-    '''
-    try:
-        if data['id'] != -1:
-            filter_list = [
-                ['id', '=', str(data['id'])]
-            ]
-            # 加密
-            data[ele] = cryptograph_text(data[ele], ele, user_name=kwargs['user_name'])
-            sql = be_sql().update_sql('Msg', {ele: data[ele], 'update_time': data['update_time']}, filter_list)
-            print(sql)
-            cur = exec_sql(sql)
-            logging.info('%s update No.%s record successfully!!!' % (ele, data['id']))
-            return cur
-    except Exception as e:
-        print('update error')
-        print(e)
-        return None
-
-
-def add_notes(filename, data):
-    '''
-    添加数据 更改会影响 增加逻辑 延后重构 wrb
-    :param filename: sqlit3文件名
-    :param data:  dict {'id':-1,'{ele}':'','ussername':''}
-    :return:
-    '''
-    sql = ''
-    try:
-        if data['id'] == -1:
-            del data['id']
-            #
-            for k, v in data.items():
-                if 'username' != k:
-                    data[k] = cryptograph_text(v, k, user_name=data['username'])
-            sql = be_sql().ins_sql('Msg', data)
-            exec_sql(sql)
-            logging.info('add records done')
-            return len(exec_sql('select * from Msg')) - 1
-    except Exception as e:
-        logging.error('add error ', ending='\t')
-        logging.error(sql)
-        print(e)
-        return -1
-
-
-def delete_notes(filename, filter_list):
-    return change_del_flag(filename, filter_list)
-
-
 def restore_note(filename, filter_list):
     return change_del_flag(filename, filter_list, is_del=0)
 
@@ -137,7 +80,7 @@ def login(username, password):
     # cryptograph_password()
     data = {'username': username, 'password': cryptograph_text(password, 'password')}
     try:
-        r = requests.post(protocol + user_host + url, headers=headers, data=data)
+        r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
         return r.json()
     except Exception as e:
         logging.warning(e)
@@ -162,17 +105,16 @@ def get_login_status():
                 'User-Agent': 'AirMemo'
             }
             data = result[0]
-            r = requests.post(protocol + user_host + url, headers=headers,
-                              data=data)
+            r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
         except Exception as e:
             logging.error(e)
-            return {'status': -1, 'errMsg': '无法连接服务器'}
+            return {'status': -1, 'msg': '无法连接服务器'}
         try:
             # print(r)
             status = r.json()
         except Exception as e:
             logging.error(e)
-            return {'status': -1, 'errMsg': '接口返回数据出错-%s' % r.status_code}
+            return {'status': -1, 'msg': '接口返回数据出错-%s' % r.status_code}
     # print(status)
     return status
 
@@ -187,7 +129,7 @@ def check_login_status():
     need_col_list = ['username', 'token']
     filter_list = [['token', 'is not', 'NULL']]
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
-    return exec_sql( sql)
+    return exec_sql(sql)
 
 
 def logout(username):
@@ -206,7 +148,9 @@ def logout(username):
             }
             data = {'username': username, 'token': result[0]['token']}
             r = requests.post(protocol + user_host + url, headers=headers,
-                              data=data)
+                              data=data,
+                              proxies=config.proxies
+                              )
             return r.json()
     except Exception as e:
         logging.error(e)
@@ -225,7 +169,7 @@ def register(username, password):
         'User-Agent': 'AirMemo'
     }
     data = {'username': username, 'password': password}
-    r = requests.post(protocol + user_host + url, headers=headers, data=data)
+    r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
     try:
         return r.json()
     except Exception as e:
@@ -258,7 +202,7 @@ def get_cloud_notes(username, token):
         'User-Agent': 'AirMemo'
     }
     data = {'username': username, 'token': token, 'page_id': '1', 'page_size': '5000'}
-    r = requests.post(protocol + user_host + url, headers=headers, data=data)
+    r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
     try:
         return r.json()
     except Exception as e:
@@ -266,5 +210,29 @@ def get_cloud_notes(username, token):
         return server_error_msg()
 
 
-def server_error_msg():
-    return {"status": -1, "errMsg": "服务端异常"}
+def server_error_msg(code):
+    return {"status": -1, "msg": "%s - 服务端异常" % code}
+
+
+def req_ser(path, data=None, headers=None):
+    '''
+    集成了接口的返回错误处理，和网络问题
+    :param path:    路径如 '/api/cloud_page'
+    :param data:
+    :param headers: 不传入默认使用 { 'User-Agent': 'AirMemo' }
+    :return:
+    '''
+    if not headers:
+        headers = {
+            'User-Agent': 'AirMemo'
+        }
+    try:
+        r = requests.post(protocol + user_host + path, headers=headers, data=data,proxies=config.proxies)
+    except Exception as e:
+        logging.error(e)
+        return {'status': -1, 'msg': '无法连接服务器'}
+    try:
+        return r.json()
+    except Exception as e:
+        logging.warning(e)
+        return server_error_msg(r.status_code)
