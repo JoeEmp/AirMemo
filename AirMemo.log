@@ -107,3 +107,54 @@
 2020-09-04 16:05:21,283 INFO settings.py set_data data init end
 2020-09-04 16:05:33,272 INFO settings.py set_data data init end
 2020-11-10 17:32:11,879 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:22:46,934 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:23:14,998 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:23:14,999 ERROR note.py get_notes name 'exec_sql' is not defined
+2020-11-10 18:27:58,827 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:27:58,832 ERROR note.py get_notes string indices must be integers
+2020-11-10 18:32:44,123 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:32:44,129 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:32:44,130 INFO main_win.py setData set data
+2020-11-10 18:32:44,567 INFO settings.py __init__ init begin
+2020-11-10 18:32:44,569 INFO settings.py set_data data init end
+2020-11-10 18:32:48,223 INFO user_dlg.py __init__ __init__
+2020-11-10 18:32:48,227 INFO user_dlg.py __init__ end init
+2020-11-10 18:32:51,990 INFO user_dlg.py __init__ __init__
+2020-11-10 18:32:51,992 INFO user_dlg.py __init__ end init
+2020-11-10 18:32:54,879 INFO user_dlg.py __init__ __init__
+2020-11-10 18:32:54,881 INFO user_dlg.py __init__ end init
+2020-11-10 18:38:56,654 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:38:56,660 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:38:56,660 INFO main_win.py setData set data
+2020-11-10 18:38:56,877 INFO settings.py __init__ init begin
+2020-11-10 18:38:56,881 INFO settings.py set_data data init end
+2020-11-10 18:40:45,320 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:40:45,324 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:40:45,324 INFO main_win.py setData set data
+2020-11-10 18:40:45,650 INFO settings.py __init__ init begin
+2020-11-10 18:40:45,655 INFO settings.py set_data data init end
+2020-11-10 18:40:48,309 INFO user_dlg.py __init__ __init__
+2020-11-10 18:40:48,312 INFO user_dlg.py __init__ end init
+2020-11-10 18:41:36,891 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:41:36,893 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:41:36,893 INFO main_win.py setData set data
+2020-11-10 18:41:37,027 INFO settings.py __init__ init begin
+2020-11-10 18:41:37,029 INFO settings.py set_data data init end
+2020-11-10 18:41:38,975 INFO user_dlg.py __init__ __init__
+2020-11-10 18:41:38,978 INFO user_dlg.py __init__ end init
+2020-11-10 18:46:22,681 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:46:22,685 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:46:22,685 INFO main_win.py setData set data
+2020-11-10 18:46:22,874 INFO settings.py __init__ init begin
+2020-11-10 18:46:22,877 INFO settings.py set_data data init end
+2020-11-10 18:46:27,832 INFO user_dlg.py __init__ __init__
+2020-11-10 18:46:27,837 INFO user_dlg.py __init__ end init
+2020-11-10 18:46:51,760 INFO main_win.py __init__ mainwindow init
+2020-11-10 18:46:51,762 WARNING main_win.py setData 'Ui_MainWindow' object has no attribute 'detail_tx_status_list'
+2020-11-10 18:46:51,762 INFO main_win.py setData set data
+2020-11-10 18:46:51,902 INFO settings.py __init__ init begin
+2020-11-10 18:46:51,904 INFO settings.py set_data data init end
+2020-11-10 18:46:54,597 INFO user_dlg.py __init__ __init__
+2020-11-10 18:46:54,599 INFO user_dlg.py __init__ end init
+2020-11-10 18:47:16,737 INFO user_dlg.py __init__ __init__
+2020-11-10 18:47:16,739 INFO user_dlg.py __init__ end init

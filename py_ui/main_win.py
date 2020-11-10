@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file './ui\demo.ui'
-#
-# Created by: PyQt5 ui code generator 5.10
-#
-# WARNING! All changes made in this file will be lost!
-
-# 有注释部分基本为生成后的作者插入代码的注释
-
 import logging
 import re
 from time import sleep
@@ -27,6 +17,7 @@ from comm.utils import getSize, cryptograph_text
 import sip
 import platform
 from comm.user_cache import mine
+from module.note import get_notes
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):

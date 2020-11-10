@@ -23,15 +23,9 @@ def get_notes(filename, username='visitor', is_del='0'):
             filter_list.pop()
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
-        cur = exec_sql(sql)
-        for c in cur:
-            c['message'] = decrypt_text(c['message'], 'message', user_name=username)
-            c['detail'] = decrypt_text(c['detail'], 'detail', user_name=username)
+        return sqlite_db.select(sql)
     except Exception as e:
-        logging.error(e)
-        return []
-    return cur
-
+        print(e)
 
 def update_notes(data, ele, **kwargs):
     '''

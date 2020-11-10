@@ -4,11 +4,12 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QMessageBox, QLineEdit
+from PyQt5.QtWidgets import QLineEdit
 from comm import operateSqlite, utils
 from module import login, logout, register
 from comm.user_cache import mine
 from comm.operateSqlite import sqlite_db, be_sql
+from py_ui.toast import Toast
 
 
 # 登录窗口
@@ -136,16 +137,13 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         logging.error(e)
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['msg']),
-                                            QMessageBox.Yes)
+                    Toast(self).show_toast("{}".format(result['msg']))
             except Exception as e:
                 logging.error(e)
         elif not self.username_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
+            Toast(self).show_toast("请输入账号")
         elif not self.password_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
+            Toast(self).show_toast("请输入密码")
 
     def show_register_dlg(self):
         ui = Ui_register_Dialog(self)
@@ -226,8 +224,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
             self.close()
             self.logout_signal.emit('visitor')
         else:
-            QMessageBox.information(self, '提示', "{}".format(
-                '请检查数据库文件和网络状态'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请检查数据库文件和网络状态'))
 
 
 # 注册窗口
@@ -329,17 +326,12 @@ class Ui_register_Dialog(QtWidgets.QDialog):
             if 0 == result['status']:
                 self.close()
             else:
-                QMessageBox.information(self, '提示', "{}".format(
-                    result['msg']), QMessageBox.Yes)
+                Toast(self).show_toast("{}".format(result['msg']))
         elif not self.username_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请输入账号'))
         elif not self.password_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请输入密码'))
         elif not self.again_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('请再次确认密码'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请再次确认密码'))
         elif self.password_le.text() != self.again_le.text():
-            QMessageBox.information(
-                self, '提示', "{}".format('两次输入的密码不相同'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('两次输入的密码不相同'))
