@@ -1,10 +1,18 @@
+'''
+@Author: your name
+@Date: 2019-09-01 17:23:03
+@LastEditTime: 2019-12-30 10:42:24
+@LastEditors: your name
+@Description: In User Settings Edit
+@FilePath: /AirMemoServer/Users/joe/Documents/git_repo/github/AirMemo/main.py
+'''
 import sys
+from comm.operateSqlite import link_db
 from py_ui.AirTray import AirTray
 from py_ui.main_win import *
 from py_ui.settings import *
 from comm.utils import setApp
 from PyQt5.QtNetwork import QLocalServer, QLocalSocket
-from comm.operateSqlite import link_db
 import config
 from comm.user_cache import mine
 
@@ -36,9 +44,6 @@ def main():
         sys.exit(app.exec_())
     finally:
         localServer.close()
-
-
-
 
 if __name__ == '__main__':
     main()

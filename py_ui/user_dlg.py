@@ -5,7 +5,7 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QLineEdit
-from comm import operateSqlite, utils, pubilc
+from comm import operateSqlite, utils
 from module import login, logout, register
 from comm.user_cache import mine
 from comm.operateSqlite import sqlite_db, be_sql
@@ -127,7 +127,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         filter_list = [
                             ['username', '=', self.username_le.text()]]
                         sql = be_sql().update_sql(table=table, value_dict=value_dict,
-                                                                filter_list=filter_list)
+                                                  filter_list=filter_list)
                         sqlite_db.transaction(sql, is_update=1)
                     try:
                         # 发射信号
@@ -326,12 +326,8 @@ class Ui_register_Dialog(QtWidgets.QDialog):
                 self.password_le.text() == self.again_le.text()):
             result = register.register(username=self.username_le.text(
             ), password=self.password_le.text(), again_pwd=self.password_le.text())
-            if result:
-                if result['status'] == 0:
-                    self.close()
-                else:
-                    QMessageBox.information(self, '提示', "{}".format(result['msg']),
-                                            QMessageBox.Yes)
+            if 0 == result['status']:
+                self.close()
             else:
                 QMessageBox.information(self, '提示', "{}".format(
                     result['msg']), QMessageBox.Yes)
@@ -346,4 +342,4 @@ class Ui_register_Dialog(QtWidgets.QDialog):
                 self, '提示', "{}".format('请再次确认密码'), QMessageBox.Yes)
         elif self.password_le.text() != self.again_le.text():
             QMessageBox.information(
-                self, '提示', "{}".format('两次密码不正确'), QMessageBox.Yes)
+                self, '提示', "{}".format('两次输入的密码不相同'), QMessageBox.Yes)

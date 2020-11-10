@@ -149,33 +149,29 @@ class be_sql(object):
             s_filter = s_filter[:-4] + ';'
             return 'delete from %s where %s' % (table, s_filter)
 
-
-def exec_sql(sql, is_update=None):
-    '''
-    :param filename: 文件名(含路径) str
-    :param sql: 需要执行的sql str
-    :param is_update: 默认为空返回全部，传入其他返回影响行数。如果是行数我会直接传'count'
-    :except:  返回 None
-    :return:  fetchall
-    '''
-    c = sqlite_db.cursor()
-    try:
-        cur = c.execute(sql)
-        sqlite_db.commit()
-    except Exception as e:
-        logging.error(e)
-        return None
-    if not is_update:
-        return cur.fetchall()
-    else:
-        return cur.rowcount
-
+def exec_sql(sql):
+    AirDataBase.select(sql)
 
 class BaseDataBase(object):
     def __init__(self):
         self.db = None
 
     def select(self, sql: str, params=None, just_first=False):
+        """[summary]
+
+        Args:
+            sql (str): [description]
+            params ([type], optional): [description]. Defaults to None.
+            just_first (bool, optional): [description]. Defaults to False.
+
+        Returns:
+            [type]: [description]
+
+        Case:
+            sql = 'update table set col = :col'
+            params = {'col':value}
+            ret = db.transaction(sql,params)
+        """
         conn = self.db.get_connection()
         ret = dict(status=False)
         if 'create table' in sql.lower():
@@ -192,14 +188,26 @@ class BaseDataBase(object):
         ret['status'] = True
         return ret
 
-    def transaction(self, sql, params=None):
+    def transaction(self, sql:str, params=None):
+        """for inseart or update sql. """
         if params:
             return self.transactions([sql], [params])
         else:
             return self.transactions([sql])
 
     def transactions(self, sqls: list, multiparams=None):
-        """ 同records实现 """
+        """ 同records实现 
+        case 
+        sqls = [
+            'update table set col1 = :col1',
+            'update table set col2 = :col2,col3 = :col3'
+        ]
+        multiparams = [
+            {'col1':value1},
+            {'col2':value2,'col3':value3}
+        ]
+        db.transaction(sql,params)
+        """
         conn = self.db.get_connection()
         transaction = conn.transaction()
         try:

@@ -20,5 +20,4 @@ class user_cache(object):
     def update_item(self, key, value):
         self.cache[key] = value
 
-
 mine = user_cache()

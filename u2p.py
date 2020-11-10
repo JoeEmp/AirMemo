@@ -1,3 +1,11 @@
+'''
+@Author: your name
+@Date: 2019-08-08 10:33:50
+@LastEditTime: 2019-12-25 21:00:38
+@LastEditors: your name
+@Description: In User Settings Edit
+@FilePath: /AirMemoServer/Users/joe/Documents/git_repo/github/AirMemo/u2p.py
+'''
 # 将UI目录下的所有.ui文件转化换为.py文件
 import os
 import subprocess
@@ -57,7 +65,7 @@ if __name__ == "__main__":
     findUI(ulist)
     # print(ulist)
     # 只转化指定文件
-    sub_ulist = ['UI/sync.ui']
+    sub_ulist = ['UI/new_recycle.ui']
     if sub_ulist:
         translation(sub_ulist)
     else:

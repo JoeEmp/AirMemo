@@ -1,10 +1,9 @@
 import config
 import requests
 
-from comm.operateSqlite import exec_sql, be_sql
-from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
+from comm.operateSqlite import be_sql,sqlite_db
+from comm.utils import cryptograph_text, decrypt_text
 import logging
-import comm.pubilc as pubilc
 
 
 def login(username, password):
@@ -52,4 +51,7 @@ def check_login_status():
     need_col_list = ['username', 'token']
     filter_list = [['token', 'is not', 'NULL']]
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
-    return exec_sql(sql)
+    ret = sqlite_db.select(sql)
+    if not ret['status']:
+        logging.error(ret['msg'])
+    return ret.get('records',list())

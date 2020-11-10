@@ -1,12 +1,11 @@
-from comm.operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql,sqlite_db
 import config
-from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
+from comm.utils import cryptograph_text, user_host, decrypt_text
 import requests
 import logging
-import comm.pubilc as pubilc
 
 
-def get_notes(filename, username='visitor', is_del='0'):
+def get_notes(filename, username='visitor', is_del='0'):    
     '''
     查询当前用户的笔记
     :param filename: sqlite3文件名
@@ -101,7 +100,7 @@ def change_del_flag(filename, filter_list, is_del=1):
     sql = be_sql().update_sql(table=table, value_dict={'is_del': str(is_del)},
                               filter_list=filter_list)
     # print(sql)
-    return exec_sql(sql, is_update=1)
+    return sqlite_db.transaction(sql)
 
 
 # 获取用户云端的数据

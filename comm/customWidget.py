@@ -33,14 +33,18 @@ class AirLineEdit(QLineEdit):
         :param info: 用户信息 {'username':'','token':''}
         :return: None
         '''
-        sql = "select time from reminder where username = '%s'  order by sequence limit 3" % info['username']
-        self.times = exec_sql(sql)
+        sql = "select time from reminder where username = '%s'  order by sequence limit 3" % info[
+            'username']
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self.times = ret['records'] if 'records' in ret.keys() else list()
         return None
 
     def createContextMenu(self):
         ''' 
-        创建右键菜单，菜单的数量没有办法动态控制，wrb
-        '''
+                创建右键菜单，菜单的数量没有办法动态控制，wrb
+                '''
         #  必须将ContextMenuPolicy设置为Qt.CustomContextMenu  
         #  否则无法使用customContextMenuRequested信号  
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -55,9 +59,12 @@ class AirLineEdit(QLineEdit):
         self.act_undo = QAction('撤销', triggered=self.undo)
         self.act_selall = QAction('全选', triggered=self.selectAll)
         self.act_del = QAction('删除该消息', triggered=self.delete_note)
-        self.set_reminder0 = QAction(self.times[0]['time'], triggered=self.set_time)
-        self.set_reminder1 = QAction(self.times[1]['time'], triggered=self.set_time)
-        self.set_reminder2 = QAction(self.times[2]['time'], triggered=self.set_time)
+        self.set_reminder0 = QAction(
+            self.times[0]['time'], triggered=self.set_time)
+        self.set_reminder1 = QAction(
+            self.times[1]['time'], triggered=self.set_time)
+        self.set_reminder2 = QAction(
+            self.times[2]['time'], triggered=self.set_time)
 
         self.contextMenu.addAction(self.act_copy)
         self.contextMenu.addAction(self.act_paste)
@@ -70,8 +77,8 @@ class AirLineEdit(QLineEdit):
 
     def showContextMenu(self, pos):
         ''' 
-        右键点击时调用的函数 
-        '''
+                右键点击时调用的函数 
+                '''
         #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(95, 20) 20为微调结果
         self.contextMenu.move(pos + self.main_win.pos() + QPoint(95, 20))
         # logging.info(pos+self.main_win.pos()+QPoint(95,20))
@@ -97,7 +104,8 @@ class AirLineEdit(QLineEdit):
             ['id', '=', id]
         ]
         if delete_notes(config.LDB_FILENAME, filter_list=filter_list) == 0:
-            QMessageBox.information(self, '提示', {}.format('无法删除空数据'), QMessageBox.Ok)
+            QMessageBox.information(
+                self, '提示', {}.format('无法删除空数据'), QMessageBox.Ok)
         else:
             # 期望不删除预设数据 未实现 wrb
             self.__lineSignal.emit(self.main_win.user_info['username'], 0)
@@ -131,7 +139,8 @@ class AirLineEdit(QLineEdit):
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
             data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
-            update_notes(data, 'message', user_name=self.main_win.user_info['username'])
+            update_notes(data, 'message',
+                         user_name=self.main_win.user_info['username'])
         self.setStyleSheet("background:#%s" % self.color)
 
 
@@ -166,7 +175,8 @@ class AirTextEdit(QTextEdit):
         # 更新数据库
         if data['detail'] != self.__eld_text:
             data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
-            update_notes(data, 'detail', user_name=self.main_win.user_info['username'])
+            update_notes(data, 'detail',
+                         user_name=self.main_win.user_info['username'])
         self.setStyleSheet('background:#%s' % self.color)
 
 
@@ -210,19 +220,3 @@ class color_sider(QSlider):
         painter.setPen(Qt::transparent)
         painter.drawRect(100, 100, 100, 100)
 '''
-
-
-class Toast(QDialog):
-
-    def __init__(self, parent=None, text='Toast'):
-        super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint)  # 无边框
-        self.setStyleSheet('QDialog{border-top-left-radius:15px;border-top-right-radius:15px;}')  # 圆角
-        self.label = QLabel(text)
-
-    def show(self):
-        # self.move(self.x() - 20, self.y())
-        super().show()
-        self.raise_()
-        time.sleep(1)
-        self.close()

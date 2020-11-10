@@ -32,10 +32,16 @@ class Ui_Settings(QtWidgets.QMainWindow):
             ['username', '=', self.user_info['username']]
         ]
         sql = be_sql().sel_sql(table=table, filter_list=filter_list)
-        self._email_records = exec_sql(sql)
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self._email_records = ret['records'] if 'records' in ret.keys() else list()
         # 获取Reminder表数据
         sql = sql.replace(table, 'Reminder') + 'order by sequence'
-        self._reminder_records = exec_sql(sql)
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self._reminder_records = ret['records'] if 'records' in ret.keys() else list()
         # print(self._reminder_records)
         logging.info('data init end')
 
@@ -606,7 +612,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # if tab_name == 'email_tab':
         # 去除无效email配置
         sql = "delete from Email_settings where password is NULL;"
-        exec_sql( sql)
+        sqlite_db.transaction(sql)
         self._reset()
         # 保存当前顺序
 

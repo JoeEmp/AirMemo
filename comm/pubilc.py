@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QWidget
-from comm.operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql, sqlite_db
 import config
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
 
 
-def get_notes(filename, username='visitor', is_del='0'):
+def get_notes(username='visitor', is_del='0'):
     '''
     查询当前用户的笔记
     :param filename: sqlite3文件名
@@ -24,20 +24,23 @@ def get_notes(filename, username='visitor', is_del='0'):
             filter_list.pop()
         sql = be_sql().sel_sql(table, filter_list=filter_list)
         # print(sql)
-        cur = exec_sql(sql)
-        for c in cur:
-            c['message'] = decrypt_text(c['message'], 'message', user_name=username)
-            c['detail'] = decrypt_text(c['detail'], 'detail', user_name=username)
+        ret = sqlite_db.select(sql)
+        if ret['status']:
+            for record in ret['records']:
+                record['message'] = decrypt_text(
+                    record['message'], 'message', user_name=username)
+                record['detail'] = decrypt_text(
+                    record['detail'], 'detail', user_name=username)
     except Exception as e:
         logging.error(e)
-        return []
-    return cur
-
-def restore_note(filename, filter_list):
-    return change_del_flag(filename, filter_list, is_del=0)
+    return ret
 
 
-def change_del_flag(filename, filter_list, is_del=1):
+def restore_note(filter_list):
+    return change_del_flag(filter_list, is_del=0)
+
+
+def change_del_flag(filter_list, is_del=1):
     '''
     软删除数据
     :param filename:
@@ -48,7 +51,7 @@ def change_del_flag(filename, filter_list, is_del=1):
     sql = be_sql().update_sql(table=table, value_dict={'is_del': str(is_del)},
                               filter_list=filter_list)
     # print(sql)
-    return exec_sql(sql, is_update=1)
+    return sqlite_db.transaction(sql)
 
 
 def clear_notes(filename, sever_date):
@@ -59,7 +62,8 @@ def clear_notes(filename, sever_date):
     :return:
     '''
     try:
-        exec_sql(("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date))
+        sqlite_db.transaction(
+            ("delete from Msg where del_time<strftime('yyyy-mm-dd',%s);" % sever_date))
         logging.info('clear done')
     except Exception as e:
         print("clear error")
@@ -78,13 +82,15 @@ def login(username, password):
         'User-Agent': 'AirMemo'
     }
     # cryptograph_password()
-    data = {'username': username, 'password': cryptograph_text(password, 'password')}
+    data = {'username': username,
+            'password': cryptograph_text(password, 'password')}
     try:
-        r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
+        r = requests.post(protocol + user_host + url,
+                          headers=headers, data=data, proxies=config.proxies)
         return r.json()
     except Exception as e:
         logging.warning(e)
-        return {}
+        return dict()
 
 
 def get_login_status():
@@ -105,7 +111,8 @@ def get_login_status():
                 'User-Agent': 'AirMemo'
             }
             data = result[0]
-            r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
+            r = requests.post(protocol + user_host + url,
+                              headers=headers, data=data, proxies=config.proxies)
         except Exception as e:
             logging.error(e)
             return {'status': -1, 'msg': '无法连接服务器'}
@@ -129,7 +136,8 @@ def check_login_status():
     need_col_list = ['username', 'token']
     filter_list = [['token', 'is not', 'NULL']]
     sql = be_sql().sel_sql(table, need_col_list, filter_list)
-    return exec_sql(sql)
+    logging.warning('sql_lite {}'.format(sqlite_db))
+    return sqlite_db.select(sql, just_first=True)
 
 
 def logout(username):
@@ -169,7 +177,8 @@ def register(username, password):
         'User-Agent': 'AirMemo'
     }
     data = {'username': username, 'password': password}
-    r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
+    r = requests.post(protocol + user_host + url,
+                      headers=headers, data=data, proxies=config.proxies)
     try:
         return r.json()
     except Exception as e:
@@ -201,8 +210,10 @@ def get_cloud_notes(username, token):
     headers = {
         'User-Agent': 'AirMemo'
     }
-    data = {'username': username, 'token': token, 'page_id': '1', 'page_size': '5000'}
-    r = requests.post(protocol + user_host + url, headers=headers, data=data,proxies=config.proxies)
+    data = {'username': username, 'token': token,
+            'page_id': '1', 'page_size': '5000'}
+    r = requests.post(protocol + user_host + url,
+                      headers=headers, data=data, proxies=config.proxies)
     try:
         return r.json()
     except Exception as e:
@@ -210,8 +221,13 @@ def get_cloud_notes(username, token):
         return server_error_msg()
 
 
-def server_error_msg(code):
-    return {"status": -1, "msg": "%s - 服务端异常" % code}
+def server_error_msg(code=-1, e=None):
+    ret = {'status': -1}
+    if issubclass(TimeoutError, e):
+        ret['msg'] = '返回超时'
+    else:
+        ret['msg'] = "%s - 服务端异常" % code
+    return ret
 
 
 def req_ser(path, data=None, headers=None):
@@ -227,7 +243,8 @@ def req_ser(path, data=None, headers=None):
             'User-Agent': 'AirMemo'
         }
     try:
-        r = requests.post(protocol + user_host + path, headers=headers, data=data,proxies=config.proxies)
+        r = requests.post(protocol + user_host + path,
+                          headers=headers, data=data, proxies=config.proxies)
     except Exception as e:
         logging.error(e)
         return {'status': -1, 'msg': '无法连接服务器'}

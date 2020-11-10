@@ -1,4 +1,3 @@
-from comm.pubilc import check_login_status
 from comm.user_cache import mine
 from module.note import get_notes
 import config

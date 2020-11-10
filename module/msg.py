@@ -1,9 +1,8 @@
-from comm.operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql, exec_sql,
 import config
 from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
 import requests
 import logging
-
 
 def add_msg(filename, data):
     '''

@@ -107,7 +107,7 @@ class Ui_recycle_Dialog(QtWidgets.QDialog):
                 filter_list = [
                     ['id', '=', str(self.del_records[i]['id'])]
                 ]
-                module.restore_note(config.LDB_FILENAME, filter_list)
+                module.restore_note(filter_list)
                 self.listWidget.takeItem(i)
         self.reset()
 

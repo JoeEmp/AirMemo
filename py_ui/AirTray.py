@@ -2,8 +2,8 @@ import logging
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-from comm.pubilc import check_login_status
 from comm.user_cache import mine
+from module.login import check_login_status
 
 
 class AirTray(QSystemTrayIcon):
@@ -64,10 +64,7 @@ class AirTray(QSystemTrayIcon):
         检测登录用户的信息
         :return:
         '''
-        ret = check_login_status()
-        if not ret['status']:
-            logging.error(ret['msg'])
-        result = ret['records'] if 'records' in ret.keys() else list()
+        result = check_login_status()
         if result:
             return result[0]
         else:

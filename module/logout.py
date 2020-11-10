@@ -1,8 +1,7 @@
 import config
-from comm.utils import cryptograph_text, protocol, user_host, decrypt_text
+from comm.utils import cryptograph_text, decrypt_text
 import requests
 import logging
-from comm.pubilc import check_login_status
 
 
 def logout(username):
