@@ -4,54 +4,36 @@ import requests
 from comm.operateSqlite import be_sql,sqlite_db
 from comm.utils import cryptograph_text, decrypt_text
 import logging
+from comm.net import url,air_api
 
-
-def login(username, password):
-    '''
-    客户端登录请求
-    :param username:
-    :param password:
-    :return:
-    '''
-    path = '/api/AirMemo/pc/login'
+@url('/api/AirMemo/pc/login')
+def login(url,username, password,*args,**kwargs):
+    """request login api """
     # cryptograph_password()
     data = {'username': username, 'password': cryptograph_text(password, 'password')}
-    return pubilc.req_ser(path, data)
+    return air_api().post(url, data=data)
 
+@url('/api/AirMemo/pc/check_login')
+def check_login(url,username, token,*args,**kwargs):
+    data = {
+        "username":username,
+        "token":token
+    }
+    return air_api().post(url, data=data)
 
+@url('/api/AirMemo/pc/check_login')
 def get_login_status():
-    '''
-    查询用户在 服务器 的登录状态
-    :return: {"status":,"msg":,"token":}
-    '''
-    # 检查本地token
-    result = check_login_status()
-    # 本地无用户登录
+    """check login status. """
+    result = check_local_status()
     if not result:
         return {'status': 1}
-    # 本地有token的用户去服务器校验
     else:
-        try:
-            path = '/api/AirMemo/pc/check_login'
-            data = result[0]
-            r = pubilc.req_ser(path, data)
-        except Exception as e:
-            logging.error(e)
-            return {'status': -1, 'msg': '未知错误'}
-    return r
+        return check_login(**result)
 
-
-def check_login_status():
-    '''
-    查找 本地 token非空的人
-    :return: 查询结果 结构[[{'username':'','token':''}],]
-             无查询结果时 结构为[]
-    '''
-    table = 'user'
-    need_col_list = ['username', 'token']
-    filter_list = [['token', 'is not', 'NULL']]
-    sql = be_sql().sel_sql(table, need_col_list, filter_list)
-    ret = sqlite_db.select(sql)
+def check_local_status() ->dict:
+    '''check someone who with token'''
+    sql = "select username,token from user where token is not NULL limit 0,1"
+    ret = sqlite_db.select(sql,just_first=True)
     if not ret['status']:
         logging.error(ret['msg'])
-    return ret.get('records',list())
+    return ret.get('records',dict())

@@ -57,7 +57,7 @@ def get_user_info(table, username):
     if not ret['status']:
         logging.error(ret['msg'])
     info = ret['records'] if 'records' in ret.keys() else list()
-    returninfo
+    return info
 
 
 # 获取索引
@@ -118,17 +118,17 @@ def cryptograph_text(text, text_type, **kwargs):
     :param text_type: 文本类型目前有 'password','msg','detail'
     :return: 密文或者空
     '''
-    text = '\ '.join(text.split())
     try:
+        text = '\ '.join(text.split())
         # 密码加密
         if 'password' == text_type:
-            return cryptograph_text(text)
+            return md5_text(text)
         # msg加密
         elif 'msg' == text_type or 'message' == text_type:
-            return get_aes_cryText(kwargs['user_name'], text)
+            return get_aes_cryText(kwargs['username'], text)
         # detail加密
         elif 'detail' == text_type:
-            return get_aes_cryText(kwargs['user_name'], text)
+            return get_aes_cryText(kwargs['username'], text)
         else:
             return None
     except Exception as e:
@@ -140,10 +140,10 @@ def decrypt_text(text, text_type, **kwargs):
     try:
         # msg解密
         if 'msg' == text_type or 'message' == text_type:
-            return get_aes_decryText(kwargs['user_name'], text)
+            return get_aes_decryText(kwargs['username'], text)
         # detail解密
         elif 'detail' == text_type:
-            return get_aes_decryText(kwargs['user_name'], text)
+            return get_aes_decryText(kwargs['username'], text)
         else:
             return None
     except Exception as e:
@@ -179,7 +179,7 @@ def get_aes_decryText(user_name, text):
     return text[:-1]
 
 
-def cryptograph_text(text):
+def md5_text(text):
     """md5(text)."""
     logging.info(text)
     m = hashlib.md5()
@@ -224,62 +224,6 @@ def get_file_data(filename: str, has_title=False, offsetlines=0, endlines=-1, is
                 yield(json.loads(lines[i].rstrip(os.linesep)))
             else:
                 yield value
-
-user_host =''
-
-class base_api(object):
-    """ 该类是requests的二次封装,算是一个sub版,如有入参错误查看requests即可. """
-
-    def __init__(self):
-        self.last_url, self.last_response = None, None
-
-    @staticmethod
-    def is_normal(response: requests.Response, code_ranges=list()) -> bool:
-        """ check http status code,you can use code_ranges assert expectation value """
-        if not code_ranges:
-            return response.ok
-        elif isinstance(code_ranges, list) and response.status_code in code_ranges:
-            return True
-        return False
-
-    def get_api(self, url, method='post', *args, **kwargs) -> dict:
-        ret = dict(status=True)
-        try:
-            if 'post' == method:
-                response = requests.post(url, **kwargs)
-            elif 'get' == method:
-                response = requests.get(url, **kwargs)
-            elif 'options' == method:
-                response = requests.options(url, **kwargs)
-            if 'code_ranges' in kwargs.keys():
-                kwargs['code_ranges'] = list()
-                ret['status'] = base_api.is_normal(
-                    response, code_ranges=kwargs['code_ranges'])
-            try:
-                ret['body'] = response.json()
-            except:
-                ret['body'] = response.text
-            self.last_url, self.last_response = url, response
-        except Exception as e:
-            ret['status'], ret['reason'] = False, e
-        return ret
-
-    def post(self, url, *args, **kwargs):
-        """ get_api use post method """
-        return self.get_api(url, method='post', *args, **kwargs)
-
-    def get(self, url, *args, **kwargs):
-        """ get_api use get method """
-        return self.get_api(url, method='get', *args, **kwargs)
-
-    def options(self, url, *args, **kwargs):
-        """ get_api use options method """
-        return self.get_api(url, method='options', *args, **kwargs)
-
-    def __doc__(self):
-        """该类是requests的二次封装,算是一个sub版,如有入参错误查看requests即可.
-        last_url,last_response分别为最近一次的请求地址和请求结果(Response)。在并发请求的时候请注意这两个属性的使用.
-        """
 
 
 if __name__ == '__main__':
