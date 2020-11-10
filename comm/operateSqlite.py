@@ -1,8 +1,10 @@
 # 这个工具类 操作 sqlite3
 import logging
 import sqlite3
+import records
+from config import LDB_FILENAME
 
-sqlit_db = None
+sqlite_db = None
 
 
 def dict_factory(cursor, row):
@@ -24,17 +26,14 @@ def link_db(filename):
     :param filename:
     :return:
     '''
-    global sqlit_db
-    while True:
-        try:
-            sqlit_db = sqlite3.connect(filename)
-            sqlit_db.row_factory = dict_factory
-            break
-        except Exception as e:
-            logging.warning(e)
+    global sqlite_db
+    try:
+        if not sqlite_db:
+            sqlite_db = AirDataBase(filename)
+    except Exception as e:
+        logging.error(e)
 
 
-# 构建字符串 提供 简单查询、更新，插入。
 class be_sql(object):
     '''
     构建字符串 提供 简单查询、更新，插入
@@ -89,7 +88,8 @@ class be_sql(object):
         for col, value in dict.items():
             s_col += col + ','
             s_value += "'" + value + "',"
-        sql = 'insert into %s(%s) values(%s)' % (table, s_col[:-1], s_value[:-1])
+        sql = 'insert into %s(%s) values(%s)' % (
+            table, s_col[:-1], s_value[:-1])
         return sql
 
     def sel_sql(self, table, need_col_list=None, filter_list=None):
@@ -158,10 +158,10 @@ def exec_sql(sql, is_update=None):
     :except:  返回 None
     :return:  fetchall
     '''
-    c = sqlit_db.cursor()
+    c = sqlite_db.cursor()
     try:
         cur = c.execute(sql)
-        sqlit_db.commit()
+        sqlite_db.commit()
     except Exception as e:
         logging.error(e)
         return None
@@ -171,9 +171,70 @@ def exec_sql(sql, is_update=None):
         return cur.rowcount
 
 
+class BaseDataBase(object):
+    def __init__(self):
+        self.db = None
+
+    def select(self, sql: str, params=None, just_first=False):
+        conn = self.db.get_connection()
+        ret = dict(status=False)
+        if 'create table' in sql.lower():
+            ret['msg'] = "cann't create table ,you should use transaction to create table"
+            return ret
+        if params:
+            rows = conn.query(sql, **params)
+        else:
+            rows = conn.query(sql)
+        if just_first:
+            ret['records'] = rows.first(as_dict=True)
+        else:
+            ret['records'] = rows.all(as_dict=True)
+        ret['status'] = True
+        return ret
+
+    def transaction(self, sql, params=None):
+        if params:
+            return self.transactions([sql], [params])
+        else:
+            return self.transactions([sql])
+
+    def transactions(self, sqls: list, multiparams=None):
+        """ 同records实现 """
+        conn = self.db.get_connection()
+        transaction = conn.transaction()
+        try:
+            for i in range(len(sqls)):
+                if multiparams:
+                    conn.query(sqls[i], **multiparams[i])
+                else:
+                    conn.query(sqls[i])
+            transaction.commit()
+        except Exception as e:
+            transaction.rollback()
+            return dict(status=False, msg=e, errorsql=sqls[i])
+        finally:
+            conn.close()
+        return dict(status=True, msg='transaction complete')
+
+
+class AirDataBase(BaseDataBase):
+    def __init__(self, filename):
+        self.db = records.Database('sqlite:///{}'.format(filename))
+
+
+link_db(LDB_FILENAME)
+
 if __name__ == '__main__':
     pass
-    table = 'user'
-    sql = 'select * from user;'
-    r = exec_sql('AirMemo.db', sql)
-    print(r)
+    db = AirDataBase('AirMemo.db')
+    select_dict = dict(username='koko')
+    ret = db.select(
+        'select * from User where username = :username', select_dict)
+    print(ret)
+    ret = db.select('select * from User', just_first=True)
+    print(ret)
+    ret = db.transaction('select * from User')
+    print(ret)
+    ret = db.transactions(['insert into User(username) values(\'cool\')',
+                           'insert into User(name) values(\'cool2\')'])
+    print(ret)

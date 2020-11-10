@@ -13,6 +13,8 @@ class AirTray(QSystemTrayIcon):
     def __init__(self, widget_dict=None):
         super().__init__()
         self.set_data()
+        if widget_dict and isinstance(widget_dict, dict):
+            self.set_menu(widget_dict)
         self.show()
 
     def set_menu(self, widget_dict):
@@ -25,7 +27,8 @@ class AirTray(QSystemTrayIcon):
         self.main_menu = QMenu()
         self.show_action = QAction('&show',
                                    triggered=self.widget_dict['main_win'].show)
-        self.settings_action = QAction('&settings', triggered=self.widget_dict['setting_win'].show)
+        self.settings_action = QAction(
+            '&settings', triggered=self.widget_dict['setting_win'].show)
         self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
@@ -61,7 +64,10 @@ class AirTray(QSystemTrayIcon):
         检测登录用户的信息
         :return:
         '''
-        result = check_login_status()
+        ret = check_login_status()
+        if not ret['status']:
+            logging.error(ret['msg'])
+        result = ret['records'] if 'records' in ret.keys() else list()
         if result:
             return result[0]
         else:

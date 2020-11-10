@@ -17,7 +17,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import config
 from comm import customWidget
-from comm.operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql,sqlite_db
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
@@ -190,13 +190,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 'background-color:rgba(196,255,255,1);')
 
             # 收起/展开按钮
-            self.hide_detail_btn = QtWidgets.QPushButton(self.verticalLayoutWidget)
+            self.hide_detail_btn = QtWidgets.QPushButton(
+                self.verticalLayoutWidget)
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))
             # -5为微调结果
-            self.hide_detail_btn.setMaximumSize(config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT - 5)
-            self.hide_detail_btn.setStyleSheet('border-image:url(%s);' % config.LEFT_ICON)
+            self.hide_detail_btn.setMaximumSize(
+                config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT - 5)
+            self.hide_detail_btn.setStyleSheet(
+                'border-image:url(%s);' % config.LEFT_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
 
             # 详情编辑框
@@ -245,11 +248,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :param username: 用户名
         :return:
         '''
-        # 判断用户
-        if username:
-            self.records = get_notes(config.LDB_FILENAME, username)
-        else:
-            self.records = get_notes(config.LDB_FILENAME)
+        username = username if username else 'visitor'
+        ret = get_notes(username)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self.records = ret['records'] if 'records' in ret.keys() else list()
 
         # 尺寸模式
         if config.SIZEMODE == 'divide':
@@ -258,7 +261,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
-        self.layoutHeight = (len(self.records) + 1) * config.COM_BTN_HEIGHT + 20
+        self.layoutHeight = (len(self.records) + 1) * \
+            config.COM_BTN_HEIGHT + 20
         try:
             if 1 in self.detail_tx_status_list:
                 self.layoutHeight += config.COM_TE_HEIGHT
@@ -309,9 +313,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         获取序号对应的数据，打开窗口
         :return:
         '''
-        id = re.findall('\d+', self.sender().objectName())[0]
-        info = exec_sql(
-            'select message,detail from Msg where id = %s' % id)[0]
+        msg_id = re.findall('\d+', self.sender().objectName())[0]
+        sql = 'select message,detail from Msg where id = %s' % msg_id
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        info = ret['records'][0] if 'records' in ret.keys() else {'message':'untitle','detail':'input text'}
         # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
@@ -331,7 +338,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         速度和CPU有关 开放给用户自己调节
         :return:
         '''
-        width = QApplication.desktop().screenGeometry().width()
+        width = QApplication.desktop().availableGeometry().width()
         platform_name = platform.system()
 
         if self.x() <= width - config.MAIN_BASEWIDTH:
@@ -426,7 +433,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.hide_detail_btn_list.append(self.hide_detail_btn)
 
         # 详情编辑框
-        self.detail_tx = customWidget.AirTextEdit(main_win=self, parent=self.verticalLayoutWidget)
+        self.detail_tx = customWidget.AirTextEdit(
+            main_win=self, parent=self.verticalLayoutWidget)
         self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
         self.detail_tx.setObjectName("detail_tx" + str(record['id']))
         # 隐藏文本框 初始化文本框状态数组
@@ -466,7 +474,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ui = None
         if result['status'] == 1:
             ui = Ui_login_Dialog(self)
-            # ui.login_signal.connect(self.get_update_Signal)
         elif result['status'] == 0:
             try:
                 ui = Ui_logout_Dialog(self, self.user_info['username'])
@@ -514,16 +521,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :return:
         '''
         self.user_info = mine.get_value('user_info')
-        records = get_notes(config.LDB_FILENAME, self.user_info['username'])
+        logging.warning(self.user_info)
+        ret = get_notes(self.user_info['username'])
+        if not ret['status']:
+            logging.error(ret['msg'])
+        records = ret['records'] if 'records' in ret.keys() else list()
         if not records:
             table = 'Msg'
             dict = {'message': 'Welcome',
                     'detail': 'Thanks\ you\ support',
                     'username': self.user_info['username']}
-            dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
-            dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
+            dict['message'] = cryptograph_text(
+                dict['message'], 'message', user_name=self.user_info['username'])
+            dict['detail'] = cryptograph_text(
+                dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
-            exec_sql(sql)
+            sqlite_db.transaction(sql)
         return self.user_info['username']
 
     def update_tx_id(self, id):
@@ -545,9 +558,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 dlg = Ui_Sync_Dialog(parent=self)
             except Exception as e:
                 logging.warning(e)
-                QMessageBox.information(self, 'tips', "无法连接服务器", QMessageBox.Ok)
+                QMessageBox.information(
+                    self, 'tips', "无法连接服务器", QMessageBox.Ok)
         else:
-            QMessageBox.information(self, 'tips', result['msg'], QMessageBox.Ok)
+            QMessageBox.information(
+                self, 'tips', result['msg'], QMessageBox.Ok)
 
     # 重写类方法
     def show(self):

@@ -1,6 +1,8 @@
 # AirMemo
 tips for desktop
 
+### 因为代码已经去了北极，为了避免bug传千年的问题,决心重构代码。
+
 ### reach
 &ensp;&ensp;1.快速记录
 
