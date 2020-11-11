@@ -13,21 +13,6 @@ import requests
 import logging
 import os
 
-# 服务器切换
-
-
-def url(url, env='debug'):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            try:
-                prefix = ENV[env].value
-            except:
-                prefix = ENV['debug'].value
-            return func(prefix+url, args, kwargs)
-        return wrapper
-    return decorator
-
-
 # 返回等分字典
 def getSize(divide):
     sizeDict = {}
@@ -113,9 +98,8 @@ def mail(info, title, recipients, content):
 
 
 def cryptograph_text(text, text_type, **kwargs):
-    '''
-    :param text: 需要加密的文本
-    :param text_type: 文本类型目前有 'password','msg','detail'
+    ''' 加密数据
+    :param text_type: 文本类型目前有 'password','message','detail'
     :return: 密文或者空
     '''
     try:
@@ -137,6 +121,10 @@ def cryptograph_text(text, text_type, **kwargs):
 
 
 def decrypt_text(text, text_type, **kwargs):
+    ''' 解密数据
+    :param text_type: 文本类型目前有 'password','message','detail'
+    :return: 密文或者空
+    '''
     try:
         # msg解密
         if 'msg' == text_type or 'message' == text_type:
@@ -162,7 +150,9 @@ def create_reminder(parent, time):
 
 def get_aes_cryText(user_name, text):
     """ 返回加密字符串 """
+    logging.info("{} {}".format(user_name,text))
     r = os.popen('./be-aes %s -c %s' % (user_name, text))
+    # r = os.popen('python3 be-aes.py %s -c %s' % (user_name, text))
     text = r.read()
     return text[:-1]
 
@@ -174,7 +164,9 @@ def get_aes_decryText(user_name, text):
     :param text: 密文
     :return: 明文
     '''
+    logging.info("{} {}".format(user_name,text))
     r = os.popen('./be-aes %s -d %s' % (user_name, text))
+    # r = os.popen('python3 be-aes.py %s -d %s' % (user_name, text))
     text = r.read()
     return text[:-1]
 
