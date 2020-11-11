@@ -1,7 +1,5 @@
 import config
-import requests
-
-from comm.operateSqlite import be_sql,sqlite_db
+from comm.operateSqlite import sqlite_db
 from comm.utils import cryptograph_text, decrypt_text
 import logging
 from comm.net import url,air_api
@@ -21,8 +19,7 @@ def check_login(url,username, token,*args,**kwargs):
     }
     return air_api().post(url, data=data)
 
-@url('/api/AirMemo/pc/check_login')
-def get_login_status():
+def get_login_status(*args,**kwargs):
     """check login status. """
     result = check_local_status()
     if not result:
