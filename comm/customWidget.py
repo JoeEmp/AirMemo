@@ -5,7 +5,7 @@ from datetime import datetime
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 from PyQt5.QtGui import QPainter, QPixmap
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTextEdit, QMenu, QAction, QMessageBox, QDialog, QLabel
-from module.note import update_notes, add_notes, delete_notes
+from module.note import update_notes, add_notes, delete_note
 import config
 from comm.operateSqlite import *
 import re
@@ -42,9 +42,7 @@ class AirLineEdit(QLineEdit):
         return None
 
     def createContextMenu(self):
-        ''' 
-                创建右键菜单，菜单的数量没有办法动态控制，wrb
-                '''
+        ''' 创建右键菜单，菜单的数量没有办法动态控制，wrb'''
         #  必须将ContextMenuPolicy设置为Qt.CustomContextMenu  
         #  否则无法使用customContextMenuRequested信号  
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -76,9 +74,7 @@ class AirLineEdit(QLineEdit):
         self.contextMenu.addAction(self.set_reminder2)
 
     def showContextMenu(self, pos):
-        ''' 
-                右键点击时调用的函数 
-                '''
+        ''' 右键点击时调用的函数 '''
         #  菜单显示前，将它移动到鼠标点击的位置  QtCore.QPoint(95, 20) 20为微调结果
         self.contextMenu.move(pos + self.main_win.pos() + QPoint(95, 20))
         # logging.info(pos+self.main_win.pos()+QPoint(95,20))
@@ -95,19 +91,12 @@ class AirLineEdit(QLineEdit):
         self.thread.run()
 
     def delete_note(self):
-        '''
-        删除note
-        :return:
-        '''
         id = re.findall('\d+', self.objectName())[0]
-        filter_list = [
-            ['id', '=', id]
-        ]
-        if delete_notes(config.LDB_FILENAME, filter_list=filter_list) == 0:
+        if -1 == id:
             QMessageBox.information(
                 self, '提示', {}.format('无法删除空数据'), QMessageBox.Ok)
         else:
-            # 期望不删除预设数据 未实现 wrb
+            delete_note(id)
             self.__lineSignal.emit(self.main_win.user_info['username'], 0)
 
     def enterEvent(self, *args, **kwargs):
@@ -129,18 +118,19 @@ class AirLineEdit(QLineEdit):
         except Exception as e:
             logging.warning(e)
         data['message'] = self.text()
+        if not data['message']:
+            data['message'] != self.__eld_text
         # 插入新的数据
         if data['id'] == -1 and data['message']:
-            # logging.warning(data)
             data['username'] = self.main_win.user_info['username']
-            new_id = add_notes(config.LDB_FILENAME, data)
+            new_id = add_notes(data)['records']['id']
             self.setObjectName('note_le' + str(new_id))
             self.update_id_Signal.emit(new_id)
         # 更新旧的数据
         elif data['message'] != self.__eld_text:
             data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
             update_notes(data, 'message',
-                         user_name=self.main_win.user_info['username'])
+                         username=self.main_win.user_info['username'])
         self.setStyleSheet("background:#%s" % self.color)
 
 
@@ -174,9 +164,8 @@ class AirTextEdit(QTextEdit):
         data['detail'] = self.toPlainText()
         # 更新数据库
         if data['detail'] != self.__eld_text:
-            data['update_time'] = "(datetime(CURRENT_TIMESTAMP, 'localtime') )"
             update_notes(data, 'detail',
-                         user_name=self.main_win.user_info['username'])
+                         username=self.main_win.user_info['username'])
         self.setStyleSheet('background:#%s' % self.color)
 
 

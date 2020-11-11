@@ -7,41 +7,43 @@ import logging
 
 
 def get_notes(username='visitor', is_del='0'):
-    sql = "select * from Msg where username = :username and is_del =0"
+    sql = "select * from Msg where username = :username and is_del = 0"
     ret = sqlite_db.select(sql,{"username":username})
     # 解密
-    # for note in ret.get('records',list()):
-    #     note['message'] = cryptograph_text(note['message'], 'message', username=username)
-    #     note['detail'] = cryptograph_text(note['detail'], 'detail', username=username)
+    for note in ret.get('records',list()):
+        note['message'] = decrypt_text(note['message'], 'message', username=username)
+        note['detail'] = decrypt_text(note['detail'], 'detail', username=username)
     return ret
 
 def update_notes(data, ele, **kwargs):
     # 加密
-    # data[ele] = cryptograph_text(data[ele], ele, user_name=kwargs['username'])
-    sql = "update Msg set {}=:{} update_time=:update_time where id != -1 and id = :id".format(ele,ele)
+    data[ele] = cryptograph_text(data[ele], ele, username=kwargs['username'])
+    sql = "update Msg set {}=:{},update_time=datetime(CURRENT_TIMESTAMP, 'localtime') where id != -1 and id = :id".format(ele,ele)
     ret = sqlite_db.transaction(sql,data)
     if not ret['status']:
-        logging.error("message:{}\nsql:{}".format(ret['message'],ret['sql']))
+        logging.error("message:{}\nsql:{}".format(ret['msg'],ret['errorsql']))
     return ret
 
 def add_notes(data):
     for k, v in data.items():
         if 'username' != k:
             ele = k
-            data[k] = cryptograph_text(v, k, user_name=data['username'])
+            data[k] = cryptograph_text(v, k, username=data['username'])
     sql = "insert into Msg({},username) values(:{},:username)".format(ele,ele)
     ret = sqlite_db.transaction(sql,data)
     if not ret['status']:
-        logging.error("message:{}\nsql:{}".format(ret['message'],ret['sql']))
+        logging.error("message:{}\nsql:{}".format(ret['msg'],ret['errorsql']))
+    sql = "select * from Msg where username = :username and is_del = 0 order by id desc limit 0 ,1"
+    ret = sqlite_db.select(sql,{"username":data['username']},just_first=True)
     return ret
 
-def delete_notes(id):
+def delete_note(id):
     return change_del_flag(id=id)
 
 
 def change_del_flag(id,is_del=1):
     ''' '''
-    sql = "update from Msg set is_del = :is_del where id=:id"
+    sql = "update Msg set is_del = :is_del where id=:id"
     return sqlite_db.transaction(sql,params={'is_del':is_del,'id':id})
 
 
