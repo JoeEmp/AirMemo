@@ -1,11 +1,3 @@
-'''
-@Author: your name
-@Date: 2019-09-01 17:23:03
-@LastEditTime: 2019-12-30 10:42:24
-@LastEditors: your name
-@Description: In User Settings Edit
-@FilePath: /AirMemoServer/Users/joe/Documents/git_repo/github/AirMemo/main.py
-'''
 import sys
 from comm.operateSqlite import link_db
 from py_ui.AirTray import AirTray
@@ -40,7 +32,8 @@ def main():
         dict = {'main_win': mainWindow, 'setting_win': setting_win}
         tray.set_menu(dict)
         tray.show()
-        mainWindow.show()
+        # mainWindow.show()
+        setting_win.show()
         sys.exit(app.exec_())
     finally:
         localServer.close()

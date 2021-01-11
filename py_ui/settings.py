@@ -10,9 +10,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 from comm.operateSqlite import *
 from comm.user_cache import mine
+from module.email_conf import add_email_conf, del_email_conf, update_email_conf, get_email_conf, get_user_email_conf
+from module.reminder import get_user_reminder_conf
+from py_ui.toast import Toast
 
 
 class Ui_Settings(QtWidgets.QMainWindow):
+
     def __init__(self, parent=None):
         super().__init__()
         logging.info('init begin')
@@ -22,32 +26,22 @@ class Ui_Settings(QtWidgets.QMainWindow):
         self.setupUi()
 
     def set_data(self):
-        '''
-        初始化数据 获取 email_settings 和 reminder 表的数据
-        :return:
-        '''
         # 获取email_settings表数据
-        table = 'email_settings'
-        filter_list = [
-            ['username', '=', self.user_info['username']]
-        ]
-        sql = be_sql().sel_sql(table=table, filter_list=filter_list)
-        ret = sqlite_db.select(sql)
+        ret = get_user_email_conf(self.user_info['username'])
         if not ret['status']:
             logging.error(ret['msg'])
-        self._email_records = ret['records'] if 'records' in ret.keys() else list()
+        self._email_records = ret.get("records", [])
         # 获取Reminder表数据
-        sql = sql.replace(table, 'Reminder') + 'order by sequence'
-        ret = sqlite_db.select(sql)
+        ret = get_user_reminder_conf(self.user_info['username'])
         if not ret['status']:
             logging.error(ret['msg'])
-        self._reminder_records = ret['records'] if 'records' in ret.keys() else list()
-        # print(self._reminder_records)
+        self._reminder_records = ret.get("records", [])
+        self.cur_email_config = None
         logging.info('data init end')
 
     def setupUi(self):
         self.setObjectName("Settings")
-        self.resize(493, 333)
+        self.resize(500, 350)
 
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
@@ -69,13 +63,13 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # 邮箱设置页保存按钮
         self.save_email_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.save_email_btn.setObjectName("save_email_btn")
-        self.save_email_btn.clicked.connect(self._save_email_config)
+        self.save_email_btn.clicked.connect(self.save_email_config)
         self.gridLayout.addWidget(self.save_email_btn, 5, 6, 1, 1)
 
         # 邮箱设置页删除按钮
         self.del_email_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.del_email_btn.setObjectName("del_email_btn")
-        self.del_email_btn.clicked.connect(self._del_item_slot)
+        self.del_email_btn.clicked.connect(self.del_email_config)
         self.gridLayout.addWidget(self.del_email_btn, 5, 3, 1, 1)
 
         # 邮箱设置页 邮箱编辑框
@@ -86,7 +80,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # 邮箱设置页添加按钮
         self.add_email_btn = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.add_email_btn.setObjectName("add_email_btn")
-        self.add_email_btn.clicked.connect(self._add_email_item_slot)
+        self.add_email_btn.clicked.connect(self.clear_email_form)
         self.gridLayout.addWidget(self.add_email_btn, 5, 1, 1, 1)
 
         # 邮箱设置页 ssl 单选按钮
@@ -147,11 +141,10 @@ class Ui_Settings(QtWidgets.QMainWindow):
                 brush = QtGui.QBrush(QtGui.QColor(1, 203, 31))
                 brush.setStyle(QtCore.Qt.NoBrush)
                 item.setForeground(brush)
-            # item.setFlags(
-            #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            item.data = record
             self.email_list.addItem(item)
-        # self.email_list.setStyleSheet('background-color:#c4ffff')
-        self.email_list.itemClicked.connect(self._set_config_slot)
+
+        self.email_list.itemClicked.connect(self.set_email_tab_config)
         self.gridLayout.addWidget(self.email_list, 1, 0, 4, 4)
 
         # 提示标签
@@ -232,7 +225,8 @@ class Ui_Settings(QtWidgets.QMainWindow):
         self.bule_Slider.setObjectName("bule_Slider")
         self.color_gridLayout.addWidget(self.bule_Slider, 3, 2, 1, 1)
         # 优先级设置框
-        self.priority_listWidget = QtWidgets.QListWidget(self.gridLayoutWidget_2)
+        self.priority_listWidget = QtWidgets.QListWidget(
+            self.gridLayoutWidget_2)
         self.priority_listWidget.setMinimumSize(QtCore.QSize(0, 180))
         self.priority_listWidget.setMaximumSize(QtCore.QSize(200, 16777215))
         self.priority_listWidget.setObjectName("priority_listWidget")
@@ -241,7 +235,8 @@ class Ui_Settings(QtWidgets.QMainWindow):
         # rgb标签
         self.label_2 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_2.setMaximumSize(QtCore.QSize(16777215, 30))
-        self.label_2.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft)
+        self.label_2.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft)
         self.label_2.setObjectName("label_2")
         self.color_gridLayout.addWidget(self.label_2, 0, 0, 1, 2)
 
@@ -274,7 +269,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
         self.priority_save_btn.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.priority_save_btn.setObjectName("priority_save_btn")
         self.color_gridLayout.addWidget(self.priority_save_btn, 5, 3, 1, 1)
-        self.tabWidget.addTab(self.color_tab, "")
+        # self.tabWidget.addTab(self.color_tab, "")
 
         self.color_gridLayout.addWidget(self.label_2, 0, 0, 1, 2)
         self.color_Slider = QtWidgets.QSlider(self.gridLayoutWidget_2)
@@ -316,67 +311,41 @@ class Ui_Settings(QtWidgets.QMainWindow):
         self.label_3.setText(_translate("Settings", "rgb:"))
         self.priority_save_btn.setText(_translate("Settings", "保存"))
         self.label_2.setText(_translate("Settings", "颜色设置"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.color_tab), _translate("Settings", "优先级颜色配置"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(
+            self.color_tab), _translate("Settings", "优先级颜色配置"))
 
-    # email页的槽函数
-    # 选中时配置
-    def _set_config_slot(self):
-        self._clear_config()
-
-        index = self.email_list.currentRow()
-        self.email_le.setText(self._email_records[index]['addr'])
-        self.password_le.setText(self._email_records[index]['password'])
-        self.sender_le.setText(self._email_records[index]['sender_name'])
-        if self._email_records[index]['ssl_port']:
-            self.ssl_le.setText(str(self._email_records[index]['ssl_port']))
-        if self._email_records[index]['user_ssl'] == 1:
+    def set_email_tab_config(self):
+        self.clear_email_form()
+        item = self.email_list.currentItem()
+        self.cur_email_config = item
+        self.email_le.setText(item.data['addr'])
+        self.password_le.setText(item.data['password'])
+        self.sender_le.setText(item.data['sender_name'])
+        if item.data['ssl_port']:
+            self.ssl_le.setText(str(item['ssl_port']))
+        if item.data['user_ssl'] == 1:
             self.ssl_le.setEnabled(True)
             self.ssl_rbtn.setChecked(True)
         else:
             self.ssl_le.setEnabled(False)
             self.ssl_rbtn.setChecked(False)
 
-    # 添加
-    def _add_email_item_slot(self):
-        '''
-        添加邮箱配置的槽函数
-        :return:
-        '''
-        self._email_records.append({'id': -1, 'username': '', 'password': '', 'sender_name': '',
-                                    'addr': 'new addr', 'ssl_port': None, 'user_ssl': 0,
-                                    'is_default': 0})
-        new_item = QListWidgetItem('new addr(请编辑Email地址后退出)')
-        # new_item.setFlags(
-        #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-        self.email_list.insertItem(len(self._email_records), new_item)
-        table = 'Email_settings'
-        dict = {'username': self.user_info['username'], 'addr': 'new addr'}
-        sql = be_sql().ins_sql(table, dict)
-        exec_sql( sql)
-        self.set_data()
-        pass
-
     # 删除按钮
-    def _del_item_slot(self):
+    def del_email_config(self):
         index = self.email_list.currentRow()
-        if index != -1:
-            ret = QMessageBox.question(self, ' ', '是否删除本条配置', QMessageBox.Yes, QMessageBox.Cancel)
+        item = self.email_list.currentItem()
+        if item:
+            ret = QMessageBox.question(self, ' ', '是否删除本条配置',
+                                 QMessageBox.Yes, QMessageBox.Cancel)
             try:
                 if ret == QMessageBox.Yes:
+                    print(del_email_conf(item.data['id']))
                     self.email_list.takeItem(index)
-                    self._clear_config()
-                    table = 'Email_settings'
-                    filter_list = [
-                        ['id', '=', str(self._email_records[index]['id'])]
-                    ]
-                    sql = be_sql().del_sql(table, filter_list=filter_list)
-                    exec_sql( sql)
-                elif ret == QMessageBox.Cancel:
-                    pass
+                    self.clear_email_form()
             except Exception as e:
-                print(e)
+                logging.error(e)
         else:
-            ret = QMessageBox.information(self, 'tips', '没有选择删除项')
+            QMessageBox.information(self, 'tips', '没有选择删除项')
 
     # ssl按钮
     def chcek_radio_slot(self):
@@ -391,66 +360,41 @@ class Ui_Settings(QtWidgets.QMainWindow):
             self.ssl_le.clear()
 
     # 清空邮箱设置表单
-    def _clear_config(self):
+    def clear_email_form(self):
         self.email_le.setText('')
         self.password_le.setText('')
         self.sender_le.setText('')
         self.ssl_le.setText('')
         self.ssl_rbtn.setChecked(False)
+        self.cur_email_config = {}
 
     # 保存设置
-    def _save_email_config(self):
-        if self.email_list.currentRow() == -1:
-            return QMessageBox.information(self, 'tips', '没有选择配置邮箱')
-        if self.email_le.text() == 'new addr':
-            QMessageBox.warning(self, ' ', '请修改邮箱地址', QMessageBox.Ok)
-            return 0
-        if self.email_le.text():
-            try:
-                if self.password_le.text():
-                    ssl_port = self.ssl_le.text()
-                    if not ssl_port:
-                        ssl_port = 'NULL'
-                        user_ssl = str(0)  # 0代表不使用
-                    else:
-                        user_ssl = str(1)
-                    if not self.sender_le.text():
-                        sender_name = self.email_le.text()
-                    else:
-                        sender_name = self.sender_le.text()
-                    # 更新设置到数据库
-                    table = 'Email_settings'
-                    value_dict = {'addr': self.email_le.text(), 'password': self.password_le.text(),
-                                  'user_ssl': user_ssl, 'ssl_port': ssl_port,
-                                  'sender_name': sender_name}
-                    filter_list = [
-                        ['id', '=', str(self.email_list.currentRow() + 1)],
-                        ['username', '=',self.user_info['username']]
-                    ]
-                    sql = be_sql().update_sql(table, value_dict=value_dict, filter_list=filter_list)
-                    ret = exec_sql( sql,is_update=1)
-                    # 更新失败，直接插入数据
-                    if ret <= 0:
-                        value_dict['username']=self.user_info['username']
-                        sql = be_sql().ins_sql(table,value_dict)
-                        exec_sql( sql)
-                    self.email_list.currentItem().setText(self.email_le.text())
-                    #清除无效配置数据
-                    sql = "delete from Email_settings where password is NULL;"
-                    exec_sql( sql)
-                    self.set_data()
-                else:
-                    QMessageBox.warning(self, ' ', '请输入密码', QMessageBox.Ok)
-            except Exception as e:
-                print(e)
+    def save_email_config(self):
+        if not self.email_le.text():
+            return QMessageBox.warning(self, ' ', '请输入邮箱地址', QMessageBox.Ok)
+        if not self.password_le.text():
+            return QMessageBox.warning(self, ' ', '请输入邮箱第三方设置密码', QMessageBox.Ok)
         else:
-            QMessageBox.warning(self, ' ', '请输入邮箱地址', QMessageBox.Ok)
+            ssl_port = self.ssl_le.text()
+            if not ssl_port:
+                ssl_port = None
+                user_ssl = 0
+            else:
+                user_ssl = 1
+            sender_name = self.email_le.text() or self.sender_le.text()
+            args = [self.user_info['username'], self.email_le.text(
+            ), self.password_le.text(), sender_name, ssl_port, user_ssl]
+            if not self.cur_email_config:
+                add_email_conf(*args)
+                self.clear_email_form()
+                Toast(self).show_toast("添加成功",height=0.15)
+            else:
+                args.insert(0, self.cur_email_config.data['id'])
+                update_email_conf(*args)
+            self.refresh_email_tab()
+        
 
     def _selectDefualt(self):
-        '''
-        # 默认使用按钮
-        :return:
-        '''
         if self.email_list.currentRow() != -1:
             for i in range(self.email_list.count()):
                 brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
@@ -463,31 +407,33 @@ class Ui_Settings(QtWidgets.QMainWindow):
             table = 'Email_settings'
             value_dict = {'is_default': '1'}
             filter_list = [
-                ['id', '=', str(self._email_records[self.email_list.currentRow()]['id'])]
+                ['id', '=', str(
+                    self._email_records[self.email_list.currentRow()]['id'])]
             ]
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql( sql)
+            exec_sql(sql)
 
             value_dict['is_default'] = '0'
             filter_list[0][1] = '!='
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql( sql)
+            exec_sql(sql)
         else:
             QMessageBox.information(self, ' ', '请选择优先使用的邮箱', QMessageBox.Ok)
 
-    def _reset(self):
-        self.set_data()
-        # 重置email_list
+    def refresh_email_tab(self):
         self.email_list.clear()
-        for record in self._email_records:
+        for record in get_user_email_conf(self.user_info['username']).get('records', []):
             item = QListWidgetItem(record['addr'])
             if record['is_default'] == 1:
                 brush = QtGui.QBrush(QtGui.QColor(1, 203, 31))
                 brush.setStyle(QtCore.Qt.NoBrush)
                 item.setForeground(brush)
-            # item.setFlags(
-            #         QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            item.data = record
             self.email_list.addItem(item)
+
+    def _reset(self):
+        self.set_data()
+        self.refresh_email_tab()
         # 重置 time_list
         self.time_list.clear()
         for record in self._reminder_records:
@@ -507,25 +453,27 @@ class Ui_Settings(QtWidgets.QMainWindow):
             QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.time_list.addItem(item)
         table = 'Reminder'
-        value_dict = {'time': '00:00:00', 'username': self.user_info['username']}
+        value_dict = {'time': '00:00:00',
+                      'username': self.user_info['username']}
         sql = be_sql().ins_sql(table, value_dict)
-        exec_sql( sql)
+        exec_sql(sql)
         self.set_data()
 
     def _del_reminder_slot(self):
         index = self.time_list.currentRow()
         if index != -1:
-            ret = QMessageBox.question(self, ' ', '是否删除此提醒时间', QMessageBox.Yes, QMessageBox.Cancel)
+            ret = QMessageBox.question(
+                self, ' ', '是否删除此提醒时间', QMessageBox.Yes, QMessageBox.Cancel)
             try:
                 if ret == QMessageBox.Yes:
                     self.time_list.takeItem(index)
-                    self._clear_config()
+                    self.clear_email_form()
                     table = 'reminder'
                     filter_list = [
                         ['id', '=', str(self._reminder_records[index]['id'])]
                     ]
                     sql = be_sql().del_sql(table, filter_list=filter_list)
-                    exec_sql( sql)
+                    exec_sql(sql)
                 elif ret == QMessageBox.Cancel:
                     pass
             except Exception as e:
@@ -598,7 +546,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
             filter_list[1][2] = str(ids[i])
             filter_list[2][2] = times[i]
             sql = be_sql().update_sql(table, value_dict, filter_list)
-            exec_sql( sql)
+            exec_sql(sql)
         pass
 
     # 优先级页的函数
@@ -608,13 +556,7 @@ class Ui_Settings(QtWidgets.QMainWindow):
 
     # 窗口函数
     def closeEvent(self, *args, **kwargs):
-        # tab_name = self.tabWidget.currentWidget().objectName()
-        # if tab_name == 'email_tab':
-        # 去除无效email配置
-        sql = "delete from Email_settings where password is NULL;"
-        sqlite_db.transaction(sql)
         self._reset()
-        # 保存当前顺序
 
     def show(self):
         super().show()

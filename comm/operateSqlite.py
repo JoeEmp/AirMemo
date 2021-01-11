@@ -1,23 +1,15 @@
-# 这个工具类 操作 sqlite3
 import logging
 import sqlite3
-import records
 from config import LDB_FILENAME
 
 sqlite_db = None
 
 
 def dict_factory(cursor, row):
-    '''
-    # 官方api提供，使返回的数据结构为 list of dict
-    :param cursor:
-    :param row:
-    :return:
-    '''
-    dict = {}
+    d = {}
     for idx, col in enumerate(cursor.description):
-        dict[col[0]] = row[idx]
-    return dict
+        d[col[0]] = row[idx]
+    return d
 
 
 def link_db(filename):
@@ -149,100 +141,69 @@ class be_sql(object):
             s_filter = s_filter[:-4] + ';'
             return 'delete from %s where %s' % (table, s_filter)
 
+
 def exec_sql(sql):
     AirDataBase.select(sql)
 
-class BaseDataBase(object):
-    def __init__(self):
-        self.db = None
+class AirDataBase():
+    def __init__(self, filename):
+        self.conn = sqlite3.connect(filename)
+        self.conn.row_factory = dict_factory
+        super().__init__()
+
+    def cursor(self, cursor=None):
+        if cursor:
+            return self.conn.cursor(cursor)
+        return self.conn.cursor()
 
     def select(self, sql: str, params=None, just_first=False):
-        """[summary]
-
-        Args:
-            sql (str): [description]
-            params ([type], optional): [description]. Defaults to None.
-            just_first (bool, optional): [description]. Defaults to False.
-
-        Returns:
-            [type]: [description]
-
-        Case:
-            sql = 'update table set col = :col'
-            params = {'col':value}
-            ret = db.transaction(sql,params)
-        """
-        conn = self.db.get_connection()
-        ret = dict(status=False)
-        if 'create table' in sql.lower():
-            ret['msg'] = "cann't create table ,you should use transaction to create table"
-            return ret
-        if params:
-            rows = conn.query(sql, **params)
+        ret = {"status": True}
+        cur = self.conn.cursor()
+        if None == params:
+            cur.execute(sql)
         else:
-            rows = conn.query(sql)
+            cur.execute(sql, params)
         if just_first:
-            ret['records'] = rows.first(as_dict=True)
+            ret['records'] = cur.fetchone()
         else:
-            ret['records'] = rows.all(as_dict=True)
-        ret['status'] = True
+            ret['records'] = cur.fetchall()
         return ret
 
-    def transaction(self, sql:str, params=None):
-        """for inseart or update sql. """
-        if params:
-            return self.transactions([sql], [params])
+    def transaction(self, sql, param=None):
+        if None == param:
+            return self.transactions([sql], [[]])
         else:
-            return self.transactions([sql])
+            return self.transactions([sql], [param])
 
-    def transactions(self, sqls: list, multiparams=None):
-        """ 同records实现 
-        case 
-        sqls = [
-            'update table set col1 = :col1',
-            'update table set col2 = :col2,col3 = :col3'
-        ]
-        multiparams = [
-            {'col1':value1},
-            {'col2':value2,'col3':value3}
-        ]
-        db.transaction(sql,params)
-        """
-        conn = self.db.get_connection()
-        transaction = conn.transaction()
+    def transactions(self, sqls, params):
+        """deal many sql transaction. if needn't param use empty list."""
+        ret = {'status': True}
+        cur = self.conn.cursor()
         try:
             for i in range(len(sqls)):
-                if multiparams:
-                    conn.query(sqls[i], **multiparams[i])
+                if 0 == len(params[i]):
+                    cur.execute(sqls[i])
                 else:
-                    conn.query(sqls[i])
-            transaction.commit()
+                    cur.execute(sqls[i], params[i])
+            self.conn.commit()
         except Exception as e:
-            transaction.rollback()
-            return dict(status=False, msg=e, errorsql=sqls[i])
-        finally:
-            conn.close()
-        return dict(status=True, msg='transaction complete')
-
-
-class AirDataBase(BaseDataBase):
-    def __init__(self, filename):
-        self.db = records.Database('sqlite:///{}'.format(filename))
-
+            ret['msg'] = e
+            ret['errorsql'] = sqls[i]
+            ret['status'] = False
+        self.conn.rollback()
+        if 1 == len(sqls):
+            ret['rowcount'] = cur.rowcount
+        return ret
 
 link_db(LDB_FILENAME)
 
 if __name__ == '__main__':
-    pass
-    db = AirDataBase('AirMemo.db')
+    db = AirDataBase_v2('../AirMemo.db')
     select_dict = dict(username='koko')
     ret = db.select(
-        'select * from User where username = :username', select_dict)
+        'select * from user')  # where username = ?', ['koko'])
     print(ret)
-    ret = db.select('select * from User', just_first=True)
+    ret = db.select('select * from user', just_first=True)
     print(ret)
-    ret = db.transaction('select * from User')
-    print(ret)
-    ret = db.transactions(['insert into User(username) values(\'cool\')',
-                           'insert into User(name) values(\'cool2\')'])
+    ret = db.transaction("delete from user where username = ?", ['cool1'])
     print(ret)

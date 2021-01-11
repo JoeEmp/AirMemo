@@ -31,7 +31,7 @@ class Toast(object):
     def show(self):
         self.toast.show()
 
-    def show_toast(self, text, time=short):
+    def show_toast(self, text, time=short, height=0.8):
         """
 
         :param text: 显示文本
@@ -42,7 +42,7 @@ class Toast(object):
             self.set_time(time)
             self.toast.rootObject().set_text(text)
             self.toast.move(int((self.parent.width() - self.width()) / 2),
-                            int(self.parent.height() * 0.8))
+                            int(self.parent.height() * height))
             self.toast.rootObject().show_toast()
         except Exception as e:
             logging.error(e)
