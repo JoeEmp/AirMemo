@@ -1,13 +1,36 @@
+import sys
 import logging
+from enum import Enum,unique
 
-# pro
-'''
-logging.basicConfig(level=logging.WARNING, filename='log.txt', filemode='a',
+try:
+    ENV = sys.argv[1]
+except IndexError:
+    ENV = 'debug'
+
+PROTOCOL = 'http://'
+@unique
+class DOMAINS(Enum):
+    debug = 'localhost:5000'
+    pro = 'todo.winn.online:5000'
+
+
+@unique
+class LOG_LEVEL(Enum):
+    debug = logging.INFO
+    pro = logging.WARNING
+
+
+logging.basicConfig(filename='AirMemo.log', level=LOG_LEVEL[ENV].value,
                     format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
-'''
-# dev
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(filename)s %(funcName)s %(message)s')
+
+# 供调试使用
+proxies = {
+    'http': 'http://0.0.0.0:8888/',
+    'https': 'https://0.0.0.0:8888/'
+}
+
+
+##### UI CONFIG #####
 
 # 隐藏速度
 SPEED = 0.001
@@ -86,4 +109,5 @@ EMAIL_LAB_WIDTH = 50
 
 EMAIL_WIDTH = 450
 
-EMAIL_HEIGHT = RECIPIENT_TX_HEIGHT + COPY_TE_HEIGHT + MSG_TE_HEIGHT + DETAIL_TE_HEIGHT + SEND_BTN_HEIGHT + 100
+EMAIL_HEIGHT = RECIPIENT_TX_HEIGHT + COPY_TE_HEIGHT + \
+    MSG_TE_HEIGHT + DETAIL_TE_HEIGHT + SEND_BTN_HEIGHT + 100

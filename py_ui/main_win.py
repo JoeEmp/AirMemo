@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file './ui\demo.ui'
-#
-# Created by: PyQt5 ui code generator 5.10
-#
-# WARNING! All changes made in this file will be lost!
-
-# 有注释部分基本为生成后的作者插入代码的注释
-
 import logging
 import re
 from time import sleep
@@ -17,15 +7,17 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import config
 from comm import customWidget
-from comm.operateSqlite import be_sql, exec_sql
+from comm.operateSqlite import be_sql,sqlite_db
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
 from py_ui.user_dlg import Ui_login_Dialog, Ui_logout_Dialog
-from comm.module import get_notes, get_login_state
+from module.login import get_login_status
 from comm.utils import getSize, cryptograph_text
 import sip
 import platform
+from comm.user_cache import mine
+from module.note import get_notes
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -41,7 +33,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         logging.info("mainwindow init")
         self.parent = parent
-        self.user_info = parent.get_info()
+        self.user_info = mine.get_value('user_info')
         self.setData(username=self.user_info['username'])
         self.setupLayout()
         self.retranslateUi()
@@ -149,10 +141,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
 
-        self.note_le_list = []
-        self.hide_detail_btn_list = []
-        self.detail_tx_list = []
-        self.detail_tx_state_list = []
+        self.note_le_list = list()
+        self.detail_tx_list = list()
+        self.detail_tx_status_list = list()
+        self.hide_detail_btn_list = list()
 
         for i in range(len(self.records)):
             self.noteLayout = QtWidgets.QGridLayout()
@@ -193,8 +185,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.hide_detail_btn.setText("")
             self.noteLayout.addWidget(self.hide_detail_btn, 0, 2, 1, 1)
             self.hide_detail_btn.setObjectName("hide_detail_btn" + str(i))
+            # -5为微调结果
             self.hide_detail_btn.setMaximumSize(
-                config.COM_BTN_WIDTH, config.COM_BTN_HEIGHT)
+                config.COM_MICRO_BTN_WIDTH, config.COM_MICRO_BTN_HEIGHT - 5)
             self.hide_detail_btn.setStyleSheet(
                 'border-image:url(%s);' % config.LEFT_ICON)
             self.hide_detail_btn_list.append(self.hide_detail_btn)
@@ -207,7 +200,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 "detail_tx" + str(self.records[i]['id']))
             # 隐藏文本框 初始化文本框状态数组
             self.detail_tx.hide()
-            self.detail_tx_state_list.append(0)
+            self.detail_tx_status_list.append(0)
             self.detail_tx_list.append(self.detail_tx)
             # 绑定槽
             self.hide_detail_btn.clicked.connect(self.ishide)
@@ -245,11 +238,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :param username: 用户名
         :return:
         '''
-        # 判断用户
-        if username:
-            self.records = get_notes(config.LDB_FILENAME, username)
-        else:
-            self.records = get_notes(config.LDB_FILENAME)
+        username = username if username else 'visitor'
+        ret = get_notes(username)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self.records = ret['records'] if 'records' in ret.keys() else list()
 
         # 尺寸模式
         if config.SIZEMODE == 'divide':
@@ -259,9 +252,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.layoutWidth = config.MAIN_BASEWIDTH
         # 20为标题高度
         self.layoutHeight = (len(self.records) + 1) * \
-                            config.COM_BTN_HEIGHT + 20
+            config.COM_BTN_HEIGHT + 20
         try:
-            if 1 in self.detail_tx_state_list:
+            if 1 in self.detail_tx_status_list:
                 self.layoutHeight += config.COM_TE_HEIGHT
         except Exception as e:
             logging.warning(e)
@@ -270,32 +263,34 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def ishide(self):
         '''
-        详情编辑框的展开和收起 暂未修复bug贴图转换
+        详情编辑框的展开和收起
         :return:
         '''
         index = self.hide_detail_btn_list.index(self.sender())
         # 隐藏  点击a后，再点击b，隐藏a
-        if 1 in self.detail_tx_state_list and self.detail_tx_state_list.index(
+        if 1 in self.detail_tx_status_list and self.detail_tx_status_list.index(
                 1) != index:
-            self.detail_tx_list[self.detail_tx_state_list.index(1)].hide()
-            self.sender()
+            self.detail_tx_list[self.detail_tx_status_list.index(1)].hide()
+            self.hide_detail_btn_list[self.detail_tx_status_list.index(1)].setStyleSheet(
+                'border-image:url(%s);' % config.LEFT_ICON)
             self.layoutHeight = self.layoutHeight - config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
-            self.detail_tx_state_list[self.detail_tx_state_list.index(1)] = 0
+            self.detail_tx_status_list[self.detail_tx_status_list.index(1)] = 0
 
         # 展开或隐藏
         if self.detail_tx_list[index].isHidden():
             self.detail_tx_list[index].show()
             self.layoutHeight = self.layoutHeight + config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
-            self.detail_tx_state_list[index] = 1
+            self.detail_tx_status_list[index] = 1
             self.sender().setStyleSheet('border-image:url(%s);' % config.DOWN_ICON)
         else:
             self.detail_tx_list[index].hide()
             self.layoutHeight = self.layoutHeight - config.COM_TE_HEIGHT
             self.setFixedSize(self.layoutWidth, self.layoutHeight)
-            self.detail_tx_state_list[index] = 0
+            self.detail_tx_status_list[index] = 0
             self.sender().setStyleSheet('border-image:url(%s);' % config.LEFT_ICON)
+
         # 调整大小
         self.resize(self.layoutWidth, self.layoutHeight)
         self.centralwidget.resize(self.layoutWidth, self.layoutHeight)
@@ -308,12 +303,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         获取序号对应的数据，打开窗口
         :return:
         '''
-        id = re.findall('\d+', self.sender().objectName())[0]
-        info = exec_sql(config.LDB_FILENAME, 'select message,detail from Msg where id = %s' % id)[0]
+        msg_id = re.findall('\d+', self.sender().objectName())[0]
+        sql = 'select message,detail from Msg where id = %s' % msg_id
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        info = ret['records'][0] if 'records' in ret.keys() else {'message':'untitle','detail':'input text'}
+        # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
 
-    def switchEdit_state(self):
+    def switchEdit_status(self):
         '''
         textEdit的状态切换
         :return:
@@ -327,7 +327,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         速度和CPU有关 开放给用户自己调节
         :return:
         '''
-        width = QApplication.desktop().screenGeometry().width()
+        width = QApplication.desktop().availableGeometry().width()
         platform_name = platform.system()
 
         if self.x() <= width - config.MAIN_BASEWIDTH:
@@ -356,6 +356,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         增加memo
         :return:
         '''
+        # 限高设置
         if QApplication.desktop().screenGeometry().height() < self.layoutHeight + config.COM_BTN_HEIGHT:
             QMessageBox.information(
                 self, 'tips', '请清除一些任务后再添加', QMessageBox.Ok)
@@ -421,12 +422,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.hide_detail_btn_list.append(self.hide_detail_btn)
 
         # 详情编辑框
-        self.detail_tx = customWidget.AirTextEdit(main_win=self, parent=self.verticalLayoutWidget)
+        self.detail_tx = customWidget.AirTextEdit(
+            main_win=self, parent=self.verticalLayoutWidget)
         self.noteLayout.addWidget(self.detail_tx, 1, 0, 1, 3)
         self.detail_tx.setObjectName("detail_tx" + str(record['id']))
         # 隐藏文本框 初始化文本框状态数组
         self.detail_tx.hide()
-        self.detail_tx_state_list.append(0)
+        self.detail_tx_status_list.append(0)
         self.detail_tx_list.append(self.detail_tx)
         # 绑定槽
         self.hide_detail_btn.clicked.connect(self.ishide)
@@ -455,20 +457,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     未登录状态下创建登录窗口
         :return:
         '''
-        result = get_login_state()
+        # 检测登录状态
+        result = get_login_status()
+        # result['status'] = 1
         ui = None
-        if result['state'] == 1:
+        if result['status'] == 1:
             ui = Ui_login_Dialog(self)
-            ui.login_signal.connect(self.get_update_Signal)
-        elif result['state'] == 2:
+        elif result['status'] == 0:
             try:
-                ui = Ui_logout_Dialog(self, result['username'])
-                ui.logout_signal.connect(self.get_update_Signal)
+                ui = Ui_logout_Dialog(self, self.user_info['username'])
             except Exception as e:
                 logging.error(e)
         else:
             QMessageBox.information(self, '提示', "{}".format(
-                result['errMsg']), QMessageBox.Yes)
+                result['msg']), QMessageBox.Yes)
             return -1
         if ui:
             ui.show()
@@ -507,18 +509,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         用于检测用户的登录状态
         :return:
         '''
-        self.parent.update_info()
-        self.user_info = self.parent.get_info()
-        records = get_notes(config.LDB_FILENAME, self.user_info['username'])
+        self.user_info = mine.get_value('user_info')
+        logging.warning(self.user_info)
+        ret = get_notes(self.user_info['username'])
+        if not ret['status']:
+            logging.error(ret['msg'])
+        records = ret['records'] if 'records' in ret.keys() else list()
         if not records:
             table = 'Msg'
             dict = {'message': 'Welcome',
                     'detail': 'Thanks\ you\ support',
                     'username': self.user_info['username']}
-            dict['message'] = cryptograph_text(dict['message'], 'message', user_name=self.user_info['username'])
-            dict['detail'] = cryptograph_text(dict['detail'], 'detail', user_name=self.user_info['username'])
+            dict['message'] = cryptograph_text(
+                dict['message'], 'message', user_name=self.user_info['username'])
+            dict['detail'] = cryptograph_text(
+                dict['detail'], 'detail', user_name=self.user_info['username'])
             sql = be_sql().ins_sql(table, dict)
-            exec_sql(config.LDB_FILENAME, sql)
+            sqlite_db.transaction(sql)
         return self.user_info['username']
 
     def update_tx_id(self, id):
@@ -533,18 +540,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         dlg.updateSignal.connect(self.get_update_Signal)
 
     def show_sync_dlg_slot(self):
-        result = get_login_state()
-        if result['state'] == 2:
+        result = get_login_status()
+        # result['status'] = 0
+        if result['status'] == 0:
             try:
                 dlg = Ui_Sync_Dialog(parent=self)
-                dlg.updateSignal.connect(self.get_update_Signal)
             except Exception as e:
-                logging.warnings(e)
+                logging.warning(e)
                 QMessageBox.information(
                     self, 'tips', "无法连接服务器", QMessageBox.Ok)
         else:
             QMessageBox.information(
-                self, 'tips', result['errMsg'], QMessageBox.Ok)
+                self, 'tips', result['msg'], QMessageBox.Ok)
 
     # 重写类方法
     def show(self):
@@ -554,8 +561,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     # 重写移动事件
     def mouseMoveEvent(self, e: QMouseEvent):
-        self._endPos = e.pos() - self._startPos
-        self.move(self.pos() + self._endPos)
+        # if not self.geometry().contains(self.pos()):
+        if self._startPos:
+            self._endPos = e.pos() - self._startPos
+            self.move(self.pos() + self._endPos)
 
     def mousePressEvent(self, e: QMouseEvent):
         if e.button() == Qt.LeftButton:  # and not self.geometry().contains(self.pos()):

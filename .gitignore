@@ -9,3 +9,5 @@ venv
 be-aes.py
 ttt.py
 test.py
+*.log
+.DS_Store

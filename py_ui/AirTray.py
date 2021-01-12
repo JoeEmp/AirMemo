@@ -2,15 +2,19 @@ import logging
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
-from comm.module import check_login_state
+from comm.user_cache import mine
+from module.login import check_local_status
+
 
 class AirTray(QSystemTrayIcon):
     widget = None
-    __user_info = {}
+    __user_info = dict()
 
     def __init__(self):
         super().__init__()
         self.set_data()
+        if widget_dict and isinstance(widget_dict, dict):
+            self.set_menu(widget_dict)
         self.show()
 
     def set_menu(self, widget_dict):
@@ -23,7 +27,8 @@ class AirTray(QSystemTrayIcon):
         self.main_menu = QMenu()
         self.show_action = QAction('&show',
                                    triggered=self.widget_dict['main_win'].show)
-        self.settings_action = QAction('&settings', triggered=self.widget_dict['setting_win'].show)
+        self.settings_action = QAction(
+            '&settings', triggered=self.widget_dict['setting_win'].show)
         self.quit_action = QAction('&exit', triggered=self.quitapp)
 
         self.main_menu.addAction(self.show_action)
@@ -49,20 +54,14 @@ class AirTray(QSystemTrayIcon):
         :return:
         '''
         self.setObjectName('AirTray')
-        self.__user_info = self.check()
+        mine.add_item('user_info', self.check())
+        self.__user_info = mine.get_value('user_info')
         self.set_icon()
 
     # 获取 username 以及 token ，默认为 'visitor'
     def check(self):
-        '''
-        检测登录用户的信息
-        :return:
-        '''
-        result = check_login_state()
-        if result:
-            return result[0]
-        else:
-            return {'username': 'visitor', 'token': ''}
+        result = check_local_status()
+        return result if result else {'username': 'visitor', 'token': ''}
 
     def iconClied(self, reason):
         "鼠标点击icon传递的信号会带有一个整形的值，1是表示单击右键，2是双击，3是单击左键，4是用鼠标中键点击"
@@ -75,18 +74,10 @@ class AirTray(QSystemTrayIcon):
         print(reason)
 
     def get_info(self):
-        '''
-        提供用户信息
-        :return:
-        '''
         return self.__user_info
 
-    def update_info(self):
-        '''
-        重新更新用户信息
-        :return:
-        '''
-        self.__user_info = self.check()
+    def update_user_info(self):
+        self.__user_info = mine.update_item('user_info', self.check())
 
     def quitapp(self):
         try:

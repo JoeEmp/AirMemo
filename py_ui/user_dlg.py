@@ -1,13 +1,15 @@
 # 此文件为用户对话框的窗口
 # 包括 login_dlg register_dlg logout_dlg
 import logging
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QMessageBox, QLineEdit
-
-import config
-from comm import operateSqlite, module, utils
+from PyQt5.QtWidgets import QLineEdit
+from comm import operateSqlite, utils
+from module.logout import logout
+from module.login import login
+from comm.user_cache import mine
+from comm.operateSqlite import sqlite_db, be_sql
+from py_ui.toast import Toast
 
 
 # 登录窗口
@@ -20,6 +22,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
         self.setupUi()
         self.retranslateUi()
         logging.info('end init')
+        self.login_signal.connect(parent.get_update_Signal)
 
     def setupUi(self):
         self.setObjectName("login_Dialog")
@@ -87,7 +90,7 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
         QtCore.QMetaObject.connectSlotsByName(self)
         self.login_btn.clicked.connect(self.do_login)
-        self.register_btn.clicked.connect(self.do_register)
+        self.register_btn.clicked.connect(self.show_register_dlg)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
@@ -99,29 +102,34 @@ class Ui_login_Dialog(QtWidgets.QDialog):
 
     def do_login(self):
         if self.username_le.text() and self.password_le.text():
-            result = module.login(username=self.username_le.text(), password=self.password_le.text())
+            result = login(
+                username=self.username_le.text(), password=self.password_le.text())
             # assert result['token'], '本地无记录'
-            print(result)
+            logging.debug(result)
             try:
-                if result['token']:
+                if result['result']['token']:
                     table = 'user'
+                    # 写入缓存
+                    mine.update_item('username', self.username_le.text())
+                    mine.update_item('token', result['result']['token'])
                     if not utils.get_user_info(table, self.username_le.text()):
                         # 没有用户直接插入
-                        dict = {'username': self.username_le.text(), 'token': result['token']}
-                        sql = operateSqlite.be_sql().ins_sql(table, dict)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql)
+                        dict = {'username': self.username_le.text(),
+                                'token': result['token']}
+                        sql = "insert into user(username,token) values ('%s','%s');"
+                        sqlite_db.transaction(sql)
                         times = ['00:15:00', '00:30:00', '01:00:00']
                         for time in times:
-                            operateSqlite.exec_sql(config.LDB_FILENAME,
-                                                   "insert into Reminder(username,time) values ('%s','%s');" % (dict[
-                                                       'username'], time))
+                            sqlite_db.transaction(
+                                "insert into Reminder(username,time) values ('%s','%s');" % (dict['username'], time))
                     # 已有用户更新数据
                     else:
-                        value_dict = {'token': result['token']}
-                        filter_list = [['username', '=', self.username_le.text()]]
-                        sql = operateSqlite.be_sql().update_sql(table=table, value_dict=value_dict,
-                                                                filter_list=filter_list)
-                        operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
+                        value_dict = {'token': result['result']['token']}
+                        filter_list = [
+                            ['username', '=', self.username_le.text()]]
+                        sql = be_sql().update_sql(table=table, value_dict=value_dict,
+                                                  filter_list=filter_list)
+                        sqlite_db.transaction(sql)
                     try:
                         # 发射信号
                         self.login_signal.emit(self.username_le.text())
@@ -129,16 +137,15 @@ class Ui_login_Dialog(QtWidgets.QDialog):
                         logging.error(e)
                     self.close()
                 else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
-                                            QMessageBox.Yes)
+                    Toast(self).show_toast("{}".format(result['msg']))
             except Exception as e:
                 logging.error(e)
         elif not self.username_le.text():
-            QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
+            Toast(self).show_toast("请输入账号")
         elif not self.password_le.text():
-            QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
+            Toast(self).show_toast("请输入密码")
 
-    def do_register(self):
+    def show_register_dlg(self):
         ui = Ui_register_Dialog(self)
         ui.show()
 
@@ -152,6 +159,7 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         self.username = username
         self.setupUi()
         self.retranslateUi()
+        self.logout_signal.connect(parent.get_update_Signal)
 
     def setupUi(self):
         self.setObjectName("logout_Dialog")
@@ -198,23 +206,17 @@ class Ui_logout_Dialog(QtWidgets.QDialog):
         self.logout_btn.setText(_translate("Dialog", "注销"))
         self.wel_lab.setText(_translate("Dialog",
                                         "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:96; color:#5f6266; background-color:#ffffff;\">Thank you support!!!</span></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; color:#5f6266; background-color:#ffffff;\">We will then keep you up to date</span><br/></p><p align=\"center\"><span style=\" font-family:\'Arial,Microsoft YaHei,微软雅黑,宋体,Malgun Gothic,Meiryo,sans-serif\'; font-size:13px; font-weight:600; color:#5f6266; background-color:#ffffff;\">%s</span></p></body></html>") % (
-                                 self.username))
+            self.username))
 
     def do_logout(self):
-        # 请求登出
-        state = module.logout(self.username)
-        if state['state'] == 1:
-            table = 'user'
-            value_dict = {'token': 'NULL'}
-            filter_list = [
-                ['username', '=', self.username]
-            ]
-            sql = operateSqlite.be_sql().update_sql(table, value_dict, filter_list)
-            operateSqlite.exec_sql(config.LDB_FILENAME, sql, is_update=1)
+        response = logout(self.username)
+        if response['status']:
+            sql = "update user set token=NULL where username = :username"
+            sqlite_db.transaction(sql,{"username",self.username})
             self.close()
             self.logout_signal.emit('visitor')
         else:
-            QMessageBox.information(self, '提示', "{}".format('请检查数据库文件和网络状态'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请检查数据库文件和网络状态'))
 
 
 # 注册窗口
@@ -311,20 +313,17 @@ class Ui_register_Dialog(QtWidgets.QDialog):
     def do_register(self):
         if self.username_le.text() and self.password_le.text() and self.again_le.text() and (
                 self.password_le.text() == self.again_le.text()):
-            result = module.register(username=self.username_le.text(), password=self.again_le.text())
-            if result:
-                if result['state'] == 1:
-                    self.close()
-                else:
-                    QMessageBox.information(self, '提示', "{}".format(result['errMsg']),
-                                            QMessageBox.Yes)
+            result = register.register(username=self.username_le.text(
+            ), password=self.password_le.text(), again_pwd=self.password_le.text())
+            if 0 == result['status']:
+                self.close()
             else:
-                QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Yes)
+                Toast(self).show_toast("{}".format(result['msg']))
         elif not self.username_le.text():
-            QMessageBox.information(self, '提示', "{}".format('请输入账号'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请输入账号'))
         elif not self.password_le.text():
-            QMessageBox.information(self, '提示', "{}".format('请输入密码'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请输入密码'))
         elif not self.again_le.text():
-            QMessageBox.information(self, '提示', "{}".format('请再次确认密码'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('请再次确认密码'))
         elif self.password_le.text() != self.again_le.text():
-            QMessageBox.information(self, '提示', "{}".format('两次密码不正确'), QMessageBox.Yes)
+            Toast(self).show_toast("{}".format('两次输入的密码不相同'))

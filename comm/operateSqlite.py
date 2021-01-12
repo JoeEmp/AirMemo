@@ -1,9 +1,31 @@
-# 这个工具类 操作 sqlite3
 import logging
 import sqlite3
+from config import LDB_FILENAME
+
+sqlite_db = None
 
 
-# 构建字符串 提供 简单查询、更新，插入。
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
+def link_db(filename):
+    '''
+    链接数据库修改本文件的db变量
+    :param filename:
+    :return:
+    '''
+    global sqlite_db
+    try:
+        if not sqlite_db:
+            sqlite_db = AirDataBase(filename)
+    except Exception as e:
+        logging.error(e)
+
+
 class be_sql(object):
     '''
     构建字符串 提供 简单查询、更新，插入
@@ -57,7 +79,8 @@ class be_sql(object):
         for col, value in dict.items():
             s_col += col + ','
             s_value += "'" + value + "',"
-        sql = 'insert into %s(%s) values(%s)' % (table, s_col[:-1], s_value[:-1])
+        sql = 'insert into %s(%s) values(%s)' % (
+            table, s_col[:-1], s_value[:-1])
         return sql
 
     def sel_sql(self, table, need_col_list=None, filter_list=None):
@@ -118,41 +141,68 @@ class be_sql(object):
             return 'delete from %s where %s' % (table, s_filter)
 
 
-def exec_sql(filename, sql, is_update=None):
-    '''
-    :param filename: 文件名(含路径) str
-    :param sql: 需要执行的sql str
-    :param is_update: 默认为空返回全部，传入其他返回影响行数。如果是行数我会直接传'count'
-    :except:  返回 None
-    :return:  fetchall
-    '''
-    db = sqlite3.connect(filename)
-    # sqlite 以字典格式返回查询结果
-    db.row_factory = dict_factory
-    c = db.cursor()
-    try:
-        cur = c.execute(sql)
-        db.commit()
-    except Exception as e:
-        logging.error(e)
-        return None
-    if not is_update:
-        return cur.fetchall()
-    else:
-        return cur.rowcount
+def exec_sql(sql):
+    AirDataBase.select(sql)
 
+class AirDataBase():
+    def __init__(self, filename):
+        self.conn = sqlite3.connect(filename)
+        self.conn.row_factory = dict_factory
+        super().__init__()
 
-# 官方api提供，使返回的数据结构为 list of dict
-def dict_factory(cursor, row):
-    dict = {}
-    for idx, col in enumerate(cursor.description):
-        dict[col[0]] = row[idx]
-    return dict
+    def cursor(self, cursor=None):
+        if cursor:
+            return self.conn.cursor(cursor)
+        return self.conn.cursor()
 
+    def select(self, sql: str, params=None, just_first=False):
+        ret = {"status": True}
+        cur = self.conn.cursor()
+        if None == params:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, params)
+        if just_first:
+            ret['records'] = cur.fetchone()
+        else:
+            ret['records'] = cur.fetchall()
+        return ret
+
+    def transaction(self, sql, param=None):
+        if None == param:
+            return self.transactions([sql], [[]])
+        else:
+            return self.transactions([sql], [param])
+
+    def transactions(self, sqls, params):
+        """deal many sql transaction. if needn't param use empty list."""
+        ret = {'status': True}
+        cur = self.conn.cursor()
+        try:
+            for i in range(len(sqls)):
+                if 0 == len(params[i]):
+                    cur.execute(sqls[i])
+                else:
+                    cur.execute(sqls[i], params[i])
+            self.conn.commit()
+        except Exception as e:
+            ret['msg'] = e
+            ret['errorsql'] = sqls[i]
+            ret['status'] = False
+        self.conn.rollback()
+        if 1 == len(sqls):
+            ret['rowcount'] = cur.rowcount
+        return ret
+
+link_db(LDB_FILENAME)
 
 if __name__ == '__main__':
-    pass
-    table = 'user'
-    sql = 'select * from user;'
-    r = exec_sql('AirMemo.db', sql)
-    print(r)
+    db = AirDataBase_v2('../AirMemo.db')
+    select_dict = dict(username='koko')
+    ret = db.select(
+        'select * from user')  # where username = ?', ['koko'])
+    print(ret)
+    ret = db.select('select * from user', just_first=True)
+    print(ret)
+    ret = db.transaction("delete from user where username = ?", ['cool1'])
+    print(ret)

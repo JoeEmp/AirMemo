@@ -29,7 +29,12 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         '''
         sql = "select * from email_settings where username = '%s' and password is not null ORDER by is_default desc" % \
               self.user_info['username']
-        self.settings = exec_sql(LDB_FILENAME, sql)
+        # test sql
+        # sql = "select * from email_settings where username = '%s'" % 'joe'
+        ret = sqlite_db.select(sql)
+        if not ret['status']:
+            logging.error(ret['msg'])
+        self.settings = ret['records'] if 'records' in ret.keys() else list()
 
     def setupUi(self):
         self.setObjectName("email_Dialog")
@@ -149,10 +154,10 @@ class Ui_Email_Dialog(QtWidgets.QDialog):
         info = {'username': self.user_info['username'], 'addr': self.sender_comb.currentText()}
         result = mail(info, self.Msg_tx.toPlainText(),
                       self.recipients_tx.toPlainText(), self.content_tx.toPlainText())
-        if result['state'] == 1:
+        if result['status'] == 1:
             self.close()
             return True
-        elif result['state'] == -1:
+        elif result['status'] == -1:
             self.send_btn.setEnabled(True)
-            QMessageBox.information(self, '提示', "{}".format(result['errMsg']), QMessageBox.Ok)
+            QMessageBox.information(self, '提示', "{}".format(result['msg']), QMessageBox.Ok)
             return True
