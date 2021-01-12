@@ -33,10 +33,9 @@ class Toast(object):
 
     def show_toast(self, text, time=short, height=0.8):
         """
-
         :param text: 显示文本
         :param time: 显示时长(单位 ms)
-        :return:
+        :param height: parent内的显示高度(默认居中)
         """
         try:
             self.set_time(time)

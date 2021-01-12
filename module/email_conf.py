@@ -56,3 +56,12 @@ def get_user_email_conf(username, *args, **kwargs):
 def get_email_conf(sql):
     print(sql)
     return sqlite_db.select(sql)
+
+def set_is_default_email_conf(id,username):
+    sql = """update email_settings set is_default = 0 where username = ? """
+    param = [username]
+    if not sqlite_db.transaction(sql,param)['status']:
+        return 
+    sql = """update email_settings set is_default = 1 where id= ? ;"""
+    param = [id]
+    return sqlite_db.transaction(sql,param)

@@ -20,4 +20,8 @@ class user_cache(object):
     def update_item(self, key, value):
         self.cache[key] = value
 
+    def __getitem__(self, key):
+        return self.cache[key]
+
+
 mine = user_cache()
