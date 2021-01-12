@@ -1,3 +1,5 @@
+from module.login import check_local_status
+
 class user_cache(object):
     def __init__(self, **kwargs):
         self.cache = dict()
@@ -23,5 +25,11 @@ class user_cache(object):
     def __getitem__(self, key):
         return self.cache[key]
 
+def init_mine():
+    d={
+        "user_info":check_local_status()
+    }
+    return user_cache(**d)
 
-mine = user_cache()
+
+mine = init_mine()

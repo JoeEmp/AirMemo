@@ -34,7 +34,6 @@ CREATE TABLE Email_settings (
 );
 
 insert into User(username) values ('visitor');
-insert into Msg(username, message, detail) values ('visitor','Welcome use AirMemo','Thanks you support');
 insert into Reminder(time) values ('00:15:00');
 insert into Reminder(time) values ('00:30:00');
 insert into Reminder(time) values ('01:00:00');

@@ -29,8 +29,13 @@ def get_login_status(*args,**kwargs):
 
 def check_local_status() ->dict:
     '''check someone who with token'''
-    sql = "select username,token from user where token is not NULL or username = 'visitor' order by id desc limit 0,1"
+    sql = """select 
+        username,token from user 
+        where token is not NULL or username = 'visitor' 
+        order by id desc limit 0,1;
+    """
     ret = sqlite_db.select(sql,just_first=True)
+    logging.warning(ret)
     if not ret['status']:
         logging.error(ret['msg'])
     return ret.get('records',dict())

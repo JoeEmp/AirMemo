@@ -4,13 +4,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QMessageBox
 from comm.user_cache import mine
 from module.login import check_local_status
-
+import platform
 
 class AirTray(QSystemTrayIcon):
-    widget = None
-    __user_info = dict()
 
-    def __init__(self):
+    def __init__(self, widget_dict=None):
         super().__init__()
         self.set_data()
         if widget_dict and isinstance(widget_dict, dict):
@@ -18,8 +16,7 @@ class AirTray(QSystemTrayIcon):
         self.show()
 
     def set_menu(self, widget_dict):
-        '''
-        设置菜单
+        '''设置菜单
         :param widget_dict: {'widget_name':widget_object}
         :return:
         '''
@@ -40,28 +37,21 @@ class AirTray(QSystemTrayIcon):
         self.setContextMenu(self.main_menu)
 
     def set_icon(self):
-        '''
-        设置图标
-        :return:
-        '''
-        # 这里的路径从main.py 算起
-        self.setIcon(QIcon('./ui/app_icon.png'))
-        pass
+        '''设置图标. '''
+        if 'windows' == platform.system().lower():
+            self.setIcon(QIcon('./ui/app_icon.png'))
+        else:
+            self.setIcon(QIcon('./ui/mac_tray_icon.png'))
 
     def set_data(self):
-        '''
-        设置data
-        :return:
-        '''
+        '''设置data. '''
         self.setObjectName('AirTray')
         mine.add_item('user_info', self.check())
         self.__user_info = mine.get_value('user_info')
         self.set_icon()
 
-    # 获取 username 以及 token ，默认为 'visitor'
     def check(self):
-        result = check_local_status()
-        return result if result else {'username': 'visitor', 'token': ''}
+        return check_local_status().get("records", {})
 
     def iconClied(self, reason):
         "鼠标点击icon传递的信号会带有一个整形的值，1是表示单击右键，2是双击，3是单击左键，4是用鼠标中键点击"

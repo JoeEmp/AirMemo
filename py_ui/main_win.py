@@ -7,7 +7,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import config
 from comm import customWidget
-from comm.operateSqlite import be_sql,sqlite_db
+from comm.operateSqlite import be_sql, sqlite_db
 from py_ui.email import Ui_Email_Dialog
 from py_ui.recycle import Ui_recycle_Dialog
 from py_ui.demo import Ui_Sync_Dialog
@@ -27,7 +27,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     layoutWidth = 0
     layoutHeight = 0
     _records = None
-    user_info = {}
 
     def __init__(self, parent=None):
         super().__init__()
@@ -308,7 +307,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ret = sqlite_db.select(sql)
         if not ret['status']:
             logging.error(ret['msg'])
-        info = ret['records'][0] if 'records' in ret.keys() else {'message':'untitle','detail':'input text'}
+        info = ret['records'][0] if 'records' in ret.keys(
+        ) else {'message': 'untitle', 'detail': 'input text'}
         # info={'message':'test','detail':'123456'} #debug 使用
         email_dlg = Ui_Email_Dialog(self, info)
         email_dlg.show()
